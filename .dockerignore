@@ -1,0 +1,24 @@
+# Node bağımlılıkları ve loglar
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Docker ve Git yapılandırmaları
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.gitignore
+
+# Ortam değişkenleri ve gizli anahtarlar
+.env
+.env.*
+
+# İşletim sistemi kalıntıları
+.DS_Store
+Thumbs.db
+
+# Dokümantasyon ve arşivler
+README.md
+*.zip
+Alumni-main/

@@ -1,0 +1,55 @@
+services:
+  # Node.js Backend Servisi
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alumni_app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5000}:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-alumni_db}
+      - DB_USER=${DB_USER:-alumni_user}
+      - DB_PASSWORD=${DB_PASSWORD:-alumni_secret_password}
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - alumni_network
+
+  # PostgreSQL Veritabanı Servisi
+  postgres:
+    image: postgres:15-alpine
+    container_name: alumni_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-alumni_db}
+      POSTGRES_USER: ${DB_USER:-alumni_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-alumni_secret_password}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - alumni_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-alumni_user} -d ${DB_NAME:-alumni_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alumni_network
+
+volumes:
+  alumni_pgdata:
+    driver: local
+
+networks:
+  alumni_network:
+    driver: bridge
