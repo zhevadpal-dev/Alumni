@@ -130,16 +130,21 @@ npm run dev
 
 ## 📡 Temel API Uç Noktaları (Endpoints Preview)
 
-### Kimlik Doğrulama (Auth)
+### Temel Sunucu ve Laboratuvar Rotaları (Basic Lab Routes)
+- `GET /` - API için `"ok"` yanıtı, tarayıcı veya ana sayfa için geçici metin (`"temporary one main page"`)
+- `GET /home` veya `GET /main` - Geçici ana sayfa (`"temporary one main page"`)
+- `GET /about` - Geçici hakkında sayfası (`"temp. about page"`)
+- `GET /hello` - Selamlama (`"Hello, World!"`)
+- `GET /hello/:name` - İsimli selamlama (Örn: `/hello/emre` -> `"Hello, Emre!"`)
+- `GET /sum/:number1/:number2` - İki sayının toplamı (Örn: `/sum/10/20` -> `30`)
+- `GET /api/health` - Sistem sağlık kontrolü JSON yanıtı
+
+### Gelecek Mezun Yönetimi Rotaları (Alumni System Preview)
 - `POST /api/auth/register` - Yeni mezun/kullanıcı kaydı
 - `POST /api/auth/login` - Giriş yapma ve JWT token alma
-
-### Mezun İşlemleri (Alumni)
 - `GET /api/alumni` - Mezun listesini filtreleme ve arama
 - `GET /api/alumni/:id` - Belirli bir mezunun profil detayları
 - `PUT /api/alumni/:id` - Profil bilgilerini güncelleme
-
-### Kariyer & İlanlar (Jobs)
 - `GET /api/jobs` - Aktif iş ve staj ilanları
 - `POST /api/jobs` - Yeni iş ilanı paylaşma
 

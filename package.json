@@ -2,10 +2,10 @@
   "name": "alumni-backend",
   "version": "1.0.0",
   "description": "Alumni Tracking System Backend API",
-  "main": "src/app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -20,6 +20,7 @@
     "alumni",
     "tracking",
     "nodejs",
+    "express",
     "postgresql",
     "docker"
   ],
