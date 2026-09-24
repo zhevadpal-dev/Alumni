@@ -1,24 +1,24 @@
-# Node.js LTS sürümü (Alpine tabanlı hafif imaj)
+# Node.js LTS version (lightweight Alpine-based image)
 FROM node:20-alpine
 
-# Uygulama çalışma dizinini ayarla
+# Set application working directory
 WORKDIR /usr/src/app
 
-# Bağımlılık manifestolarını kopyala
+# Copy package dependency manifests
 COPY package*.json ./
 
-# Bağımlılıkları yükle
+# Install dependencies
 RUN npm install
 
-# Kaynak kodları çalışma dizinine kopyala
+# Copy application source code
 COPY . .
 
-# Uygulama portu
+# Expose application port
 EXPOSE 5000
 
-# Varsayılan ortam değişkenleri
+# Default environment variables
 ENV NODE_ENV=development
 ENV PORT=5000
 
-# Uygulamayı başlat
+# Start the application
 CMD ["npm", "start"]

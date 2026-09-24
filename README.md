@@ -1,73 +1,71 @@
-# 🎓 Alumni Tracking System (Mezun Takip Sistemi)
+# 🎓 Alumni Tracking System
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)](https://github.com/zhevadpal-dev/Alumni)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)](https://github.com/zhevadpal-dev/Alumni)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Alumni Tracking System**, üniversite ve eğitim kurumlarının mezunlarıyla olan bağlarını güçlendirmek, kariyer gelişimlerini izlemek ve mezunlar arasındaki iletişimi desteklemek amacıyla geliştirilen modern bir mezun takip ve yönetim platformudur.
+**Alumni Tracking System** is a scalable, containerized web platform designed for higher education institutions to maintain enduring relationships with graduates, track career pathways, foster professional networking, and streamline institutional communication.
 
-Backend tarafında **Node.js**, veritabanı olarak ilişkisel veri yönetiminde güçlü ve güvenilir olan **PostgreSQL**, ortam bağımsız ve kolay dağıtım için **Docker** ve kaynak kod yönetimi için **GitHub** kullanılmaktadır.
-
----
-
-## 🚀 Özellikler (Key Features)
-
-- **👤 Mezun Profili Yönetimi:** Mezunların iletişim bilgileri, eğitim geçmişi, mezuniyet yılı ve güncel iş/pozisyon bilgileri.
-- **💼 Kariyer ve İş İlanları:** Mezunlar ve kurumlar arasında staj/iş ilanı paylaşımı ve başvuru takibi.
-- **📅 Etkinlik Yönetimi:** Mezunlar buluşması, seminerler, paneller ve katılım durumları.
-- **🤝 Mezun Ağı & Mentorluk:** Mezunların birbiriyle iletişime geçebileceği, mentor-öğrenci/mezun eşleşmeleri yapabileceği ağ yapısı.
-- **📊 Raporlama ve İstatistikler:** Mezunların sektör dağılımı, istihdam oranları ve bölgesel analizler.
-- **🔐 Kimlik Doğrulama & Yetkilendirme:** JWT tabanlı güvenli oturum yönetimi ve rol bazlı erişim kontrolü (Öğrenci, Mezun, Yönetici).
+The backend is built with **Node.js** and **Express**, utilizing **PostgreSQL** for relational data persistence, fully containerized with **Docker & Docker Compose** for streamlined deployment, and hosted on **GitHub** for version control and CI/CD pipelines.
 
 ---
 
-## 🛠️ Teknoloji Yığını (Tech Stack)
+## 🚀 Key Features
 
-| Alan | Teknoloji | Açıklama |
+- **👤 Alumni Profile Management:** Comprehensive tracking of contact information, academic records, graduation year, and ongoing career histories.
+- **💼 Career & Opportunities Portal:** Job and internship board enabling alumni and partner organizations to share opportunities and track applications.
+- **📅 Events & Reunions:** Scheduling and RSVP tracking for homecomings, professional webinars, networking sessions, and panels.
+- **🤝 Alumni Networking & Mentorship:** Directory search and mentorship matching connecting current students with established alumni.
+- **📊 Analytics & Institutional Insights:** Aggregated metrics on employment rates, industry distribution, and geographic alumni dispersal.
+- **🔐 Security & Access Control:** JWT-based stateless authentication and Role-Based Access Control (Admin, Alumni, Student).
+
+---
+
+## 🛠️ Technology Stack
+
+| Domain | Technology | Description |
 | :--- | :--- | :--- |
-| **Backend** | [Node.js](https://nodejs.org/) (Express / Fastify) | Hızlı, ölçeklenebilir ve asenkron RESTful API servisi |
-| **Veritabanı** | [PostgreSQL](https://www.postgresql.org/) | Güvenilir ilişkisel veritabanı yönetimi |
-| **Konteynerizasyon** | [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/) | Ortamlar arası tutarlı geliştirme ve dağıtım |
-| **Versiyon Kontrol** | [Git](https://git-scm.com/) & [GitHub](https://github.com/) | Kaynak kod kontrolü, issue takibi ve iş birliği |
-| **Kimlik Doğrulama** | JWT (JSON Web Tokens) & bcrypt | Güvenli parola saklama ve token tabanlı oturum |
+| **Runtime & Backend** | [Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/) | Non-blocking, asynchronous RESTful API framework |
+| **Database** | [PostgreSQL 15](https://www.postgresql.org/) | ACID-compliant relational database management system |
+| **Containerization** | [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/) | Isolated, reproducible container execution environments |
+| **Version Control** | [Git](https://git-scm.com/) & [GitHub](https://github.com/) | Source code management, issue tracking, and workflow automation |
+| **Authentication** | JWT (JSON Web Tokens) & bcrypt | Cryptographic token sessions and salted password hashing |
 
 ---
 
-## 📁 Örnek Proje Mimarisi (Project Structure)
+## 📁 Project Structure
 
 ```text
 Alumni/
 ├── src/
-│   ├── config/          # Veritabanı ve ortam değişkenleri konfigürasyonu
-│   ├── controllers/     # İstek yönlendiricileri ve iş mantığı kontrolü
-│   ├── models/          # PostgreSQL modelleri / tabloları
-│   ├── routes/          # RESTful API rotaları (auth, alumni, jobs, events)
-│   ├── middlewares/     # Kimlik doğrulama, validasyon ve hata yakalama katmanları
-│   ├── services/        # Veritabanı sorguları ve yardımcı servisler
-│   └── app.js           # Uygulama başlangıç noktası
-├── migrations/          # Veritabanı şema ve göç dosyaları (SQL / Knex / Prisma vb.)
-├── Dockerfile           # Backend Node.js imajı için yapılandırma
-├── docker-compose.yml   # Node.js uygulaması ve PostgreSQL veritabanı servisi
-├── .env.example         # Örnek çevre değişkenleri
-├── .gitignore           # Git tarafından takip edilmeyecek dosyalar
-├── package.json         # Node.js bağımlılıkları ve scriptleri
-└── README.md            # Proje dokümantasyonu
+│   ├── routes/              # Express API route modules
+│   │   └── index.js         # Endpoint declarations (lab & application routes)
+│   └── app.js               # Express application initialization and middleware
+├── index.js                 # Server entry point binding HTTP listener
+├── Dockerfile               # Production-ready Node.js container definition
+├── docker-compose.yml       # Multi-container orchestration (App & PostgreSQL)
+├── .dockerignore            # Build context exclusion rules
+├── .env.example             # Template configuration for environment variables
+├── .gitignore               # Version control ignore rules
+├── package.json             # NPM package manifests and execution scripts
+└── README.md                # Project documentation
 ```
 
 ---
 
-## ⚡ Kurulum ve Başlangıç (Getting Started)
+## ⚡ Getting Started
 
-### Ön Koşullar (Prerequisites)
-- [Node.js](https://nodejs.org/) (v18 veya üzeri)
-- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine (v20+)
 - [Git](https://git-scm.com/)
 
 ---
 
-### 1. Depoyu Klonlayın
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/zhevadpal-dev/Alumni.git
@@ -76,108 +74,125 @@ cd Alumni
 
 ---
 
-### 2. Çevre Değişkenlerini Ayarlayın
+### 2. Configure Environment Variables
 
-Kök dizinde bir `.env` dosyası oluşturun:
+Create a `.env` file in the root directory by copying the template:
+
+```bash
+cp .env.example .env
+```
+
+Default configuration values:
 
 ```env
 PORT=5000
 NODE_ENV=development
 
-# PostgreSQL Yapılandırması
+# PostgreSQL Database Configuration
 DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=alumni_db
 DB_USER=alumni_user
 DB_PASSWORD=alumni_secret_password
-
-# JWT Yapılandırması
-JWT_SECRET=super_secret_jwt_key_change_in_production
-JWT_EXPIRES_IN=7d
 ```
 
 ---
 
-### 3. Docker ile Tek Komutla Çalıştırma (Önerilen) 🐳
+### 3. Run with Docker Compose (Recommended) 🐳
 
-PostgreSQL ve Node.js backend'i konteynerler halinde başlatmak için:
+Launch both the Node.js backend and the PostgreSQL database in isolated containers:
 
 ```bash
-# Servisleri arka planda derle ve başlat
+# Build and start services in detached mode
 docker compose up -d --build
 
-# Konteyner loglarını izlemek için
+# Inspect container output and logs
 docker compose logs -f
 ```
 
-Servisler ayağa kalktığında API `http://localhost:5000` üzerinden hizmet vermeye başlayacaktır.
+The application server will become reachable at `http://localhost:5000`.
+
+To terminate containers and tear down the network:
+
+```bash
+docker compose down
+```
 
 ---
 
-### 4. Lokal Geliştirme (Local Development)
+### 4. Local Development
 
-PostgreSQL'i yerel makinenizde veya sadece veritabanı konteyneri olarak çalıştırıp backend'i yerel çalıştırmak isterseniz:
+To run the backend directly on your host machine:
 
 ```bash
-# Bağımlılıkları yükleyin
+# Install dependencies
 npm install
 
-# Geliştirici modunda başlatın
+# Start the server with Node
+node index.js
+
+# Or start in watch mode with Nodemon
 npm run dev
 ```
 
 ---
 
-## 📡 Temel API Uç Noktaları (Endpoints Preview)
+## 📡 API Endpoints
 
-### Temel Sunucu ve Laboratuvar Rotaları (Basic Lab Routes)
-- `GET /` - API için `"ok"` yanıtı, tarayıcı veya ana sayfa için geçici metin (`"temporary one main page"`)
-- `GET /home` veya `GET /main` - Geçici ana sayfa (`"temporary one main page"`)
-- `GET /about` - Geçici hakkında sayfası (`"temp. about page"`)
-- `GET /hello` - Selamlama (`"Hello, World!"`)
-- `GET /hello/:name` - İsimli selamlama (Örn: `/hello/emre` -> `"Hello, Emre!"`)
-- `GET /sum/:number1/:number2` - İki sayının toplamı (Örn: `/sum/10/20` -> `30`)
-- `GET /api/health` - Sistem sağlık kontrolü JSON yanıtı
+### Core & Laboratory Routes
 
-### Gelecek Mezun Yönetimi Rotaları (Alumni System Preview)
-- `POST /api/auth/register` - Yeni mezun/kullanıcı kaydı
-- `POST /api/auth/login` - Giriş yapma ve JWT token alma
-- `GET /api/alumni` - Mezun listesini filtreleme ve arama
-- `GET /api/alumni/:id` - Belirli bir mezunun profil detayları
-- `PUT /api/alumni/:id` - Profil bilgilerini güncelleme
-- `GET /api/jobs` - Aktif iş ve staj ilanları
-- `POST /api/jobs` - Yeni iş ilanı paylaşma
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | API ping / Home placeholder | Terminal/curl: `"ok"` \| Browser: `"temporary one main page"` |
+| `GET` | `/home` | Placeholder home page | `"temporary one main page"` |
+| `GET` | `/about` | Placeholder about page | `"temp. about page"` |
+| `GET` | `/hello` | Standard greeting | `"Hello, World!"` |
+| `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
+| `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
+| `GET` | `/api/health` | Service health status JSON | `{"status": "success", "message": "..."}` |
 
----
+### Planned Alumni Management Endpoints
 
-## 🔒 Güvenlik & En İyi Uygulamalar
-
-- Parolalar **bcrypt** ile hash'lenerek saklanır.
-- Hassas veriler `.env` dosyalarında tutulur ve `.gitignore` ile depoya eklenmesi engellenir.
-- SQL enjeksiyonlarına karşı parametrik sorgular veya modern ORM/Query Builder araçları kullanılır.
-- CORS ve Helmet ile HTTP başlıkları güvence altına alınır.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register a new user profile |
+| `POST` | `/api/auth/login` | Authenticate user and issue JWT bearer token |
+| `GET` | `/api/alumni` | Search and filter graduate records |
+| `GET` | `/api/alumni/:id` | Retrieve comprehensive alumni profile |
+| `PUT` | `/api/alumni/:id` | Update profile information |
+| `GET` | `/api/jobs` | Retrieve active career opportunities |
+| `POST` | `/api/jobs` | Submit a new career or internship listing |
 
 ---
 
-## 🤝 Katkıda Bulunma (Contributing)
+## 🔒 Security & Architecture Standards
 
-1. Bu depoyu Fork edin (`Fork` butonuna tıklayın).
-2. Yeni bir özellik dalı oluşturun:
-   ```bash
-   git checkout -b feature/yeni-ozellik
-   ```
-3. Değişikliklerinizi commit edin:
-   ```bash
-   git commit -m "feat: Yeni mezun arama filtresi eklendi"
-   ```
-4. Dalınıza push yapın:
-   ```bash
-   git push origin feature/yeni-ozellik
-   ```
-5. GitHub üzerinden bir **Pull Request** açın.
+- **Modular Separation of Concerns:** Application configuration (`src/app.js`), route handlers (`src/routes/`), and process listeners (`index.js`) are decoupled for testability and maintainability.
+- **Input Validation:** Route parameters and body payloads are parsed and validated to prevent type errors.
+- **Environment Isolation:** Sensitive credentials, connection strings, and tokens remain isolated in `.env` files and excluded from source control.
+- **Cross-Origin Resource Sharing (CORS):** Pre-configured middleware permits secure integration with external web clients and SPAs.
 
 ---
 
-## 📄 Lisans
+## 🤝 Contributing
 
-Bu proje [MIT](LICENSE) lisansı ile lisanslanmıştır.
+1. Fork this repository.
+2. Create a dedicated feature branch:
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "feat: implement amazing feature"
+   ```
+4. Push to your branch:
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. Open a **Pull Request** on GitHub.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT](LICENSE) License.

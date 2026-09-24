@@ -1,24 +1,24 @@
-# Node bağımlılıkları ve loglar
+# Node dependencies and logs
 node_modules
 npm-debug.log
 yarn-error.log
 
-# Docker ve Git yapılandırmaları
+# Docker and Git configurations
 Dockerfile*
 docker-compose*
 .dockerignore
 .git
 .gitignore
 
-# Ortam değişkenleri ve gizli anahtarlar
+# Environment variables and secrets
 .env
 .env.*
 
-# İşletim sistemi kalıntıları
+# Operating system files
 .DS_Store
 Thumbs.db
 
-# Dokümantasyon ve arşivler
+# Documentation and archives
 README.md
 *.zip
 Alumni-main/

@@ -7,15 +7,15 @@ const routes = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Temel ara yazılımlar (Middlewares)
+// Essential middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rotaları bağla
+// Mount routes
 app.use('/', routes);
 
-// Sistem sağlık kontrolü (Docker / DevOps için)
+// System health check endpoint (for Docker / DevOps monitoring)
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -24,7 +24,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Modülerlik: Doğrudan çalıştırıldığında portu dinle, testlerde require edilebilsin
+// Modularity: Start server if executed directly, export app for testing
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

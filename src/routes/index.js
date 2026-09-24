@@ -3,12 +3,12 @@ const router = express.Router();
 
 /**
  * GET /
- * Tahtadaki iki gereksinimi de karşılar:
- * 1) GET / -> "ok" yanıtı dönsün (API / Test / curl istekleri için)
- * 2) GET / veya ana sayfa için geçici basit bir HTML/metin ("temporary one main page")
+ * Satisfies both route requirements:
+ * 1) GET / -> returns "ok" (for API, automated test, and curl requests)
+ * 2) GET / or home page -> returns temporary placeholder content ("temporary one main page")
  */
 router.get('/', (req, res) => {
-  // Eğer tarayıcı üzerinden HTML talebi gelmişse veya query ile ana sayfa istenirse
+  // Check if request is from a browser accepting HTML or explicitly requesting home page
   const isBrowserRequest = req.headers.accept && req.headers.accept.includes('text/html');
   const isHomePageRequest = req.query.page === 'home' || req.query.page === 'main';
 
@@ -16,13 +16,13 @@ router.get('/', (req, res) => {
     return res.send('temporary one main page');
   }
 
-  // API, test veya düz metin istekleri için "ok"
+  // Return "ok" for API, test, or plain text requests
   res.send('ok');
 });
 
 /**
  * GET /home & GET /main
- * Ana sayfa için geçici basit bir HTML / metin
+ * Temporary simple HTML / text for home page
  */
 router.get(['/home', '/main'], (req, res) => {
   res.send('temporary one main page');
@@ -30,7 +30,7 @@ router.get(['/home', '/main'], (req, res) => {
 
 /**
  * GET /ok
- * Açıkça "ok" yanıtı isteyen çağrılar için alternatif uç nokta
+ * Explicit endpoint returning "ok"
  */
 router.get('/ok', (req, res) => {
   res.send('ok');
@@ -38,7 +38,7 @@ router.get('/ok', (req, res) => {
 
 /**
  * GET /hello
- * "Hello, World!" yanıtı döner
+ * Returns "Hello, World!"
  */
 router.get('/hello', (req, res) => {
   res.send('Hello, World!');
@@ -46,28 +46,28 @@ router.get('/hello', (req, res) => {
 
 /**
  * GET /hello/:name
- * Girilen isme göre selamlama yanıtı döner (Örn: /hello/emre -> "Hello, Emre!")
+ * Returns greeting based on parameter (e.g., /hello/emre -> "Hello, Emre!")
  */
 router.get('/hello/:name', (req, res) => {
   const { name } = req.params;
   if (!name) {
     return res.send('Hello, World!');
   }
-  // İsmin ilk harfini büyük yapar (emre -> Emre)
+  // Capitalize the first letter of the name (e.g., emre -> Emre)
   const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
   res.send(`Hello, ${formattedName}!`);
 });
 
 /**
  * GET /sum/:number1/:number2
- * İki sayıyı toplayıp sonucunu döner
+ * Calculates and returns the sum of two numbers
  */
 router.get('/sum/:number1/:number2', (req, res) => {
   const num1 = Number(req.params.number1);
   const num2 = Number(req.params.number2);
 
   if (isNaN(num1) || isNaN(num2)) {
-    return res.status(400).send('Lütfen geçerli iki sayı giriniz.');
+    return res.status(400).send('Please provide two valid numbers.');
   }
 
   const sum = num1 + num2;
@@ -76,7 +76,7 @@ router.get('/sum/:number1/:number2', (req, res) => {
 
 /**
  * GET /about
- * Geçici hakkında sayfası ("temp. about page")
+ * Temporary about page ("temp. about page")
  */
 router.get('/about', (req, res) => {
   res.send('temp. about page');

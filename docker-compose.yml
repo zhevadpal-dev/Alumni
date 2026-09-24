@@ -1,5 +1,5 @@
 services:
-  # Node.js Backend Servisi
+  # Node.js Backend Service
   app:
     build:
       context: .
@@ -25,7 +25,7 @@ services:
     networks:
       - alumni_network
 
-  # PostgreSQL Veritabanı Servisi
+  # PostgreSQL Database Service
   postgres:
     image: postgres:15-alpine
     container_name: alumni_postgres
