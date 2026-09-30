@@ -133,7 +133,11 @@ router.get(['/api/health', '/health'], (req, res) => {
  * Adds a new user from form data or JSON body (in-memory store, no database yet)
  */
 router.post(['/api/users', '/users'], (req, res) => {
-  const { name, email, role, graduationYear, department } = req.body;
+  const name = req.body?.name || req.query?.name;
+  const email = req.body?.email || req.query?.email;
+  const role = req.body?.role || req.query?.role;
+  const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
+  const department = req.body?.department || req.query?.department;
 
   // Validation: name and email are required
   if (!name || !email) {
