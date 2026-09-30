@@ -189,4 +189,147 @@ router.get(['/api/users', '/users'], (req, res) => {
   });
 });
 
+/**
+ * GET /api/users/:id & GET /users/:id
+ * Retrieves a single user by ID
+ */
+router.get(['/api/users/:id', '/users/:id'], (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'User ID must be a valid integer.'
+    });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user) {
+    return res.status(404).json({
+      status: 'error',
+      message: `User with ID ${userId} not found.`
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: user
+  });
+});
+
+/**
+ * PUT /api/users/:id & PUT /users/:id
+ * Fully updates/replaces an existing user record
+ */
+router.put(['/api/users/:id', '/users/:id'], (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'User ID must be a valid integer.'
+    });
+  }
+
+  const userIndex = users.findIndex(u => u.id === userId);
+  if (userIndex === -1) {
+    return res.status(404).json({
+      status: 'error',
+      message: `User with ID ${userId} not found.`
+    });
+  }
+
+  const name = req.body?.name || req.query?.name;
+  const email = req.body?.email || req.query?.email;
+  const role = req.body?.role || req.query?.role;
+  const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
+  const department = req.body?.department || req.query?.department;
+
+  // PUT requires full primary fields (name and email)
+  if (!name || !email) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'PUT request requires both name and email for full update.'
+    });
+  }
+
+  // Check if new email is already used by another user
+  const emailInUse = users.some(u => u.id !== userId && u.email.toLowerCase() === email.trim().toLowerCase());
+  if (emailInUse) {
+    return res.status(409).json({
+      status: 'error',
+      message: 'Email address is already in use by another user.'
+    });
+  }
+
+  // Update user record completely
+  users[userIndex] = {
+    ...users[userIndex],
+    name: name.trim(),
+    email: email.trim(),
+    role: role ? role.trim() : 'alumni',
+    department: department ? department.trim() : null,
+    graduationYear: graduationYear ? Number(graduationYear) : null,
+    updatedAt: new Date().toISOString()
+  };
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'User completely updated successfully (PUT)',
+    data: users[userIndex]
+  });
+});
+
+/**
+ * PATCH /api/users/:id & PATCH /users/:id
+ * Partially updates an existing user record (only modifies provided fields)
+ */
+router.patch(['/api/users/:id', '/users/:id'], (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'User ID must be a valid integer.'
+    });
+  }
+
+  const userIndex = users.findIndex(u => u.id === userId);
+  if (userIndex === -1) {
+    return res.status(404).json({
+      status: 'error',
+      message: `User with ID ${userId} not found.`
+    });
+  }
+
+  const name = req.body?.name || req.query?.name;
+  const email = req.body?.email || req.query?.email;
+  const role = req.body?.role || req.query?.role;
+  const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
+  const department = req.body?.department || req.query?.department;
+
+  // If email is being changed, check if it's taken by another user
+  if (email) {
+    const emailInUse = users.some(u => u.id !== userId && u.email.toLowerCase() === email.trim().toLowerCase());
+    if (emailInUse) {
+      return res.status(409).json({
+        status: 'error',
+        message: 'Email address is already in use by another user.'
+      });
+    }
+  }
+
+  // Update only provided fields
+  const user = users[userIndex];
+  if (name !== undefined) user.name = name.trim();
+  if (email !== undefined) user.email = email.trim();
+  if (role !== undefined) user.role = role.trim();
+  if (department !== undefined) user.department = department.trim();
+  if (graduationYear !== undefined) user.graduationYear = Number(graduationYear);
+  user.updatedAt = new Date().toISOString();
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'User partially updated successfully (PATCH)',
+    data: user
+  });
+});
+
 module.exports = router;

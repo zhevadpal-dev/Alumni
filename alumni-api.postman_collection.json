@@ -106,6 +106,106 @@
       "response": []
     },
     {
+      "name": "Get Single User by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        },
+        "description": "Retrieves details of a single user by their ID."
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Completely (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "name",
+              "value": "Zeynep Naz Updated",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "zeynep.updated@example.com",
+              "type": "text"
+            },
+            {
+              "key": "role",
+              "value": "mentor",
+              "type": "text"
+            },
+            {
+              "key": "department",
+              "value": "AI Engineering",
+              "type": "text"
+            },
+            {
+              "key": "graduationYear",
+              "value": "2025",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        },
+        "description": "Replaces all fields of an existing user record by ID."
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Partially (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "department",
+              "value": "Software Engineering",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        },
+        "description": "Partially updates specific fields (e.g. only department) of an existing user by ID."
+      },
+      "response": []
+    },
+    {
       "name": "Get Root / Home",
       "request": {
         "method": "GET",
