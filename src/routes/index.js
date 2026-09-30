@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const swaggerSpec = require('../docs/swaggerSpec');
+const { getSwaggerHtml } = require('../docs/swaggerUiHtml');
 
 // In-memory data store (temporary storage without database)
 const users = [
@@ -361,6 +363,28 @@ router.delete(['/api/users/:id', '/users/:id'], (req, res) => {
     message: `User with ID ${userId} has been successfully deleted.`,
     data: deletedUser
   });
+});
+
+/**
+ * GET /api/swagger & GET /swagger & GET /api-docs
+ * Serves the interactive Swagger UI documentation and testing playground
+ */
+router.get(['/api/swagger', '/swagger', '/api-docs'], (req, res) => {
+  // If client specifically requests JSON (e.g. via Postman or curl with application/json or ?format=json)
+  if (req.query.format === 'json' || (req.headers.accept && req.headers.accept.includes('application/json') && !req.headers.accept.includes('text/html'))) {
+    return res.status(200).json(swaggerSpec);
+  }
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(getSwaggerHtml(swaggerSpec));
+});
+
+/**
+ * GET /api/swagger.json & GET /swagger.json
+ * Returns raw OpenAPI 3.0 specification in JSON format
+ */
+router.get(['/api/swagger.json', '/swagger.json'], (req, res) => {
+  res.status(200).json(swaggerSpec);
 });
 
 module.exports = router;

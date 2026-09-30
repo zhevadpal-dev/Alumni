@@ -1,0 +1,5 @@
+$kind: http-request
+description: Retrieves details of a single user by their ID.
+url: "{{baseUrl}}/api/users/1"
+method: GET
+order: 4000

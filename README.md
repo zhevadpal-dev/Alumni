@@ -143,6 +143,8 @@ npm run dev
 
 | Method | Endpoint | Description | Example Request / Output |
 | :--- | :--- | :--- | :--- |
+| `GET` | `/api/swagger` | Interactive Swagger UI Documentation | Visual interactive OpenAPI playground |
+| `GET` | `/api/swagger.json` | Raw OpenAPI 3.0 Specification JSON | Full API schema in JSON |
 | `GET` | `/` | API ping / Home placeholder | Terminal/curl: `"ok"` \| Browser: `"temporary one main page"` |
 | `GET` | `/home` | Placeholder home page | `"temporary one main page"` |
 | `GET` | `/about` | Placeholder about page | `"temp. about page"` |

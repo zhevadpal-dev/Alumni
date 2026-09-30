@@ -1,0 +1,7 @@
+$kind: http-request
+description: Returns full system health status (uptime, memory, platform, environment) in JSON format.
+url: "{{baseUrl}}/api/health"
+method: GET
+headers:
+  Accept: application/json
+order: 1000

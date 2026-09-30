@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns 'Hello, World!' greeting.
+url: "{{baseUrl}}/hello"
+method: GET
+order: 9000

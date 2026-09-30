@@ -1,0 +1,5 @@
+$kind: http-request
+description: Calculates and returns sum of two integers (e.g. 15 + 25 = 40).
+url: "{{baseUrl}}/sum/15/25"
+method: GET
+order: 11000

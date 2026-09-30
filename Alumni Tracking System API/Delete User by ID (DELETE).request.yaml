@@ -1,0 +1,5 @@
+$kind: http-request
+description: Deletes an existing user record from in-memory storage by ID.
+url: "{{baseUrl}}/api/users/1"
+method: DELETE
+order: 7000

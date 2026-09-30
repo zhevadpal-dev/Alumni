@@ -1,0 +1,9 @@
+$kind: http-request
+description: Partially updates specific fields (e.g. only department) of an existing user by ID.
+url: "{{baseUrl}}/api/users/1"
+method: PATCH
+body:
+  type: urlencoded
+  content:
+    department: Software Engineering
+order: 6000

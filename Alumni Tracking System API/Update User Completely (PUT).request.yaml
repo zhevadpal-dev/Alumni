@@ -1,0 +1,13 @@
+$kind: http-request
+description: Replaces all fields of an existing user record by ID.
+url: "{{baseUrl}}/api/users/1"
+method: PUT
+body:
+  type: urlencoded
+  content:
+    name: Zeynep Naz Updated
+    email: zeynep.updated@example.com
+    role: mentor
+    department: AI Engineering
+    graduationYear: "2025"
+order: 5000

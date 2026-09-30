@@ -1,0 +1,5 @@
+$kind: http-request
+description: Interactive Swagger UI documentation and testing playground for all API endpoints.
+url: "{{baseUrl}}/api/swagger"
+method: GET
+order: 500

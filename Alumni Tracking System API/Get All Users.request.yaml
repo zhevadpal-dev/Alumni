@@ -1,0 +1,5 @@
+$kind: http-request
+description: Retrieves the list of currently registered in-memory users.
+url: "{{baseUrl}}/api/users"
+method: GET
+order: 3000

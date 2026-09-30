@@ -1,0 +1,6 @@
+$kind: http-request
+name: Get Root / Home
+description: Root endpoint returning 'ok' for API/curl or temporary home page for browsers.
+url: "{{baseUrl}}/"
+method: GET
+order: 8000

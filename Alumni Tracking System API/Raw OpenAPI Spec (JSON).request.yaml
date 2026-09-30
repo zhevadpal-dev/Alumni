@@ -1,0 +1,5 @@
+$kind: http-request
+description: Raw OpenAPI 3.0 specification in JSON format.
+url: "{{baseUrl}}/api/swagger.json"
+method: GET
+order: 600

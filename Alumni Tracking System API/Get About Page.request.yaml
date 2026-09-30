@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns placeholder about page text.
+url: "{{baseUrl}}/about"
+method: GET
+order: 12000

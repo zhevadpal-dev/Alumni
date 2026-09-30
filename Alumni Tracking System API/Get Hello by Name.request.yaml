@@ -1,0 +1,5 @@
+$kind: http-request
+description: Returns personalized greeting, e.g. 'Hello, Emre!'.
+url: "{{baseUrl}}/hello/emre"
+method: GET
+order: 10000

@@ -1,0 +1,4 @@
+$kind: collection
+description: API endpoints for the Alumni Tracking System backend
+variables:
+  baseUrl: http://localhost:5001
