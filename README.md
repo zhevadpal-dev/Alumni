@@ -155,6 +155,7 @@ npm run dev
 | `GET` | `/api/users/:id` | Retrieve single user by ID | `/api/users/1` |
 | `PUT` | `/api/users/:id` | Full update/replacement of user record | Body: `name`, `email`, `role`, etc. |
 | `PATCH` | `/api/users/:id` | Partial update of specific user fields | Body: fields to update (e.g. `department`) |
+| `DELETE` | `/api/users/:id` | Delete user record by ID | `/api/users/1` |
 
 ### Planned Alumni Management Endpoints
 

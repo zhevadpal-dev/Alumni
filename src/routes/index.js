@@ -332,4 +332,35 @@ router.patch(['/api/users/:id', '/users/:id'], (req, res) => {
   });
 });
 
+/**
+ * DELETE /api/users/:id & DELETE /users/:id
+ * Deletes an existing user record by ID
+ */
+router.delete(['/api/users/:id', '/users/:id'], (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'User ID must be a valid integer.'
+    });
+  }
+
+  const userIndex = users.findIndex(u => u.id === userId);
+  if (userIndex === -1) {
+    return res.status(404).json({
+      status: 'error',
+      message: `User with ID ${userId} not found.`
+    });
+  }
+
+  // Remove the user from in-memory array
+  const [deletedUser] = users.splice(userIndex, 1);
+
+  return res.status(200).json({
+    status: 'success',
+    message: `User with ID ${userId} has been successfully deleted.`,
+    data: deletedUser
+  });
+});
+
 module.exports = router;
