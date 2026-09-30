@@ -182,6 +182,18 @@ npm run dev
 
 ---
 
+## 📋 Route Development & Documentation Workflow
+
+Whenever a new route or endpoint is defined in this project, the following protocol is strictly enforced:
+1. **Implementation:** Define the route logic in `src/routes/`.
+2. **Swagger Documentation:** Document the path, parameters, request body, and response schemas in `src/docs/swaggerSpec.js` so it automatically appears in the interactive UI at `/api/swagger`.
+3. **README Synchronization:** Add the endpoint to the **API Endpoints** table in `README.md`.
+4. **Postman Collections:** Update both `alumni-api.postman_collection.json` and `Alumni Tracking System API/` with pre-configured requests.
+5. **Live Server Reload:** Restart the running container (`docker compose restart app`).
+6. **Git Version Control:** Automatically stage all changes, write a descriptive commit message, and push directly to `origin main`.
+
+---
+
 ## 🤝 Contributing
 
 1. Fork this repository.
