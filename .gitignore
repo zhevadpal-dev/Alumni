@@ -23,3 +23,7 @@ postgres_data/
 # Temporary unzipped archives
 *.zip
 Alumni-main/
+
+# Postman local workspace files
+.postman/
+postman/

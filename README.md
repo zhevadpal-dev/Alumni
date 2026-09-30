@@ -85,7 +85,7 @@ cp .env.example .env
 Default configuration values:
 
 ```env
-PORT=5000
+PORT=5001
 NODE_ENV=development
 
 # PostgreSQL Database Configuration
@@ -110,7 +110,7 @@ docker compose up -d --build
 docker compose logs -f
 ```
 
-The application server will become reachable at `http://localhost:5000`.
+The application server will become reachable at `http://localhost:5001`.
 
 To terminate containers and tear down the network:
 

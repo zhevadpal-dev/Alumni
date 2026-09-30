@@ -14,11 +14,11 @@ RUN npm install
 COPY . .
 
 # Expose application port
-EXPOSE 5000
+EXPOSE 5001
 
 # Default environment variables
 ENV NODE_ENV=development
-ENV PORT=5000
+ENV PORT=5001
 
 # Start the application
 CMD ["npm", "start"]

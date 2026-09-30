@@ -22,3 +22,5 @@ Thumbs.db
 README.md
 *.zip
 Alumni-main/
+.postman/
+postman/
