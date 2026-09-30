@@ -1,0 +1,134 @@
+{
+  "info": {
+    "_postman_id": "b7e21a8d-2394-4d81-8b22-alumnitrack01",
+    "name": "Alumni Tracking System API",
+    "description": "API endpoints for the Alumni Tracking System backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check (System Status)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "Returns full system health status (uptime, memory, platform, environment) in JSON format."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Root / Home",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "Root endpoint returning 'ok' for API/curl or temporary home page for browsers."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Hello World",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/hello",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hello"
+          ]
+        },
+        "description": "Returns 'Hello, World!' greeting."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Hello by Name",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/hello/emre",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hello",
+            "emre"
+          ]
+        },
+        "description": "Returns personalized greeting, e.g. 'Hello, Emre!'."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Sum of Numbers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sum/15/25",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sum",
+            "15",
+            "25"
+          ]
+        },
+        "description": "Calculates and returns sum of two integers (e.g. 15 + 25 = 40)."
+      },
+      "response": []
+    },
+    {
+      "name": "Get About Page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/about",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "about"
+          ]
+        },
+        "description": "Returns placeholder about page text."
+      },
+      "response": []
+    }
+  ]
+}
