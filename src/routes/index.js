@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
+// In-memory data store (temporary storage without database)
+const users = [
+  {
+    id: 1,
+    name: 'Sample Alumni',
+    email: 'alumni@example.com',
+    role: 'alumni',
+    department: 'Computer Science',
+    graduationYear: 2023,
+    createdAt: new Date().toISOString()
+  }
+];
+
 /**
  * GET /
  * Satisfies both route requirements:
@@ -112,6 +125,63 @@ router.get(['/api/health', '/health'], (req, res) => {
       heapUsed: `${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`,
       external: `${(mem.external / 1024 / 1024).toFixed(2)} MB`
     }
+  });
+});
+
+/**
+ * POST /api/users & POST /users
+ * Adds a new user from form data or JSON body (in-memory store, no database yet)
+ */
+router.post(['/api/users', '/users'], (req, res) => {
+  const { name, email, role, graduationYear, department } = req.body;
+
+  // Validation: name and email are required
+  if (!name || !email) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Name and email are required fields.'
+    });
+  }
+
+  // Check if email already exists
+  const emailExists = users.some(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  if (emailExists) {
+    return res.status(409).json({
+      status: 'error',
+      message: 'A user with this email already exists.'
+    });
+  }
+
+  // Create new user object
+  const newUser = {
+    id: users.length + 1,
+    name: name.trim(),
+    email: email.trim(),
+    role: role ? role.trim() : 'alumni',
+    department: department ? department.trim() : null,
+    graduationYear: graduationYear ? Number(graduationYear) : null,
+    createdAt: new Date().toISOString()
+  };
+
+  // Store in memory
+  users.push(newUser);
+
+  return res.status(201).json({
+    status: 'success',
+    message: 'User created successfully',
+    data: newUser
+  });
+});
+
+/**
+ * GET /api/users & GET /users
+ * Returns list of all in-memory users
+ */
+router.get(['/api/users', '/users'], (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    count: users.length,
+    data: users
   });
 });
 

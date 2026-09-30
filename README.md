@@ -150,6 +150,8 @@ npm run dev
 | `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
 | `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
 | `GET` | `/api/health` | Comprehensive system health check JSON | `{"status": "OK", "uptime": 12.34, "memory": {...}}` |
+| `POST` | `/api/users` | Add new user (form/JSON format, in-memory) | Body: `name`, `email`, `role`, `department` |
+| `GET` | `/api/users` | List all registered in-memory users | Returns JSON array of users |
 
 ### Planned Alumni Management Endpoints
 

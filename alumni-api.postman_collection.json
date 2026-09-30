@@ -38,6 +38,74 @@
       "response": []
     },
     {
+      "name": "Create User (Form Format)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "name",
+              "value": "Zeynep Naz",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "zeynep@example.com",
+              "type": "text"
+            },
+            {
+              "key": "role",
+              "value": "alumni",
+              "type": "text"
+            },
+            {
+              "key": "department",
+              "value": "Computer Engineering",
+              "type": "text"
+            },
+            {
+              "key": "graduationYear",
+              "value": "2024",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        },
+        "description": "Adds a new user in form format (urlencoded/form-data) stored in-memory (no database)."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        },
+        "description": "Retrieves the list of currently registered in-memory users."
+      },
+      "response": []
+    },
+    {
       "name": "Get Root / Home",
       "request": {
         "method": "GET",
