@@ -12,17 +12,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Mount routes
+// Mount routes (includes /, /hello, /sum, /about, /api/health)
 app.use('/', routes);
-
-// System health check endpoint (for Docker / DevOps monitoring)
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Alumni Tracking System API is running healthy',
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Modularity: Start server if executed directly, export app for testing
 if (require.main === module) {

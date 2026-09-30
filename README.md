@@ -149,7 +149,7 @@ npm run dev
 | `GET` | `/hello` | Standard greeting | `"Hello, World!"` |
 | `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
 | `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
-| `GET` | `/api/health` | Service health status JSON | `{"status": "success", "message": "..."}` |
+| `GET` | `/api/health` | Comprehensive system health check JSON | `{"status": "OK", "uptime": 12.34, "memory": {...}}` |
 
 ### Planned Alumni Management Endpoints
 
