@@ -1,27 +1,34 @@
 /**
  * User Controller (Business Logic & Request Orchestration)
- * Handles input parsing, validation, calls the User Model, and formats HTTP responses.
+ * Handles input parsing, validation, delegates to UserModel, and formats HTTP responses.
  */
 
 const UserModel = require('../models/userModel');
 
 class UserController {
   /**
-   * GET /api/users
-   * Returns list of all registered users
+   * GET /api/users & GET /users
+   * Returns list of all registered users (supports ?role, ?department, ?graduationYear, ?search, ?limit, ?page)
    */
   static getAllUsers(req, res) {
-    const users = UserModel.findAll();
-    return res.status(200).json({
-      status: 'success',
-      count: users.length,
-      data: users
-    });
+    try {
+      const users = UserModel.findAll(req.query);
+      return res.status(200).json({
+        status: 'success',
+        count: users.length,
+        data: users
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching users.'
+      });
+    }
   }
 
   /**
-   * GET /api/users/:id
-   * Retrieves single user record by ID
+   * GET /api/users/:id & GET /users/:id
+   * Retrieves single user record by numeric ID
    */
   static getUserById(req, res) {
     const userId = parseInt(req.params.id, 10);
@@ -47,8 +54,8 @@ class UserController {
   }
 
   /**
-   * POST /api/users
-   * Creates a new user record
+   * POST /api/users & POST /users
+   * Creates a new user record in the in-memory store
    */
   static createUser(req, res) {
     const name = req.body?.name || req.query?.name;
@@ -56,6 +63,9 @@ class UserController {
     const role = req.body?.role || req.query?.role;
     const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
     const department = req.body?.department || req.query?.department;
+    const phone = req.body?.phone || req.query?.phone;
+    const company = req.body?.company || req.query?.company;
+    const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
 
     // Validation: name and email are mandatory
     if (!name || !email) {
@@ -74,23 +84,33 @@ class UserController {
       });
     }
 
-    const newUser = UserModel.create({
-      name,
-      email,
-      role,
-      department,
-      graduationYear
-    });
+    try {
+      const newUser = UserModel.create({
+        name,
+        email,
+        role,
+        department,
+        graduationYear,
+        phone,
+        company,
+        jobTitle
+      });
 
-    return res.status(201).json({
-      status: 'success',
-      message: 'User created successfully',
-      data: newUser
-    });
+      return res.status(201).json({
+        status: 'success',
+        message: 'User created successfully',
+        data: newUser
+      });
+    } catch (err) {
+      return res.status(err.statusCode || 400).json({
+        status: 'error',
+        message: err.message
+      });
+    }
   }
 
   /**
-   * PUT /api/users/:id
+   * PUT /api/users/:id & PUT /users/:id
    * Full update/replacement of an existing user record
    */
   static updateUserPut(req, res) {
@@ -115,6 +135,9 @@ class UserController {
     const role = req.body?.role || req.query?.role;
     const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
     const department = req.body?.department || req.query?.department;
+    const phone = req.body?.phone || req.query?.phone;
+    const company = req.body?.company || req.query?.company;
+    const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
 
     if (!name || !email) {
       return res.status(400).json({
@@ -132,23 +155,33 @@ class UserController {
       });
     }
 
-    const updatedUser = UserModel.update(userId, {
-      name,
-      email,
-      role,
-      department,
-      graduationYear
-    });
+    try {
+      const updatedUser = UserModel.update(userId, {
+        name,
+        email,
+        role,
+        department,
+        graduationYear,
+        phone,
+        company,
+        jobTitle
+      });
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'User completely updated successfully (PUT)',
-      data: updatedUser
-    });
+      return res.status(200).json({
+        status: 'success',
+        message: 'User completely updated successfully (PUT)',
+        data: updatedUser
+      });
+    } catch (err) {
+      return res.status(err.statusCode || 400).json({
+        status: 'error',
+        message: err.message
+      });
+    }
   }
 
   /**
-   * PATCH /api/users/:id
+   * PATCH /api/users/:id & PATCH /users/:id
    * Partial update of an existing user record
    */
   static updateUserPatch(req, res) {
@@ -173,6 +206,9 @@ class UserController {
     const role = req.body?.role || req.query?.role;
     const graduationYear = req.body?.graduationYear || req.query?.graduationYear;
     const department = req.body?.department || req.query?.department;
+    const phone = req.body?.phone || req.query?.phone;
+    const company = req.body?.company || req.query?.company;
+    const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
 
     // Check unique email if updating email
     if (email) {
@@ -191,18 +227,28 @@ class UserController {
     if (role !== undefined) patchPayload.role = role;
     if (department !== undefined) patchPayload.department = department;
     if (graduationYear !== undefined) patchPayload.graduationYear = graduationYear;
+    if (phone !== undefined) patchPayload.phone = phone;
+    if (company !== undefined) patchPayload.company = company;
+    if (jobTitle !== undefined) patchPayload.jobTitle = jobTitle;
 
-    const updatedUser = UserModel.patch(userId, patchPayload);
+    try {
+      const updatedUser = UserModel.patch(userId, patchPayload);
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'User partially updated successfully (PATCH)',
-      data: updatedUser
-    });
+      return res.status(200).json({
+        status: 'success',
+        message: 'User partially updated successfully (PATCH)',
+        data: updatedUser
+      });
+    } catch (err) {
+      return res.status(err.statusCode || 400).json({
+        status: 'error',
+        message: err.message
+      });
+    }
   }
 
   /**
-   * DELETE /api/users/:id
+   * DELETE /api/users/:id & DELETE /users/:id
    * Deletes an existing user record by ID
    */
   static deleteUser(req, res) {

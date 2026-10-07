@@ -141,9 +141,77 @@ Alumni/
 ### 🧩 Architectural Layers & Responsibilities
 
 #### 1. 🗄️ Model Layer (`src/models/`)
-- Encapsulates data representation, data validation, and persistence operations.
-- Completely decoupled from HTTP request/response concepts, making it reusable across web endpoints, background workers, or CLI scripts.
-- **`userModel.js`**: Implements in-memory data store for user records, ID auto-incrementing, lookup methods (`findAll`, `findById`, `findByEmail`), and state mutation operations (`create`, `update`, `patch`, `delete`).
+- Encapsulates entity representation, data validation, and persistence operations completely decoupled from HTTP/controller logic.
+- **In-Memory Architecture (Zero Database Dependency):** Operates on an internal structured memory array (`users`), allowing instantaneous execution, rapid prototyping, and automated unit testing without requiring an active PostgreSQL or MongoDB database connection.
+- **`userModel.js`**: Features a robust, enterprise-grade class providing complete CRUD operations, schema validation, multi-criteria filtering, and data consistency safeguards.
+
+##### 📋 User Entity Schema
+
+| Attribute | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `Integer` | System-generated | Unique auto-increment primary key | `1` |
+| `name` | `String` | Yes | Full name of the user / graduate | `"Zeynep Naz"` |
+| `email` | `String` | Yes (Unique) | Unique, validated email (case-insensitive) | `"zeynep@example.com"` |
+| `role` | `String` | No (Default: `'alumni'`) | Allowed values: `alumni`, `student`, `faculty`, `admin` | `"alumni"` |
+| `department` | `String` | No | Degree program or academic department | `"Computer Engineering"` |
+| `graduationYear` | `Integer` | No | Valid graduation year between 1900 and 2100 | `2024` |
+| `phone` | `String` | No | Contact phone number | `"+90 555 123 4567"` |
+| `company` | `String` | No | Current company / employer | `"Tech Corp"` |
+| `jobTitle` | `String` | No | Current job or professional title | `"Software Engineer"` |
+| `createdAt` | `ISO 8601 String` | System-generated | Timestamp of creation | `"2026-10-07T07:30:00.000Z"` |
+| `updatedAt` | `ISO 8601 String` | System-generated | Timestamp of last modification (PUT/PATCH) | `"2026-10-07T07:35:00.000Z"` |
+
+##### 🛠️ Implemented CRUD Functions
+
+```javascript
+const UserModel = require('../models/userModel');
+
+// 1. CREATE (C)
+const newUser = UserModel.create({
+  name: 'Ayşe Kaya',
+  email: 'ayse@example.com',
+  role: 'alumni',
+  department: 'Electrical Engineering',
+  graduationYear: 2022
+});
+
+// 2. READ (R)
+const allUsers     = UserModel.findAll();                      // All records
+const filtered     = UserModel.findAll({ role: 'alumni' });   // Filter by role
+const searched     = UserModel.findAll({ search: 'Kaya' });   // Free text search
+const paginated    = UserModel.findAll({ page: 1, limit: 10 });// Pagination
+const userById     = UserModel.findById(1);                    // Find by primary ID
+const userByEmail  = UserModel.findByEmail('ayse@example.com');// Case-insensitive email
+const isExisting   = UserModel.exists(1);                      // Boolean existence check
+const totalCount   = UserModel.count({ role: 'alumni' });      // Filtered record count
+
+// 3. UPDATE (U)
+// Full replacement (PUT semantics - requires name & email)
+const updatedUser  = UserModel.update(1, {
+  name: 'Ayşe Kaya Demir',
+  email: 'ayse.demir@example.com',
+  department: 'Computer Science',
+  graduationYear: 2022
+});
+
+// Partial modification (PATCH semantics - modifies only provided keys)
+const patchedUser  = UserModel.patch(1, {
+  company: 'Global AI Lab',
+  jobTitle: 'Senior Research Engineer'
+});
+
+// 4. DELETE (D)
+const deletedUser  = UserModel.delete(1);                      // Delete by ID
+const deletedEmail = UserModel.deleteByEmail('ayse@example.com');// Delete by email
+UserModel.reset();                                             // Reset to seed dataset
+```
+
+##### 🛡️ Validation & Data Integrity Safeguards
+- **Email Uniqueness:** Prevents duplicate registrations across `create`, `update`, and `patch`.
+- **Format Validation:** RFC-compliant regex validation (`isValidEmail()`) ensures emails are structurally valid.
+- **Role Enforcement:** Restricts roles strictly to predefined whitelist (`alumni`, `student`, `faculty`, `admin`).
+- **Graduation Year Range:** Enforces realistic integer years between 1900 and 2100.
+- **Defensive Immutability:** CRUD methods return shallow clones to avoid unintended external memory mutations.
 
 #### 2. 🎨 View Layer (`src/views/`)
 - Responsible for the presentation output sent to clients.

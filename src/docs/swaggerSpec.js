@@ -56,7 +56,51 @@ const swaggerSpec = {
       get: {
         tags: ['Users'],
         summary: 'List all users',
-        description: 'Retrieves all registered user records stored in memory.',
+        description: 'Retrieves all registered user records stored in memory with optional filtering, search, and pagination.',
+        parameters: [
+          {
+            name: 'role',
+            in: 'query',
+            required: false,
+            description: 'Filter users by role (alumni, student, faculty, admin)',
+            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'admin'] }
+          },
+          {
+            name: 'department',
+            in: 'query',
+            required: false,
+            description: 'Filter users by academic department',
+            schema: { type: 'string', example: 'Computer Science' }
+          },
+          {
+            name: 'graduationYear',
+            in: 'query',
+            required: false,
+            description: 'Filter users by graduation year',
+            schema: { type: 'integer', example: 2023 }
+          },
+          {
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Search substring across name, email, department, or company',
+            schema: { type: 'string', example: 'Alumni' }
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            description: 'Maximum number of users to return (for pagination)',
+            schema: { type: 'integer', example: 10 }
+          },
+          {
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Page number (for pagination)',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
         responses: {
           '200': {
             description: 'List of users returned successfully',
