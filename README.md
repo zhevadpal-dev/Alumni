@@ -216,9 +216,14 @@ UserModel.reset();                                             // Reset to seed 
 - **Defensive Immutability:** CRUD methods return shallow clones to avoid unintended external memory mutations.
 
 #### 2. 🎨 View Layer (`src/views/`)
-- Responsible for the presentation output sent to clients.
-- Decouples UI structure, HTML markup, and response styling from controller logic.
-- **`htmlViews.js`**: Renders browser-friendly HTML page layouts for human visitors accessing core routes such as the home page (`renderHome()`) and about page (`renderAbout()`).
+- Responsible for the presentation output sent to clients, cleanly decoupling UI layout, CSS styling, and HTML templates from controller orchestration.
+- **`htmlViews.js`**: Generates responsive, server-rendered HTML view templates:
+  - **`GET /users` (Directory & Form View):** Renders `renderUsersList(users)` displaying registered alumni member cards and an embedded interactive HTML registration form (`<form action="/users" method="POST">`) allowing users to register new alumni directly from the browser.
+  - **`POST /users` (Success / Error Views):**
+    - `renderUserCreatedSuccess(user)`: Displays a confirmation view with user details, status badges, and quick links (`Back to Directory`, `View Profile`, `Add Another`).
+    - `renderUserError(message)`: Displays an error card if validation fails (e.g. missing required fields or duplicate email) with a link back to the form.
+  - **`GET /users/:id` (Profile View):** Renders `renderUserProfile(user)` showing full profile attributes, metadata, and department/graduation history.
+  - **`GET /` & `GET /about`:** Renders baseline layout templates (`renderHome()`, `renderAbout()`).
 
 #### 3. 🧠 Controller Layer (`src/controllers/`)
 - Acts as the intermediary orchestrating the application flow.

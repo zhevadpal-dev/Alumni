@@ -477,8 +477,11 @@ const swaggerSpec = {
         },
         responses: {
           '201': {
-            description: 'User created successfully',
+            description: 'User created successfully (HTML confirmation or JSON)',
             content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...User Registered Successfully!...</html>' }
+              },
               'application/json': {
                 schema: {
                   type: 'object',
@@ -494,12 +497,18 @@ const swaggerSpec = {
           '400': {
             description: 'Validation error (missing name or email)',
             content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Registration Error...</html>' }
+              },
               'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
             }
           },
           '409': {
             description: 'Email already registered',
             content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...A user with this email already exists...</html>' }
+              },
               'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
             }
           }
