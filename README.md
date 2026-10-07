@@ -365,16 +365,17 @@ npm run dev
 | `PATCH` | `/api/users/:id` | Partial update of specific fields | Body: fields to update (e.g. `department`) |
 | `DELETE` | `/api/users/:id` | Delete user record by ID | Returns deleted user JSON |
 
-### 🌐 Web MVC User Endpoints (`UserController` ➡️ `/users`)
+### 🌐 Web MVC User Endpoints with View Layer (`UserController` ➡️ `/users`)
 
-| Method | Endpoint | Description | Example Request / Output |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/users` | Web user directory (HTML page or JSON) | Browser: HTML Directory Cards \| API: JSON |
-| `POST` | `/users` | Create user via web form or request | Body: `name`, `email`, `role`, `department` |
-| `GET` | `/users/:id` | Web user profile view (HTML page or JSON) | Browser: HTML Profile Card \| API: JSON |
-| `PUT` | `/users/:id` | Full replacement via web endpoint | Replaces user record |
-| `PATCH` | `/users/:id` | Partial update via web endpoint | Updates specified fields |
-| `DELETE` | `/users/:id` | Delete user via web endpoint | Deletes user record |
+| Method | Endpoint | CRUD Role | View Layer Output | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/users` | **Read (List)** | `renderUsersList(users)` | Server-rendered HTML directory with embedded registration form |
+| `POST` | `/users` | **Create** | `renderUserCreatedSuccess(user)` | Processes form submission and renders HTML success confirmation |
+| `GET` | `/users/:id` | **Read (Detail)** | `renderUserProfile(user)` | Server-rendered HTML single user profile card |
+| `GET` | `/users/:id/edit` | **Update (Form)** | `renderUserEditForm(user)` | Pre-populated HTML edit form for browser modification |
+| `PUT` / `POST` | `/users/:id` & `/users/:id/edit` | **Update (Full)** | `renderUserUpdatedSuccess(user)` | Replaces user record and renders HTML updated view |
+| `PATCH` | `/users/:id` | **Update (Partial)** | `renderUserUpdatedSuccess(user)` | Partially updates fields and renders HTML updated view |
+| `DELETE` / `POST` | `/users/:id` & `/users/:id/delete` | **Delete** | `renderUserDeletedSuccess(user)` | Deletes user record and renders HTML deletion confirmation |
 
 ### Planned Alumni Management Endpoints
 

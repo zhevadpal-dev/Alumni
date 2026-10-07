@@ -661,8 +661,11 @@ const swaggerSpec = {
         ],
         responses: {
           '200': {
-            description: 'User successfully deleted',
+            description: 'User successfully deleted (HTML confirmation or JSON)',
             content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...User Deleted Successfully...</html>' }
+              },
               'application/json': {
                 schema: {
                   type: 'object',
@@ -676,6 +679,37 @@ const swaggerSpec = {
             }
           },
           '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/users/{id}/edit': {
+      get: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Web user edit form view',
+        description: 'Returns server-rendered HTML form populated with existing user record for browser editing.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML edit form page',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...<form action="/users/1/edit" method="POST">...</html>' }
+              }
+            }
+          },
+          '404': {
+            description: 'User not found',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+            }
+          }
         }
       }
     },
