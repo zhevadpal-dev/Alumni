@@ -105,7 +105,8 @@ Alumni/
 │   │   └── htmlViews.js             # Server-rendered HTML page templates (Home, About)
 │   │
 │   ├── controllers/                 # CONTROLLER LAYER (Application & Business Logic)
-│   │   ├── userController.js        # User CRUD orchestration, payload validation, status codes
+│   │   ├── apiUserController.js     # RESTful API controller for /api/users (JSON CRUD, status codes)
+│   │   ├── userController.js        # Web MVC controller for /users (HTML views & web responses)
 │   │   ├── healthController.js      # System health telemetry, uptime, memory & OS metrics
 │   │   ├── coreController.js        # Lab endpoints, greeting generators, math calculations
 │   │   └── swaggerController.js     # Swagger UI page rendering & OpenAPI JSON provider
@@ -221,7 +222,15 @@ UserModel.reset();                                             // Reset to seed 
 #### 3. 🧠 Controller Layer (`src/controllers/`)
 - Acts as the intermediary orchestrating the application flow.
 - Accepts parsed HTTP requests from routes, executes defensive input validation, invokes appropriate Model methods, selects output views or JSON representations, and emits HTTP status codes.
-- **`userController.js`**: Handles user listing, creation validation, single user retrieval, full updates (`PUT`), partial updates (`PATCH`), and deletion (`DELETE`).
+- **`apiUserController.js` (REST API Controller):**
+  - Dedicated to `/api/users` and `/api/users/:id`.
+  - Implements complete JSON CRUD operations: `getAllUsers` (with filtering, search, pagination), `getUserById`, `createUser`, `updateUserPut`, `updateUserPatch`, `deleteUser`.
+  - Emits standardized JSON response contracts (`{ status: 'success', data: ... }`) and HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`).
+- **`userController.js` (Web / MVC View Controller):**
+  - Dedicated to `/users` and `/users/:id`.
+  - Implements web-oriented CRUD operations and content negotiation.
+  - When accessed via web browsers (`Accept: text/html`), renders rich HTML views (`HtmlViews.renderUsersList` and `HtmlViews.renderUserProfile`).
+  - When accessed programmatically or via form submission, executes CRUD workflows on `UserModel` and returns appropriate web/JSON payloads.
 - **`healthController.js`**: Extracts node process uptime, platform architecture, and memory usage metrics (`rss`, `heapTotal`, `heapUsed`) for monitoring systems.
 - **`coreController.js`**: Handles base endpoints, content-negotiated responses, arithmetic calculations (`/sum/:num1/:num2`), and personalized greetings.
 - **`swaggerController.js`**: Serves the interactive Swagger UI and OpenAPI 3.0 specification JSON.

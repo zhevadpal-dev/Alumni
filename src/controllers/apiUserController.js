@@ -1,29 +1,20 @@
 /**
- * User Controller (Web & Presentation MVC Controller)
+ * API User Controller (RESTful JSON Endpoints)
  * 
- * Manages web-facing user endpoints (/users, /users/:id).
- * Supports browser-rendered HTML views (via HtmlViews) as well as direct web responses.
- * Implements complete CRUD functions (Create, Read, Update, Delete).
+ * Exclusively handles API requests targeting `/api/users`.
+ * Performs input parsing, delegates CRUD actions to UserModel, and emits standard JSON payloads.
  */
 
 const UserModel = require('../models/userModel');
-const HtmlViews = require('../views/htmlViews');
 
-class UserController {
+class ApiUserController {
   /**
-   * GET /users
-   * Read (R) - Lists users. Returns HTML view for browser clients or JSON for programmatic clients.
+   * GET /api/users
+   * List all user records with optional filter, search, and pagination.
    */
   static getAllUsers(req, res) {
     try {
       const users = UserModel.findAll(req.query);
-      const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
-
-      if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(HtmlViews.renderUsersList(users));
-      }
-
       return res.status(200).json({
         status: 'success',
         count: users.length,
@@ -38,8 +29,8 @@ class UserController {
   }
 
   /**
-   * GET /users/:id
-   * Read (R) - Retrieves a single user profile. Returns HTML view or JSON.
+   * GET /api/users/:id
+   * Retrieve a single user record by numeric ID.
    */
   static getUserById(req, res) {
     const userId = parseInt(req.params.id, 10);
@@ -58,12 +49,6 @@ class UserController {
       });
     }
 
-    const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
-    if (isHtml) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(HtmlViews.renderUserProfile(user));
-    }
-
     return res.status(200).json({
       status: 'success',
       data: user
@@ -71,8 +56,8 @@ class UserController {
   }
 
   /**
-   * POST /users
-   * Create (C) - Creates a new user record.
+   * POST /api/users
+   * Create a new user record in the in-memory store.
    */
   static createUser(req, res) {
     const name = req.body?.name || req.query?.name;
@@ -84,6 +69,7 @@ class UserController {
     const company = req.body?.company || req.query?.company;
     const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
 
+    // Validation: name and email are mandatory
     if (!name || !email) {
       return res.status(400).json({
         status: 'error',
@@ -91,6 +77,7 @@ class UserController {
       });
     }
 
+    // Check unique email constraint
     const existingUser = UserModel.findByEmail(email);
     if (existingUser) {
       return res.status(409).json({
@@ -125,8 +112,8 @@ class UserController {
   }
 
   /**
-   * PUT /users/:id
-   * Update (U) - Fully updates/replaces an existing user record.
+   * PUT /api/users/:id
+   * Fully update/replace an existing user record.
    */
   static updateUserPut(req, res) {
     const userId = parseInt(req.params.id, 10);
@@ -161,6 +148,7 @@ class UserController {
       });
     }
 
+    // Check unique email conflict
     const emailOwner = UserModel.findByEmail(email);
     if (emailOwner && emailOwner.id !== userId) {
       return res.status(409).json({
@@ -195,8 +183,8 @@ class UserController {
   }
 
   /**
-   * PATCH /users/:id
-   * Update (U) - Partially updates specific fields of an existing user.
+   * PATCH /api/users/:id
+   * Partially update specific fields of an existing user record.
    */
   static updateUserPatch(req, res) {
     const userId = parseInt(req.params.id, 10);
@@ -224,6 +212,7 @@ class UserController {
     const company = req.body?.company || req.query?.company;
     const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
 
+    // Check unique email conflict if changing email
     if (email) {
       const emailOwner = UserModel.findByEmail(email);
       if (emailOwner && emailOwner.id !== userId) {
@@ -261,8 +250,8 @@ class UserController {
   }
 
   /**
-   * DELETE /users/:id
-   * Delete (D) - Deletes an existing user record.
+   * DELETE /api/users/:id
+   * Delete an existing user record by numeric ID.
    */
   static deleteUser(req, res) {
     const userId = parseInt(req.params.id, 10);
@@ -289,12 +278,12 @@ class UserController {
   }
 }
 
-// REST Resource Aliases
-UserController.index = UserController.getAllUsers;
-UserController.show = UserController.getUserById;
-UserController.create = UserController.createUser;
-UserController.update = UserController.updateUserPut;
-UserController.patch = UserController.updateUserPatch;
-UserController.delete = UserController.deleteUser;
+// REST Resource Aliases for standard MVC frameworks
+ApiUserController.index = ApiUserController.getAllUsers;
+ApiUserController.show = ApiUserController.getUserById;
+ApiUserController.store = ApiUserController.createUser;
+ApiUserController.update = ApiUserController.updateUserPut;
+ApiUserController.patch = ApiUserController.updateUserPatch;
+ApiUserController.destroy = ApiUserController.deleteUser;
 
-module.exports = UserController;
+module.exports = ApiUserController;
