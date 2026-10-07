@@ -36,23 +36,135 @@ The backend is built with **Node.js** and **Express**, utilizing **PostgreSQL** 
 
 ---
 
-## 📁 Project Structure
+## 🏛️ MVC Architecture & Project Structure
+
+The Alumni Tracking System backend follows the **Model-View-Controller (MVC)** architectural design pattern to achieve a strict separation of concerns, high maintainability, testability, and scalability.
+
+```
+                                 ┌─────────────────────────┐
+                                 │   Client (Browser/API)  │
+                                 └────────────┬────────────┘
+                                              │ HTTP Request
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │   Main App (app.js)     │
+                                 │   & Middleware Stack    │
+                                 └────────────┬────────────┘
+                                              │
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │  Routes (src/routes/)   │
+                                 │  - Endpoint definitions │
+                                 │  - URL / Method routing │
+                                 └────────────┬────────────┘
+                                              │
+                                              ▼
+                               ┌─────────────────────────────┐
+                               │ Controllers                 │
+                               │ (src/controllers/)          │
+                               │ - Input validation          │
+                               │ - Request orchestration     │
+                               │ - Business workflow logic   │
+                               └───┬─────────────────────┬───┘
+                                   │                     │
+                     Fetches / Mutates                   │ Sends data / triggers
+                     data entity                         │ presentation
+                                   ▼                     ▼
+              ┌──────────────────────────┐         ┌──────────────────────────┐
+              │   Models (src/models/)   │         │   Views (src/views/)     │
+              │ - Data layer & schema    │         │ - HTML presentation      │
+              │ - State management       │         │ - Browser UI templates   │
+              │ - Database abstraction   │         └─────────────┬────────────┘
+              └────────────┬─────────────┘                       │
+                           │                                     │
+                           └───────────────┬─────────────────────┘
+                                           │
+                                           ▼
+                               ┌─────────────────────────────┐
+                               │     HTTP Response           │
+                               │ (JSON Payload / HTML Page)  │
+                               └───────────┬─────────────────┘
+                                           │
+                                           ▼
+                                 ┌─────────────────────────┐
+                                 │         Client          │
+                                 └─────────────────────────┘
+```
+
+---
+
+### 📂 Directory & File Hierarchy
 
 ```text
 Alumni/
 ├── src/
-│   ├── routes/              # Express API route modules
-│   │   └── index.js         # Endpoint declarations (lab & application routes)
-│   └── app.js               # Express application initialization and middleware
-├── index.js                 # Server entry point binding HTTP listener
-├── Dockerfile               # Production-ready Node.js container definition
-├── docker-compose.yml       # Multi-container orchestration (App & PostgreSQL)
-├── .dockerignore            # Build context exclusion rules
-├── .env.example             # Template configuration for environment variables
-├── .gitignore               # Version control ignore rules
-├── package.json             # NPM package manifests and execution scripts
-└── README.md                # Project documentation
+│   ├── models/                      # MODEL LAYER (Data Access & State)
+│   │   └── userModel.js             # User data entity, in-memory data store, CRUD queries
+│   │
+│   ├── views/                       # VIEW LAYER (Presentation & UI)
+│   │   └── htmlViews.js             # Server-rendered HTML page templates (Home, About)
+│   │
+│   ├── controllers/                 # CONTROLLER LAYER (Application & Business Logic)
+│   │   ├── userController.js        # User CRUD orchestration, payload validation, status codes
+│   │   ├── healthController.js      # System health telemetry, uptime, memory & OS metrics
+│   │   ├── coreController.js        # Lab endpoints, greeting generators, math calculations
+│   │   └── swaggerController.js     # Swagger UI page rendering & OpenAPI JSON provider
+│   │
+│   ├── routes/                      # ROUTING LAYER (Endpoint Definitions & Dispatching)
+│   │   ├── index.js                 # Central router aggregating all sub-routers
+│   │   ├── userRoutes.js            # User endpoints (/api/users, /api/users/:id)
+│   │   ├── healthRoutes.js          # Health check endpoints (/api/health, /health)
+│   │   ├── coreRoutes.js            # Base routes (/, /home, /about, /hello, /sum)
+│   │   └── swaggerRoutes.js         # Documentation routes (/api/swagger, /api/swagger.json)
+│   │
+│   ├── docs/                        # DOCUMENTATION LAYER (OpenAPI & Interactive UI)
+│   │   ├── swaggerSpec.js           # OpenAPI 3.0 specification definition (paths, schemas)
+│   │   └── swaggerUiHtml.js         # Swagger UI HTML shell generator with CDN bundles
+│   │
+│   └── app.js                       # Express app configuration, CORS, parsers, route mounting
+│
+├── index.js                         # Production server entrypoint binding HTTP listener (PORT 5001)
+├── Dockerfile                       # Multi-stage production Node.js 20 Alpine container image
+├── docker-compose.yml               # Multi-container orchestration (Node app & PostgreSQL db)
+├── .dockerignore                    # Build context exclusions (node_modules, logs, .git)
+├── .env.example                     # Environment configuration variable template
+├── .env                             # Local environment variables (PORT, DB credentials)
+├── .gitignore                       # Git repository ignore rules
+├── alumni-api.postman_collection.json # Complete Postman API collection (v2.1 format)
+├── Alumni Tracking System API/      # Postman v3 collection directory with .request.yaml files
+├── package.json                     # Node.js project manifest, dependencies, and npm scripts
+└── README.md                        # Master project documentation
 ```
+
+---
+
+### 🧩 Architectural Layers & Responsibilities
+
+#### 1. 🗄️ Model Layer (`src/models/`)
+- Encapsulates data representation, data validation, and persistence operations.
+- Completely decoupled from HTTP request/response concepts, making it reusable across web endpoints, background workers, or CLI scripts.
+- **`userModel.js`**: Implements in-memory data store for user records, ID auto-incrementing, lookup methods (`findAll`, `findById`, `findByEmail`), and state mutation operations (`create`, `update`, `patch`, `delete`).
+
+#### 2. 🎨 View Layer (`src/views/`)
+- Responsible for the presentation output sent to clients.
+- Decouples UI structure, HTML markup, and response styling from controller logic.
+- **`htmlViews.js`**: Renders browser-friendly HTML page layouts for human visitors accessing core routes such as the home page (`renderHome()`) and about page (`renderAbout()`).
+
+#### 3. 🧠 Controller Layer (`src/controllers/`)
+- Acts as the intermediary orchestrating the application flow.
+- Accepts parsed HTTP requests from routes, executes defensive input validation, invokes appropriate Model methods, selects output views or JSON representations, and emits HTTP status codes.
+- **`userController.js`**: Handles user listing, creation validation, single user retrieval, full updates (`PUT`), partial updates (`PATCH`), and deletion (`DELETE`).
+- **`healthController.js`**: Extracts node process uptime, platform architecture, and memory usage metrics (`rss`, `heapTotal`, `heapUsed`) for monitoring systems.
+- **`coreController.js`**: Handles base endpoints, content-negotiated responses, arithmetic calculations (`/sum/:num1/:num2`), and personalized greetings.
+- **`swaggerController.js`**: Serves the interactive Swagger UI and OpenAPI 3.0 specification JSON.
+
+#### 4. 🚦 Routing Layer (`src/routes/`)
+- Strictly maps incoming HTTP verbs (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) and URL patterns to controller action handlers.
+- Promotes modularity by partitioning routes into dedicated files (`userRoutes.js`, `healthRoutes.js`, `coreRoutes.js`, `swaggerRoutes.js`) and aggregating them via `index.js`.
+
+#### 5. ⚙️ Application & Server Configuration (`src/app.js` & `index.js`)
+- **`src/app.js`**: Configures middleware pipelines (CORS, JSON parser, urlencoded parser, multipart form parser) and mounts the master router. Decoupled from the port listener for seamless integration testing with supertest/jest.
+- **`index.js`**: Server bootstrap entry point that imports `app.js`, reads the `PORT` environment variable (`5001`), and binds the HTTP server.
 
 ---
 
