@@ -113,7 +113,8 @@ Alumni/
 │   │
 │   ├── routes/                      # ROUTING LAYER (Endpoint Definitions & Dispatching)
 │   │   ├── index.js                 # Central router aggregating all sub-routers
-│   │   ├── userRoutes.js            # User endpoints (/api/users, /api/users/:id)
+│   │   ├── apiUserRoutes.js         # RESTful API user routes (/api/users, /api/users/:id)
+│   │   ├── userRoutes.js            # Web MVC user routes (/users, /users/:id)
 │   │   ├── healthRoutes.js          # Health check endpoints (/api/health, /health)
 │   │   ├── coreRoutes.js            # Base routes (/, /home, /about, /hello, /sum)
 │   │   └── swaggerRoutes.js         # Documentation routes (/api/swagger, /api/swagger.json)
@@ -237,7 +238,13 @@ UserModel.reset();                                             // Reset to seed 
 
 #### 4. 🚦 Routing Layer (`src/routes/`)
 - Strictly maps incoming HTTP verbs (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) and URL patterns to controller action handlers.
-- Promotes modularity by partitioning routes into dedicated files (`userRoutes.js`, `healthRoutes.js`, `coreRoutes.js`, `swaggerRoutes.js`) and aggregating them via `index.js`.
+- Promotes modularity by partitioning routes into dedicated modules:
+  - **`apiUserRoutes.js`**: Routes `/api/users` and `/api/users/:id` to `ApiUserController`.
+  - **`userRoutes.js`**: Routes `/users` and `/users/:id` to `UserController`.
+  - **`healthRoutes.js`**: Routes `/api/health` and `/health` to `HealthController`.
+  - **`coreRoutes.js`**: Routes `/`, `/home`, `/about`, `/hello`, `/sum` to `CoreController`.
+  - **`swaggerRoutes.js`**: Routes `/api/swagger`, `/api/swagger.json` to `SwaggerController`.
+  - **`index.js`**: Central router aggregating all sub-routers onto the main Express app.
 
 #### 5. ⚙️ Application & Server Configuration (`src/app.js` & `index.js`)
 - **`src/app.js`**: Configures middleware pipelines (CORS, JSON parser, urlencoded parser, multipart form parser) and mounts the master router. Decoupled from the port listener for seamless integration testing with supertest/jest.
@@ -334,19 +341,35 @@ npm run dev
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/swagger` | Interactive Swagger UI Documentation | Visual interactive OpenAPI playground |
 | `GET` | `/api/swagger.json` | Raw OpenAPI 3.0 Specification JSON | Full API schema in JSON |
+| `GET` | `/api/health` | Comprehensive system health check JSON | `{"status": "OK", "uptime": 12.34, "memory": {...}}` |
 | `GET` | `/` | API ping / Home placeholder | Terminal/curl: `"ok"` \| Browser: `"temporary one main page"` |
 | `GET` | `/home` | Placeholder home page | `"temporary one main page"` |
 | `GET` | `/about` | Placeholder about page | `"temp. about page"` |
 | `GET` | `/hello` | Standard greeting | `"Hello, World!"` |
 | `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
 | `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
-| `GET` | `/api/health` | Comprehensive system health check JSON | `{"status": "OK", "uptime": 12.34, "memory": {...}}` |
-| `POST` | `/api/users` | Add new user (form/JSON format, in-memory) | Body: `name`, `email`, `role`, `department` |
-| `GET` | `/api/users` | List all registered in-memory users | Returns JSON array of users |
-| `GET` | `/api/users/:id` | Retrieve single user by ID | `/api/users/1` |
-| `PUT` | `/api/users/:id` | Full update/replacement of user record | Body: `name`, `email`, `role`, etc. |
-| `PATCH` | `/api/users/:id` | Partial update of specific user fields | Body: fields to update (e.g. `department`) |
-| `DELETE` | `/api/users/:id` | Delete user record by ID | `/api/users/1` |
+
+### 🚀 REST API User Endpoints (`ApiUserController` ➡️ `/api/users`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/users` | List all users (supports `role`, `department`, `search`, `limit`, `page`) | Returns JSON array of user records |
+| `POST` | `/api/users` | Create new user (JSON or urlencoded) | Body: `name`, `email`, `role`, `department` |
+| `GET` | `/api/users/:id` | Retrieve single user by ID | Returns JSON user record |
+| `PUT` | `/api/users/:id` | Full replacement of user record | Body: `name`, `email`, `role`, etc. |
+| `PATCH` | `/api/users/:id` | Partial update of specific fields | Body: fields to update (e.g. `department`) |
+| `DELETE` | `/api/users/:id` | Delete user record by ID | Returns deleted user JSON |
+
+### 🌐 Web MVC User Endpoints (`UserController` ➡️ `/users`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/users` | Web user directory (HTML page or JSON) | Browser: HTML Directory Cards \| API: JSON |
+| `POST` | `/users` | Create user via web form or request | Body: `name`, `email`, `role`, `department` |
+| `GET` | `/users/:id` | Web user profile view (HTML page or JSON) | Browser: HTML Profile Card \| API: JSON |
+| `PUT` | `/users/:id` | Full replacement via web endpoint | Replaces user record |
+| `PATCH` | `/users/:id` | Partial update via web endpoint | Updates specified fields |
+| `DELETE` | `/users/:id` | Delete user via web endpoint | Deletes user record |
 
 ### Planned Alumni Management Endpoints
 

@@ -24,8 +24,12 @@ const swaggerSpec = {
       description: 'System telemetry, runtime status, and healthcheck operations'
     },
     {
-      name: 'Users',
-      description: 'In-memory user management operations (CRUD)'
+      name: 'API Users (ApiUserController)',
+      description: 'RESTful API user endpoints returning standard JSON payloads (/api/users)'
+    },
+    {
+      name: 'Web Users (UserController)',
+      description: 'Web MVC user endpoints supporting HTML views and web requests (/users)'
     },
     {
       name: 'Core Lab Routes',
@@ -54,7 +58,7 @@ const swaggerSpec = {
     },
     '/api/users': {
       get: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'List all users',
         description: 'Retrieves all registered user records stored in memory with optional filtering, search, and pagination.',
         parameters: [
@@ -125,7 +129,7 @@ const swaggerSpec = {
         }
       },
       post: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'Create a new user',
         description: 'Registers a new user record. Accepts form data (urlencoded/multipart) or JSON payloads.',
         requestBody: {
@@ -180,7 +184,7 @@ const swaggerSpec = {
     },
     '/api/users/{id}': {
       get: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'Get single user by ID',
         description: 'Returns profile details for a specific user ID.',
         parameters: [
@@ -226,7 +230,7 @@ const swaggerSpec = {
         }
       },
       put: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'Full update of user record (PUT)',
         description: 'Completely replaces an existing user record. Name and email are required.',
         parameters: [
@@ -292,7 +296,7 @@ const swaggerSpec = {
         }
       },
       patch: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'Partial update of user record (PATCH)',
         description: 'Modifies only specific fields of an existing user record (e.g. only department or role).',
         parameters: [
@@ -368,7 +372,7 @@ const swaggerSpec = {
         }
       },
       delete: {
-        tags: ['Users'],
+        tags: ['API Users (ApiUserController)'],
         summary: 'Delete user record',
         description: 'Removes an existing user record from in-memory storage by ID.',
         parameters: [
@@ -404,6 +408,265 @@ const swaggerSpec = {
               }
             }
           }
+        }
+      }
+    },
+    '/users': {
+      get: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Web user directory listing (HTML or JSON)',
+        description: 'Returns server-rendered HTML page of users for browsers (Accept: text/html) or JSON list for API requests.',
+        parameters: [
+          {
+            name: 'role',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'admin'] }
+          },
+          {
+            name: 'department',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', example: 'Computer Science' }
+          },
+          {
+            name: 'search',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', example: 'Alumni' }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML directory page or JSON user list',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    count: { type: 'integer', example: 2 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/User' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Create user via web form or JSON',
+        description: 'Creates a new user record via form data or JSON body.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: { $ref: '#/components/schemas/UserInput' }
+            },
+            'application/json': {
+              schema: { $ref: '#/components/schemas/UserInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'User created successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'User created successfully' },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '400': {
+            description: 'Validation error (missing name or email)',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+            }
+          },
+          '409': {
+            description: 'Email already registered',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+            }
+          }
+        }
+      }
+    },
+    '/users/{id}': {
+      get: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Web user profile page (HTML or JSON)',
+        description: 'Returns server-rendered HTML profile page for browsers or JSON for API clients.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML profile page or JSON user record',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'User not found',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+            }
+          }
+        }
+      },
+      put: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Full update of user record via web endpoint (PUT)',
+        description: 'Replaces all fields of user record.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: { $ref: '#/components/schemas/UserInput' }
+            },
+            'application/json': {
+              schema: { $ref: '#/components/schemas/UserInput' }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'User record completely updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'User completely updated successfully (PUT)' },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Missing required fields or invalid ID' },
+          '404': { description: 'User not found' },
+          '409': { description: 'Email already used by another record' }
+        }
+      },
+      patch: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Partial update of user record via web endpoint (PATCH)',
+        description: 'Modifies only specific fields of user record.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  email: { type: 'string', format: 'email' },
+                  role: { type: 'string' },
+                  department: { type: 'string' },
+                  graduationYear: { type: 'integer' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'User record partially updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'User partially updated successfully (PATCH)' },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' },
+          '409': { description: 'Email already in use' }
+        }
+      },
+      delete: {
+        tags: ['Web Users (UserController)'],
+        summary: 'Delete user record via web endpoint',
+        description: 'Removes user record by ID.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'User successfully deleted',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'User with ID 1 has been successfully deleted.' },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
         }
       }
     },

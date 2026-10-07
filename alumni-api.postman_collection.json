@@ -269,6 +269,53 @@
       "response": []
     },
     {
+      "name": "Web User Directory (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users"
+          ]
+        },
+        "description": "Returns rendered HTML alumni directory or JSON list via UserController."
+      },
+      "response": []
+    },
+    {
+      "name": "Web User Profile (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1"
+          ]
+        },
+        "description": "Returns rendered HTML user profile page or JSON record via UserController."
+      },
+      "response": []
+    },
+    {
       "name": "Get Root / Home",
       "request": {
         "method": "GET",
