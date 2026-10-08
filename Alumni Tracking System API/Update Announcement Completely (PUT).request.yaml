@@ -1,0 +1,14 @@
+$kind: http-request
+description: Replaces an announcement completely by ID.
+url: "{{baseUrl}}/api/announcements/1"
+method: PUT
+body:
+  type: json
+  content: |-
+    {
+      "title": "Annual Alumni Homecoming 2026 - Registration Open",
+      "content": "Registration is officially open for the Annual Homecoming Weekend featuring networking dinners and awards.",
+      "author": "Alumni Relations Office",
+      "category": "Event"
+    }
+order: 7400

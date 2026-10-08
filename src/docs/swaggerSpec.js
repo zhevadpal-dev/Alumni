@@ -32,6 +32,14 @@ const swaggerSpec = {
       description: 'Web MVC user endpoints supporting HTML views and web requests (/users)'
     },
     {
+      name: 'API Announcements (ApiAnnouncementController)',
+      description: 'RESTful API announcement endpoints returning standard JSON payloads (/api/announcements)'
+    },
+    {
+      name: 'Web Announcements (AnnouncementController)',
+      description: 'Web management interface and HTML UI endpoints for announcements (/announcements)'
+    },
+    {
       name: 'Core Lab Routes',
       description: 'Basic laboratory and greeting endpoints'
     }
@@ -713,6 +721,479 @@ const swaggerSpec = {
         }
       }
     },
+    '/api/announcements': {
+      get: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'List all announcements',
+        description: 'Retrieves all announcements stored in memory with optional filtering by category, author, search keyword, and pagination.',
+        parameters: [
+          {
+            name: 'category',
+            in: 'query',
+            required: false,
+            description: 'Filter by category (General, Event, Career, Academic, News, Urgent)',
+            schema: { type: 'string', enum: ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'] }
+          },
+          {
+            name: 'author',
+            in: 'query',
+            required: false,
+            description: 'Filter by publishing author or office substring',
+            schema: { type: 'string', example: 'Alumni' }
+          },
+          {
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Search keyword across title, content, or author',
+            schema: { type: 'string', example: 'Homecoming' }
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            description: 'Limit returned results count',
+            schema: { type: 'integer', example: 10 }
+          },
+          {
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Page offset',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of announcements returned successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    count: { type: 'integer', example: 3 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Announcement' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'Create a new announcement',
+        description: 'Publishes and persists a new announcement record in memory.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AnnouncementInput' }
+            },
+            'application/x-www-form-urlencoded': {
+              schema: { $ref: '#/components/schemas/AnnouncementInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Announcement created successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement created successfully' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '400': {
+            description: 'Validation error (missing title or content)',
+            content: {
+              'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+            }
+          }
+        }
+      }
+    },
+    '/api/announcements/{id}': {
+      get: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'Get single announcement by ID',
+        description: 'Retrieves announcement details by numeric ID.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Announcement found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Invalid numeric ID provided' },
+          '404': { description: 'Announcement not found' }
+        }
+      },
+      put: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'Update announcement (PUT)',
+        description: 'Updates announcement attributes.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/AnnouncementInput' } }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Announcement updated successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement updated successfully' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Validation error' },
+          '404': { description: 'Announcement not found' }
+        }
+      },
+      patch: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'Partial update of announcement (PATCH)',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  content: { type: 'string' },
+                  author: { type: 'string' },
+                  category: { type: 'string' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Announcement updated successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement updated successfully' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Validation error' },
+          '404': { description: 'Announcement not found' }
+        }
+      },
+      delete: {
+        tags: ['API Announcements (ApiAnnouncementController)'],
+        summary: 'Delete announcement',
+        description: 'Permanently removes an announcement record from memory.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Announcement successfully deleted',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement with ID #1 has been successfully deleted.' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '204': { description: 'No content (if requested via status=204)' },
+          '400': { description: 'Invalid numeric ID provided' },
+          '404': { description: 'Announcement not found' }
+        }
+      }
+    },
+    '/announcements': {
+      get: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Web announcement management interface (HTML or JSON)',
+        description: 'Returns server-rendered HTML management interface with overview stats, announcement table, and embedded creation form.',
+        parameters: [
+          {
+            name: 'category',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', enum: ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'] }
+          },
+          {
+            name: 'search',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', example: 'Mentorship' }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML management UI or JSON list',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Announcement Management...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    count: { type: 'integer', example: 3 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Announcement' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Create announcement via web form or request',
+        description: 'Processes announcement creation and returns rendered HTML confirmation or JSON.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: { $ref: '#/components/schemas/AnnouncementInput' }
+            },
+            'application/json': {
+              schema: { $ref: '#/components/schemas/AnnouncementInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Announcement created successfully (HTML confirmation or JSON)',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Announcement Published Successfully!...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement created successfully' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Validation error (missing title or content)' }
+        }
+      }
+    },
+    '/announcements/new': {
+      get: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Web announcement creation form page',
+        description: 'Returns standalone HTML form page for creating a new announcement.',
+        responses: {
+          '200': {
+            description: 'Rendered HTML form page',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...New Announcement...</html>' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/announcements/{id}': {
+      get: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Web announcement detail reading view',
+        description: 'Returns server-rendered HTML reading page for a specific announcement.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML reading view or JSON announcement',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Announcement Detail...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/Announcement' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Announcement not found' }
+        }
+      }
+    },
+    '/announcements/{id}/edit': {
+      get: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Web announcement edit form view',
+        description: 'Returns server-rendered HTML form pre-populated with announcement data.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML edit form page',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Edit Announcement...</html>' }
+              }
+            }
+          },
+          '404': { description: 'Announcement not found' }
+        }
+      },
+      post: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Process announcement edit form submission',
+        description: 'Updates announcement record via form submission and renders updated view.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': { schema: { $ref: '#/components/schemas/AnnouncementInput' } },
+            'application/json': { schema: { $ref: '#/components/schemas/AnnouncementInput' } }
+          }
+        },
+        responses: {
+          '200': { description: 'Announcement updated successfully (HTML confirmation or JSON)' },
+          '400': { description: 'Validation error' },
+          '404': { description: 'Announcement not found' }
+        }
+      }
+    },
+    '/announcements/{id}/delete': {
+      post: {
+        tags: ['Web Announcements (AnnouncementController)'],
+        summary: 'Delete announcement via web form action',
+        description: 'Processes deletion request from HTML management table or detail view.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Announcement successfully deleted (HTML confirmation or JSON)',
+            content: {
+              'text/html': {
+                schema: { type: 'string', example: '<!DOCTYPE html><html>...Announcement Deleted...</html>' }
+              },
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Announcement with ID #1 deleted successfully.' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Announcement not found' }
+        }
+      }
+    },
     '/': {
       get: {
         tags: ['Core Lab Routes'],
@@ -848,6 +1329,28 @@ const swaggerSpec = {
           role: { type: 'string', example: 'alumni' },
           department: { type: 'string', example: 'Computer Engineering' },
           graduationYear: { type: 'integer', example: 2024 }
+        }
+      },
+      Announcement: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          title: { type: 'string', example: 'Annual Alumni Homecoming 2026' },
+          content: { type: 'string', example: 'We are thrilled to welcome all alumni back to campus for the Annual Homecoming Weekend...' },
+          author: { type: 'string', example: 'Alumni Relations Office' },
+          category: { type: 'string', enum: ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'], example: 'Event' },
+          createdAt: { type: 'string', format: 'date-time', example: '2026-10-01T10:00:00.000Z' },
+          updatedAt: { type: 'string', format: 'date-time', example: '2026-10-01T10:00:00.000Z' }
+        }
+      },
+      AnnouncementInput: {
+        type: 'object',
+        required: ['title', 'content'],
+        properties: {
+          title: { type: 'string', example: 'Spring 2026 Mentorship Program Applications Open' },
+          content: { type: 'string', example: 'Connect with current undergraduate students to provide career mentorship...' },
+          author: { type: 'string', example: 'Career Development Center' },
+          category: { type: 'string', enum: ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'], example: 'Career' }
         }
       },
       HealthResponse: {

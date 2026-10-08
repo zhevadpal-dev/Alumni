@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders standalone HTML form to publish a new announcement.
+url: "{{baseUrl}}/announcements/new"
+method: GET
+headers:
+  Accept: text/html
+order: 7900

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders pre-populated HTML form to edit an existing announcement.
+url: "{{baseUrl}}/announcements/1/edit"
+method: GET
+headers:
+  Accept: text/html
+order: 8000

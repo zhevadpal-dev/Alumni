@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieves all announcements with optional search, category, and author filters.
+url: "{{baseUrl}}/api/announcements"
+method: GET
+headers:
+  Accept: application/json
+order: 7200

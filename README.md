@@ -99,12 +99,16 @@ The Alumni Tracking System backend follows the **Model-View-Controller (MVC)** a
 Alumni/
 ├── src/
 │   ├── models/                      # MODEL LAYER (Data Access & State)
+│   │   ├── announcementModel.js     # Announcement data entity, in-memory data store, CRUD queries
 │   │   └── userModel.js             # User data entity, in-memory data store, CRUD queries
 │   │
 │   ├── views/                       # VIEW LAYER (Presentation & UI)
-│   │   └── htmlViews.js             # Server-rendered HTML page templates (Home, About)
+│   │   ├── announcementViews.js     # Server-rendered HTML templates for announcements (List, Detail, Form)
+│   │   └── htmlViews.js             # Server-rendered HTML page templates (Home, About, Users)
 │   │
 │   ├── controllers/                 # CONTROLLER LAYER (Application & Business Logic)
+│   │   ├── apiAnnouncementController.js # RESTful API controller for /api/announcements (JSON CRUD, status codes)
+│   │   ├── announcementController.js    # Web MVC controller for /announcements (HTML views & web responses)
 │   │   ├── apiUserController.js     # RESTful API controller for /api/users (JSON CRUD, status codes)
 │   │   ├── userController.js        # Web MVC controller for /users (HTML views & web responses)
 │   │   ├── healthController.js      # System health telemetry, uptime, memory & OS metrics
@@ -113,6 +117,8 @@ Alumni/
 │   │
 │   ├── routes/                      # ROUTING LAYER (Endpoint Definitions & Dispatching)
 │   │   ├── index.js                 # Central router aggregating all sub-routers
+│   │   ├── apiAnnouncementRoutes.js # RESTful API announcement routes (/api/announcements, /api/announcements/:id)
+│   │   ├── announcementRoutes.js    # Web MVC announcement routes (/announcements, /announcements/:id)
 │   │   ├── apiUserRoutes.js         # RESTful API user routes (/api/users, /api/users/:id)
 │   │   ├── userRoutes.js            # Web MVC user routes (/users, /users/:id)
 │   │   ├── healthRoutes.js          # Health check endpoints (/api/health, /health)
@@ -208,15 +214,75 @@ const deletedEmail = UserModel.deleteByEmail('ayse@example.com');// Delete by em
 UserModel.reset();                                             // Reset to seed dataset
 ```
 
-##### 🛡️ Validation & Data Integrity Safeguards
+##### 🛡️ Validation & Data Integrity Safeguards (User)
 - **Email Uniqueness:** Prevents duplicate registrations across `create`, `update`, and `patch`.
 - **Format Validation:** RFC-compliant regex validation (`isValidEmail()`) ensures emails are structurally valid.
 - **Role Enforcement:** Restricts roles strictly to predefined whitelist (`alumni`, `student`, `faculty`, `admin`).
 - **Graduation Year Range:** Enforces realistic integer years between 1900 and 2100.
 - **Defensive Immutability:** CRUD methods return shallow clones to avoid unintended external memory mutations.
 
+---
+
+- **`announcementModel.js`**: Provides an in-memory datastore for institutional announcements, events, and news updates with full CRUD capabilities, defensive cloning, search, and category validation.
+
+##### 📋 Announcement Entity Schema
+
+| Attribute | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `Integer` | System-generated | Unique auto-increment primary key | `1` |
+| `title` | `String` | Yes | Headline / title of the announcement | `"Annual Alumni Homecoming 2026"` |
+| `content` | `String` | Yes | Full announcement body text | `"We are thrilled to welcome all alumni..."` |
+| `author` | `String` | No (Default: `'Alumni Relations Office'`) | Department or person publishing the notice | `"Alumni Relations Office"` |
+| `category` | `String` | No (Default: `'General'`) | Whitelist: `General`, `Event`, `Career`, `Academic`, `News`, `Urgent` | `"Event"` |
+| `createdAt` | `ISO 8601 String` | System-generated | Timestamp of creation | `"2026-10-01T10:00:00.000Z"` |
+| `updatedAt` | `ISO 8601 String` | System-generated | Timestamp of last modification | `"2026-10-01T10:00:00.000Z"` |
+
+##### 🛠️ Implemented Announcement CRUD Functions
+
+```javascript
+const AnnouncementModel = require('../models/announcementModel');
+
+// 1. CREATE (C)
+const newNotice = AnnouncementModel.create({
+  title: 'Spring 2026 Career Fair',
+  content: 'Join over 50 top employers on campus for internships and full-time hiring.',
+  author: 'Career Development Center',
+  category: 'Career'
+});
+
+// 2. READ (R)
+const allNotices = AnnouncementModel.getAll();                      // All records (sorted newest first)
+const filtered   = AnnouncementModel.getAll({ category: 'Event' }); // Filter by category
+const searched   = AnnouncementModel.getAll({ search: 'Career' });  // Free text search in title/content/author
+const paginated  = AnnouncementModel.getAll({ page: 1, limit: 10 });// Pagination
+const noticeById = AnnouncementModel.getById(1);                    // Find by primary ID
+const isExisting = AnnouncementModel.exists(1);                    // Boolean existence check
+const count      = AnnouncementModel.count({ category: 'Career' }); // Filtered record count
+
+// 3. UPDATE (U)
+const updatedNotice = AnnouncementModel.update(1, {
+  title: 'Annual Alumni Homecoming 2026 - Registration Open',
+  category: 'Event'
+});
+
+// 4. DELETE (D)
+const deletedNotice = AnnouncementModel.delete(1);                  // Delete by ID
+AnnouncementModel.reset();                                          // Reset to initial seed dataset
+```
+
+##### 🛡️ Validation & Data Integrity Safeguards (Announcement)
+- **Required Fields:** Enforces mandatory presence of non-empty `title` and `content`.
+- **Category Whitelist:** Restricts category values strictly to `General`, `Event`, `Career`, `Academic`, `News`, `Urgent`.
+- **Defensive Immutability:** CRUD methods return shallow clones to prevent unintended mutation of internal memory arrays.
+
 #### 2. 🎨 View Layer (`src/views/`)
 - Responsible for the presentation output sent to clients, cleanly decoupling UI layout, CSS styling, and HTML templates from controller orchestration.
+- **`announcementViews.js`**: Generates responsive, modern server-rendered HTML management interfaces:
+  - **`GET /announcements` (Directory & Management View):** Renders `renderList(announcements, stats)` with analytical summary cards (Total Announcements, Categories, Latest update), categorized card grid, tabular listings with action buttons, and an embedded quick-publish form.
+  - **`GET /announcements/new` (Creation Form):** Renders `renderNewForm()` with accessible inputs, category selector, author override, and responsive design.
+  - **`GET /announcements/:id` (Detail View):** Renders `renderDetail(announcement)` with category badges, author attribution, publication timestamps, full text formatting, and contextual navigation.
+  - **`GET /announcements/:id/edit` (Edit Form):** Renders `renderEditForm(announcement)` pre-populated with current values for streamlined updates.
+  - **Success & Confirmation Views:** `renderCreateSuccess(announcement)`, `renderUpdateSuccess(announcement)`, `renderDeleteSuccess(announcement)` providing clear feedback and links back to the directory.
 - **`htmlViews.js`**: Generates responsive, server-rendered HTML view templates:
   - **`GET /users` (Directory & Form View):** Renders `renderUsersList(users)` displaying registered alumni member cards and an embedded interactive HTML registration form (`<form action="/users" method="POST">`) allowing users to register new alumni directly from the browser.
   - **`POST /users` (Success / Error Views):**
@@ -228,6 +294,15 @@ UserModel.reset();                                             // Reset to seed 
 #### 3. 🧠 Controller Layer (`src/controllers/`)
 - Acts as the intermediary orchestrating the application flow.
 - Accepts parsed HTTP requests from routes, executes defensive input validation, invokes appropriate Model methods, selects output views or JSON representations, and emits HTTP status codes.
+- **`apiAnnouncementController.js` (REST API Controller):**
+  - Dedicated to `/api/announcements` and `/api/announcements/:id`.
+  - Implements complete JSON CRUD operations: `getAll` (with filtering by category, search, author, pagination), `getById`, `create`, `update`, `remove`.
+  - Emits standardized JSON response contracts (`{ status: 'success', data: ... }`) and HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `204 No Content`).
+- **`announcementController.js` (Web / MVC View Controller):**
+  - Dedicated to `/announcements`, `/announcements/new`, `/announcements/:id`, `/announcements/:id/edit`, `/announcements/:id/delete`.
+  - Implements web-oriented CRUD operations and content negotiation.
+  - When accessed via web browsers (`Accept: text/html`), renders rich HTML views (`AnnouncementViews.renderList`, `renderDetail`, `renderNewForm`, `renderEditForm`).
+  - When accessed programmatically or via form submission, executes CRUD workflows on `AnnouncementModel` and returns appropriate web/JSON payloads.
 - **`apiUserController.js` (REST API Controller):**
   - Dedicated to `/api/users` and `/api/users/:id`.
   - Implements complete JSON CRUD operations: `getAllUsers` (with filtering, search, pagination), `getUserById`, `createUser`, `updateUserPut`, `updateUserPatch`, `deleteUser`.
@@ -244,6 +319,8 @@ UserModel.reset();                                             // Reset to seed 
 #### 4. 🚦 Routing Layer (`src/routes/`)
 - Strictly maps incoming HTTP verbs (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) and URL patterns to controller action handlers.
 - Promotes modularity by partitioning routes into dedicated modules:
+  - **`apiAnnouncementRoutes.js`**: Routes `/api/announcements` and `/api/announcements/:id` to `ApiAnnouncementController`.
+  - **`announcementRoutes.js`**: Routes `/announcements`, `/announcements/new`, `/announcements/:id`, `/announcements/:id/edit`, `/announcements/:id/delete` to `AnnouncementController`.
   - **`apiUserRoutes.js`**: Routes `/api/users` and `/api/users/:id` to `ApiUserController`.
   - **`userRoutes.js`**: Routes `/users` and `/users/:id` to `UserController`.
   - **`healthRoutes.js`**: Routes `/api/health` and `/health` to `HealthController`.
@@ -376,6 +453,29 @@ npm run dev
 | `PUT` / `POST` | `/users/:id` & `/users/:id/edit` | **Update (Full)** | `renderUserUpdatedSuccess(user)` | Replaces user record and renders HTML updated view |
 | `PATCH` | `/users/:id` | **Update (Partial)** | `renderUserUpdatedSuccess(user)` | Partially updates fields and renders HTML updated view |
 | `DELETE` / `POST` | `/users/:id` & `/users/:id/delete` | **Delete** | `renderUserDeletedSuccess(user)` | Deletes user record and renders HTML deletion confirmation |
+
+### 📢 REST API Announcement Endpoints (`ApiAnnouncementController` ➡️ `/api/announcements`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/announcements` | List announcements (supports `category`, `search`, `author`, `limit`, `page`) | Returns JSON array of announcement records |
+| `POST` | `/api/announcements` | Create new announcement (JSON or urlencoded) | Body: `title`, `content`, `author`, `category` |
+| `GET` | `/api/announcements/:id` | Retrieve single announcement by ID | Returns JSON announcement record |
+| `PUT` | `/api/announcements/:id` | Full / partial update of announcement record | Body: `title`, `content`, `category`, `author` |
+| `PATCH` | `/api/announcements/:id` | Partial update of announcement fields | Body: fields to update |
+| `DELETE` | `/api/announcements/:id` | Delete announcement by ID | Returns `204 No Content` or deleted announcement JSON |
+
+### 🌐 Web MVC Announcement Endpoints with View Layer (`AnnouncementController` ➡️ `/announcements`)
+
+| Method | Endpoint | CRUD Role | View Layer Output | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/announcements` | **Read (List)** | `renderList(announcements, stats)` | Responsive HTML announcement directory with stats and embedded create form |
+| `GET` | `/announcements/new` | **Create (Form)** | `renderNewForm()` | Standalone HTML form for publishing a new announcement |
+| `POST` | `/announcements` | **Create (Action)** | `renderCreateSuccess(announcement)` | Processes form submission and renders HTML success confirmation |
+| `GET` | `/announcements/:id` | **Read (Detail)** | `renderDetail(announcement)` | Server-rendered HTML announcement detail view with metadata |
+| `GET` | `/announcements/:id/edit` | **Update (Form)** | `renderEditForm(announcement)` | Pre-populated HTML edit form for browser modification |
+| `POST` / `PUT` | `/announcements/:id` & `/announcements/:id/edit` | **Update (Action)** | `renderUpdateSuccess(announcement)` | Updates announcement and renders HTML updated view |
+| `POST` / `DELETE` | `/announcements/:id` & `/announcements/:id/delete` | **Delete (Action)** | `renderDeleteSuccess(announcement)` | Deletes announcement and renders HTML deletion confirmation |
 
 ### Planned Alumni Management Endpoints
 

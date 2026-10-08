@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieves details of a single announcement by ID.
+url: "{{baseUrl}}/api/announcements/1"
+method: GET
+headers:
+  Accept: application/json
+order: 7300

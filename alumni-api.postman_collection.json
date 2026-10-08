@@ -316,6 +316,272 @@
       "response": []
     },
     {
+      "name": "Create Announcement (API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Alumni Gala Night 2026\",\n  \"content\": \"Join fellow graduates and faculty for an evening celebrating milestone achievements.\",\n  \"author\": \"Alumni Relations Office\",\n  \"category\": \"Event\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements"
+          ]
+        },
+        "description": "Creates a new announcement stored in-memory (no database required)."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Announcements (API)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements"
+          ]
+        },
+        "description": "Retrieves list of announcements with optional search, category, author, and pagination query params."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Announcement by ID (API)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "1"
+          ]
+        },
+        "description": "Retrieves details of a single announcement by its numeric ID."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Announcement Completely (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Annual Alumni Homecoming 2026 - Registration Open\",\n  \"content\": \"Registration is officially open for the Annual Homecoming Weekend.\",\n  \"author\": \"Alumni Relations Office\",\n  \"category\": \"Event\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "1"
+          ]
+        },
+        "description": "Updates an existing announcement by ID using PUT semantics."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Announcement Partially (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"category\": \"Urgent\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "1"
+          ]
+        },
+        "description": "Partially updates specific attributes of an announcement by ID."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Announcement by ID (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "1"
+          ]
+        },
+        "description": "Deletes an announcement from the in-memory store by ID."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Announcement Directory (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/announcements",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "announcements"
+          ]
+        },
+        "description": "Returns rendered HTML announcement management directory with stats and quick-create form."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Create Announcement Form (HTML)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/announcements/new",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "announcements",
+            "new"
+          ]
+        },
+        "description": "Renders standalone HTML form to publish a new announcement."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Single Announcement Detail (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/announcements/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "announcements",
+            "1"
+          ]
+        },
+        "description": "Returns rendered HTML view displaying full single announcement details."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Edit Announcement Form (HTML)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/announcements/1/edit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "announcements",
+            "1",
+            "edit"
+          ]
+        },
+        "description": "Renders pre-populated HTML form to modify an existing announcement."
+      },
+      "response": []
+    },
+    {
       "name": "Get Root / Home",
       "request": {
         "method": "GET",

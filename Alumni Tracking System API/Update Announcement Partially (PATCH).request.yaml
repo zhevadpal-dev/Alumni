@@ -1,0 +1,11 @@
+$kind: http-request
+description: Partially updates attributes of an announcement by ID.
+url: "{{baseUrl}}/api/announcements/1"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "category": "Urgent"
+    }
+order: 7500

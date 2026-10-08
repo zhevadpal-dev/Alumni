@@ -1,0 +1,7 @@
+$kind: http-request
+description: Returns server-rendered HTML single announcement detail view with metadata and actions.
+url: "{{baseUrl}}/announcements/1"
+method: GET
+headers:
+  Accept: text/html
+order: 7800

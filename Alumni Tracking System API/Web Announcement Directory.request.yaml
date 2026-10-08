@@ -1,0 +1,7 @@
+$kind: http-request
+description: Returns server-rendered HTML announcement directory with analytics and create form.
+url: "{{baseUrl}}/announcements"
+method: GET
+headers:
+  Accept: text/html
+order: 7700

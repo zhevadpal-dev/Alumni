@@ -1,0 +1,14 @@
+$kind: http-request
+description: Creates a new announcement in the in-memory array store.
+url: "{{baseUrl}}/api/announcements"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "title": "Alumni Gala Night 2026",
+      "content": "Join fellow graduates and faculty for an evening celebrating milestone achievements.",
+      "author": "Alumni Relations Office",
+      "category": "Event"
+    }
+order: 7100

@@ -1,0 +1,5 @@
+$kind: http-request
+description: Deletes an announcement from the in-memory array store by ID.
+url: "{{baseUrl}}/api/announcements/1"
+method: DELETE
+order: 7600
