@@ -9,26 +9,26 @@ services:
     ports:
       - "${PORT:-5001}:5001"
     environment:
-      - NODE_ENV=development
-      - PORT=5001
-      - DB_HOST=postgres
-      - DB_PORT=5432
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=${PORT:-5001}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-5432}
       - DB_NAME=${DB_NAME:-alumni_db}
       - DB_USER=${DB_USER:-alumni_user}
       - DB_PASSWORD=${DB_PASSWORD:-alumni_secret_password}
+      - DATABASE_URL=${DATABASE_URL:-postgres://${DB_USER:-alumni_user}:${DB_PASSWORD:-alumni_secret_password}@${DB_HOST:-db}:${DB_PORT:-5432}/${DB_NAME:-alumni_db}}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      postgres:
-        condition: service_healthy
+      - db
     networks:
       - alumni_network
 
   # PostgreSQL Database Service
-  postgres:
+  db:
     image: postgres:15-alpine
-    container_name: alumni_postgres
+    container_name: alumni_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-alumni_db}
@@ -37,7 +37,7 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
-      - alumni_pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-alumni_user} -d ${DB_NAME:-alumni_db}"]
       interval: 5s
@@ -47,7 +47,7 @@ services:
       - alumni_network
 
 volumes:
-  alumni_pgdata:
+  postgres_data:
     driver: local
 
 networks:

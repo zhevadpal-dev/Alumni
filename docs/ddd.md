@@ -27,7 +27,7 @@
 The **Alumni Tracking System** employs a decoupled, multi-tier data architecture following strict **Model-View-Controller (MVC)** principles.
 
 - **Current State:** Active models ([`src/models/userModel.js`](../src/models/userModel.js) and [`src/models/announcementModel.js`](../src/models/announcementModel.js)) encapsulate in-memory array collections with defensive cloning, deterministic ID generators, query filtering, and schema validation. This allows instantaneous boot times, zero external database setup friction for development/testing, and complete container portability.
-- **Target State:** The system is pre-configured with a containerized PostgreSQL 15 database (`alumni_postgres`), ready for seamless transition to durable relational persistence via Knex.js query builder or native connection pools without altering controller or view contracts.
+- **Target State:** The system is pre-configured with a containerized PostgreSQL 15 database (`alumni_db`), ready for seamless transition to durable relational persistence via Knex.js query builder or native connection pools without altering controller or view contracts.
 
 ---
 

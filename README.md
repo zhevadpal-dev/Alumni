@@ -345,7 +345,7 @@ The Alumni Tracking System employs a structured data design strictly encapsulate
 - **Domain Validation & Integrity Rules:**
   - **User Entity:** Enforces mandatory RFC-compliant emails (case-insensitive uniqueness), whitelist role authorization (`alumni`, `student`, `faculty`, `admin`), and valid graduation years (1900–2100).
   - **Announcement Entity:** Enforces mandatory title/content bodies, category whitelist (`General`, `Event`, `Career`, `Academic`, `News`, `Urgent`), and automatic ISO 8601 timestamps.
-- **Relational Persistence Target:** Full DDL mapping to PostgreSQL 15 (`alumni_postgres` container) with foreign keys (`announcements.author_id -> users.id`), indexes on lookup columns, and automated `updated_at` trigger functions.
+- **Relational Persistence Target:** Full DDL mapping to PostgreSQL 15 (`alumni_db` container) with foreign keys (`announcements.author_id -> users.id`), indexes on lookup columns, and automated `updated_at` trigger functions.
 - **In-Memory Lifecycle Verification:** Proven via empirical "Forgetting Tests" where runtime state resets cleanly upon container reboot (`docker compose down && up`).
 
 📖 For comprehensive entity specifications, schema definitions, validation rules, Mermaid ER diagrams, and PostgreSQL migration DDL, see the full document:  
@@ -386,18 +386,21 @@ PORT=5001
 NODE_ENV=development
 
 # PostgreSQL Database Configuration
-DB_HOST=postgres
+DB_HOST=db
 DB_PORT=5432
 DB_NAME=alumni_db
 DB_USER=alumni_user
 DB_PASSWORD=alumni_secret_password
+DATABASE_URL=postgres://alumni_user:alumni_secret_password@db:5432/alumni_db
 ```
 
 ---
 
 ### 3. Run with Docker Compose (Recommended) 🐳
 
-Launch both the Node.js backend and the PostgreSQL database in isolated containers:
+Launch the full containerized application stack orchestrated via `docker-compose.yml`:
+- **`app` Service (`alumni_app`):** Node.js backend API listening on container port `5001` and mapped to host port `5001:5001` (safely avoiding macOS AirPlay Receiver conflicts on port 5000). Features live source code volume mounting with isolated `node_modules`.
+- **`db` Service (`alumni_db`):** PostgreSQL 15 Alpine database exposed on host port `5432:5432` with durable named volume `postgres_data:/var/lib/postgresql/data` ensuring data persistence across restarts.
 
 ```bash
 # Build and start services in detached mode
