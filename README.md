@@ -139,7 +139,9 @@ Alumni/
 ├── .env                             # Local environment variables (PORT, DB credentials)
 ├── .gitignore                       # Git repository ignore rules
 ├── alumni-api.postman_collection.json # Complete Postman API collection (v2.1 format)
-├── Alumni Tracking System API/      # Postman v3 collection directory with .request.yaml files
+├── tests/                           # TEST SUITE & VERIFICATION
+│   └── forgetting-test.sh           # Automated in-memory lifecycle verification script (Forgetting Test)
+├── DATA_DESIGN.md                   # Comprehensive Data Design & Persistence Architecture documentation
 ├── package.json                     # Node.js project manifest, dependencies, and npm scripts
 └── README.md                        # Master project documentation
 ```
