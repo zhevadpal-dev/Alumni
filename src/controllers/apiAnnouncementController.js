@@ -17,9 +17,9 @@ class ApiAnnouncementController {
    * GET /api/announcements
    * Retrieve all announcements with optional filtering by category, search, author, and pagination.
    */
-  static getAll(req, res) {
+  static async getAll(req, res) {
     try {
-      const items = AnnouncementModel.getAll(req.query);
+      const items = await AnnouncementModel.getAll(req.query);
       return res.status(200).json({
         status: 'success',
         count: items.length,
@@ -37,7 +37,7 @@ class ApiAnnouncementController {
    * GET /api/announcements/:id
    * Retrieve a single announcement by its numeric ID.
    */
-  static getById(req, res) {
+  static async getById(req, res) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -46,25 +46,32 @@ class ApiAnnouncementController {
       });
     }
 
-    const item = AnnouncementModel.getById(id);
-    if (!item) {
-      return res.status(404).json({
+    try {
+      const item = await AnnouncementModel.getById(id);
+      if (!item) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Announcement with ID ${id} not found.`
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: item
+      });
+    } catch (err) {
+      return res.status(500).json({
         status: 'error',
-        message: `Announcement with ID ${id} not found.`
+        message: err.message || 'Internal server error while fetching announcement.'
       });
     }
-
-    return res.status(200).json({
-      status: 'success',
-      data: item
-    });
   }
 
   /**
    * POST /api/announcements
-   * Create a new announcement.
+   * Create a new announcement in PostgreSQL.
    */
-  static create(req, res) {
+  static async create(req, res) {
     const { title, content, author, category } = req.body || {};
 
     if (!title || !content) {
@@ -75,7 +82,7 @@ class ApiAnnouncementController {
     }
 
     try {
-      const created = AnnouncementModel.create({
+      const created = await AnnouncementModel.create({
         title,
         content,
         author,
@@ -97,9 +104,9 @@ class ApiAnnouncementController {
 
   /**
    * PUT /api/announcements/:id & PATCH /api/announcements/:id
-   * Update an existing announcement.
+   * Update an existing announcement in PostgreSQL.
    */
-  static update(req, res) {
+  static async update(req, res) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -108,16 +115,15 @@ class ApiAnnouncementController {
       });
     }
 
-    const existing = AnnouncementModel.getById(id);
-    if (!existing) {
-      return res.status(404).json({
-        status: 'error',
-        message: `Announcement with ID ${id} not found.`
-      });
-    }
-
     try {
-      const updated = AnnouncementModel.update(id, req.body || {});
+      const updated = await AnnouncementModel.update(id, req.body || {});
+      if (!updated) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Announcement with ID ${id} not found.`
+        });
+      }
+
       return res.status(200).json({
         status: 'success',
         message: 'Announcement updated successfully',
@@ -133,9 +139,9 @@ class ApiAnnouncementController {
 
   /**
    * DELETE /api/announcements/:id
-   * Delete an existing announcement by ID.
+   * Delete an existing announcement from PostgreSQL by ID.
    */
-  static remove(req, res) {
+  static async remove(req, res) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -144,24 +150,31 @@ class ApiAnnouncementController {
       });
     }
 
-    const deleted = AnnouncementModel.delete(id);
-    if (!deleted) {
-      return res.status(404).json({
+    try {
+      const deleted = await AnnouncementModel.delete(id);
+      if (!deleted) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Announcement with ID ${id} not found.`
+        });
+      }
+
+      // Support 204 No Content if client requests via query or header, default 200 with deleted item
+      if (req.query.status === '204' || req.headers['prefer'] === 'return=minimal') {
+        return res.status(204).send();
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        message: `Announcement with ID ${id} has been successfully deleted.`,
+        data: deleted
+      });
+    } catch (err) {
+      return res.status(500).json({
         status: 'error',
-        message: `Announcement with ID ${id} not found.`
+        message: err.message || 'Internal server error while deleting announcement.'
       });
     }
-
-    // Support 204 No Content if client requests via query or header, default 200 with deleted item
-    if (req.query.status === '204' || req.headers['prefer'] === 'return=minimal') {
-      return res.status(204).send();
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      message: `Announcement with ID ${id} has been successfully deleted.`,
-      data: deleted
-    });
   }
 }
 

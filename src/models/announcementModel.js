@@ -1,45 +1,13 @@
 /**
- * Announcement Model (In-Memory Data Access & Entity Layer)
+ * Announcement Model (PostgreSQL Persistence & Entity Layer)
  * 
- * Provides an in-memory data store simulating a database table for announcements
- * without requiring an external database connection.
- * Implements complete CRUD (Create, Read, Update, Delete) operations, schema validation,
- * query filtering, and data consistency safeguards.
+ * Provides relational database access and persistence for the Announcement entity
+ * backed by PostgreSQL via the connection pool in src/config/db.js.
+ * Implements complete CRUD (Create, Read, Update, Delete) operations,
+ * schema validation, query filtering, pagination, and data consistency safeguards.
  */
 
-// Initial seed data for development, testing, and initial bootstrap
-const initialSeedAnnouncements = [
-  {
-    id: 1,
-    title: 'Annual Alumni Homecoming 2026',
-    content: 'We are thrilled to welcome all alumni back to campus for the Annual Homecoming Weekend featuring networking dinners, department tours, and the alumni award ceremony.',
-    author: 'Alumni Relations Office',
-    category: 'Event',
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: 2,
-    title: 'Spring 2026 Mentorship Program Applications Open',
-    content: 'Connect with current undergraduate students to provide career mentorship, portfolio reviews, and industry guidance. Applications are open until the end of the month.',
-    author: 'Career Development Center',
-    category: 'Career',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: 3,
-    title: 'Alumni Spotlight: Tech Innovations in Artificial Intelligence',
-    content: 'Join our upcoming webinar with distinguished alumni pioneers discussing recent breakthroughs in AI systems, ethical machine learning, and practical production engineering.',
-    author: 'Faculty of Engineering',
-    category: 'Academic',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-  }
-];
-
-// In-memory array data store (mutable state)
-let announcements = JSON.parse(JSON.stringify(initialSeedAnnouncements));
+const { query } = require('../config/db');
 
 class AnnouncementModel {
   /**
@@ -52,7 +20,7 @@ class AnnouncementModel {
   // ==========================================
 
   /**
-   * Retrieve all announcements with optional filtering, search, and pagination.
+   * Retrieve all announcements from PostgreSQL with optional filtering, search, and pagination.
    * 
    * @param {Object} [filter={}] - Query options
    * @param {string} [filter.category] - Filter by category (e.g. 'Event', 'Career')
@@ -61,60 +29,83 @@ class AnnouncementModel {
    * @param {string} [filter.author] - Filter by author
    * @param {number|string} [filter.limit] - Limit maximum returned records
    * @param {number|string} [filter.page=1] - Page number for pagination
-   * @returns {Array<Object>} Cloned array of matching announcement records
+   * @returns {Promise<Array<Object>>} Matching announcement records
    */
-  static getAll(filter = {}) {
-    let result = [...announcements];
+  static async getAll(filter = {}) {
+    let sql = `
+      SELECT id, title, content, author, category, 
+             created_at AS "createdAt", 
+             updated_at AS "updatedAt"
+      FROM announcements
+    `;
+
+    const conditions = [];
+    const params = [];
 
     // Filter by category
     if (filter.category) {
-      const targetCategory = String(filter.category).trim().toLowerCase();
-      result = result.filter(a => a.category && a.category.toLowerCase() === targetCategory);
+      params.push(String(filter.category).trim().toLowerCase());
+      conditions.push(`LOWER(category) = $${params.length}`);
     }
 
     // Filter by author
     if (filter.author) {
-      const targetAuthor = String(filter.author).trim().toLowerCase();
-      result = result.filter(a => a.author && a.author.toLowerCase().includes(targetAuthor));
+      params.push(`%${String(filter.author).trim().toLowerCase()}%`);
+      conditions.push(`LOWER(author) LIKE $${params.length}`);
     }
 
     // Search in title, content, or author
     const searchQuery = filter.search || filter.q;
     if (searchQuery) {
-      const queryLower = String(searchQuery).trim().toLowerCase();
-      result = result.filter(a =>
-        (a.title && a.title.toLowerCase().includes(queryLower)) ||
-        (a.content && a.content.toLowerCase().includes(queryLower)) ||
-        (a.author && a.author.toLowerCase().includes(queryLower))
-      );
+      params.push(`%${String(searchQuery).trim().toLowerCase()}%`);
+      const pIdx = params.length;
+      conditions.push(`(LOWER(title) LIKE $${pIdx} OR LOWER(content) LIKE $${pIdx} OR LOWER(COALESCE(author, '')) LIKE $${pIdx})`);
     }
 
-    // Default sort: newest first (by id or createdAt descending)
-    result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (conditions.length > 0) {
+      sql += ` WHERE ${conditions.join(' AND ')}`;
+    }
+
+    // Default sort: newest first (by id descending)
+    sql += ` ORDER BY id DESC`;
 
     // Pagination
     if (filter.limit) {
       const limit = Math.max(1, parseInt(filter.limit, 10));
       const page = filter.page ? Math.max(1, parseInt(filter.page, 10)) : 1;
-      const startIndex = (page - 1) * limit;
-      result = result.slice(startIndex, startIndex + limit);
+      const offset = (page - 1) * limit;
+
+      params.push(limit);
+      sql += ` LIMIT $${params.length}`;
+
+      params.push(offset);
+      sql += ` OFFSET $${params.length}`;
     }
 
-    return result.map(a => ({ ...a }));
+    const res = await query(sql, params);
+    return res.rows;
   }
 
   /**
    * Find an announcement by its numeric ID.
    * 
    * @param {number|string} id - Announcement ID
-   * @returns {Object|null} Matching announcement or null if not found
+   * @returns {Promise<Object|null>} Matching announcement or null if not found
    */
-  static getById(id) {
+  static async getById(id) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const announcement = announcements.find(a => a.id === numericId);
-    return announcement ? { ...announcement } : null;
+    const sql = `
+      SELECT id, title, content, author, category, 
+             created_at AS "createdAt", 
+             updated_at AS "updatedAt"
+      FROM announcements
+      WHERE id = $1
+    `;
+
+    const res = await query(sql, [numericId]);
+    return res.rows[0] || null;
   }
 
   // ==========================================
@@ -122,17 +113,17 @@ class AnnouncementModel {
   // ==========================================
 
   /**
-   * Create and persist a new announcement in memory.
+   * Create and persist a new announcement in PostgreSQL.
    * 
    * @param {Object} data - Announcement attributes
    * @param {string} data.title - Title (required)
    * @param {string} data.content - Body content (required)
-   * @param {string} [data.author='Alumni Relations'] - Author / publishing department
+   * @param {string} [data.author='Alumni Relations Office'] - Author / publishing department
    * @param {string} [data.category='General'] - Category
-   * @returns {Object} Newly created announcement
+   * @returns {Promise<Object>} Newly created announcement record
    * @throws {Error} If validation fails
    */
-  static create(data) {
+  static async create(data) {
     const validation = this.validate(data, false);
     if (!validation.isValid) {
       const error = new Error(validation.errors.join('; '));
@@ -140,23 +131,27 @@ class AnnouncementModel {
       throw error;
     }
 
-    const nextId = announcements.length > 0 ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
-    const now = new Date().toISOString();
+    const cleanCategory = data.category && this.CATEGORIES.map(c => c.toLowerCase()).includes(data.category.trim().toLowerCase())
+      ? this.CATEGORIES.find(c => c.toLowerCase() === data.category.trim().toLowerCase())
+      : 'General';
 
-    const newAnnouncement = {
-      id: nextId,
-      title: data.title.trim(),
-      content: data.content.trim(),
-      author: data.author && data.author.trim() ? data.author.trim() : 'Alumni Relations Office',
-      category: data.category && this.CATEGORIES.map(c => c.toLowerCase()).includes(data.category.trim().toLowerCase())
-        ? this.CATEGORIES.find(c => c.toLowerCase() === data.category.trim().toLowerCase())
-        : 'General',
-      createdAt: now,
-      updatedAt: now
-    };
+    const sql = `
+      INSERT INTO announcements (title, content, author, category, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      RETURNING id, title, content, author, category, 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
 
-    announcements.push(newAnnouncement);
-    return { ...newAnnouncement };
+    const values = [
+      data.title.trim(),
+      data.content.trim(),
+      data.author && data.author.trim() ? data.author.trim() : 'Alumni Relations Office',
+      cleanCategory
+    ];
+
+    const res = await query(sql, values);
+    return res.rows[0];
   }
 
   // ==========================================
@@ -164,19 +159,19 @@ class AnnouncementModel {
   // ==========================================
 
   /**
-   * Update an existing announcement by ID.
+   * Update an existing announcement in PostgreSQL by ID.
    * 
    * @param {number|string} id - Announcement ID
    * @param {Object} data - Updated attributes
-   * @returns {Object|null} Updated announcement or null if not found
+   * @returns {Promise<Object|null>} Updated announcement or null if not found
    * @throws {Error} If validation fails
    */
-  static update(id, data) {
+  static async update(id, data) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const index = announcements.findIndex(a => a.id === numericId);
-    if (index === -1) return null;
+    const existing = await this.getById(numericId);
+    if (!existing) return null;
 
     const validation = this.validate(data, true);
     if (!validation.isValid) {
@@ -185,20 +180,34 @@ class AnnouncementModel {
       throw error;
     }
 
-    const existing = announcements[index];
-    const updatedAnnouncement = {
-      ...existing,
-      title: data.title !== undefined && data.title.trim() ? data.title.trim() : existing.title,
-      content: data.content !== undefined && data.content.trim() ? data.content.trim() : existing.content,
-      author: data.author !== undefined && data.author.trim() ? data.author.trim() : existing.author,
-      category: data.category && this.CATEGORIES.map(c => c.toLowerCase()).includes(data.category.trim().toLowerCase())
-        ? this.CATEGORIES.find(c => c.toLowerCase() === data.category.trim().toLowerCase())
-        : existing.category,
-      updatedAt: new Date().toISOString()
-    };
+    let cleanCategory = existing.category;
+    if (data.category && this.CATEGORIES.map(c => c.toLowerCase()).includes(data.category.trim().toLowerCase())) {
+      cleanCategory = this.CATEGORIES.find(c => c.toLowerCase() === data.category.trim().toLowerCase());
+    }
 
-    announcements[index] = updatedAnnouncement;
-    return { ...updatedAnnouncement };
+    const sql = `
+      UPDATE announcements
+      SET title = $1,
+          content = $2,
+          author = $3,
+          category = $4,
+          updated_at = NOW()
+      WHERE id = $5
+      RETURNING id, title, content, author, category, 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
+
+    const values = [
+      data.title !== undefined && data.title.trim() ? data.title.trim() : existing.title,
+      data.content !== undefined && data.content.trim() ? data.content.trim() : existing.content,
+      data.author !== undefined && data.author.trim() ? data.author.trim() : existing.author,
+      cleanCategory,
+      numericId
+    ];
+
+    const res = await query(sql, values);
+    return res.rows[0] || null;
   }
 
   // ==========================================
@@ -206,20 +215,25 @@ class AnnouncementModel {
   // ==========================================
 
   /**
-   * Delete an existing announcement by ID.
+   * Delete an existing announcement from PostgreSQL by ID.
    * 
    * @param {number|string} id - Announcement ID
-   * @returns {Object|null} Deleted announcement or null if not found
+   * @returns {Promise<Object|null>} Deleted announcement or null if not found
    */
-  static delete(id) {
+  static async delete(id) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const index = announcements.findIndex(a => a.id === numericId);
-    if (index === -1) return null;
+    const sql = `
+      DELETE FROM announcements
+      WHERE id = $1
+      RETURNING id, title, content, author, category, 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
 
-    const [deleted] = announcements.splice(index, 1);
-    return { ...deleted };
+    const res = await query(sql, [numericId]);
+    return res.rows[0] || null;
   }
 
   // ==========================================
@@ -271,30 +285,25 @@ class AnnouncementModel {
   }
 
   /**
-   * Check if an announcement with the specified ID exists.
+   * Check if an announcement with the specified ID exists in PostgreSQL.
    * 
    * @param {number|string} id - Announcement ID
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  static exists(id) {
-    return this.getById(id) !== null;
+  static async exists(id) {
+    const announcement = await this.getById(id);
+    return announcement !== null;
   }
 
   /**
    * Return the total count of announcements matching optional filter criteria.
    * 
    * @param {Object} [filter={}] - Filter criteria
-   * @returns {number}
+   * @returns {Promise<number>}
    */
-  static count(filter = {}) {
-    return this.getAll(filter).length;
-  }
-
-  /**
-   * Reset in-memory store to initial seed dataset (useful for testing & resets).
-   */
-  static reset() {
-    announcements = JSON.parse(JSON.stringify(initialSeedAnnouncements));
+  static async count(filter = {}) {
+    const items = await this.getAll(filter);
+    return items.length;
   }
 }
 

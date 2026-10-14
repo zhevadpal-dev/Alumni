@@ -98,9 +98,16 @@ The Alumni Tracking System backend follows the **Model-View-Controller (MVC)** a
 ```text
 Alumni/
 ├── src/
-│   ├── models/                      # MODEL LAYER (Data Access & State)
-│   │   ├── announcementModel.js     # Announcement data entity, in-memory data store, CRUD queries
-│   │   └── userModel.js             # User data entity, in-memory data store, CRUD queries
+│   ├── config/                      # CONFIGURATION LAYER (Database & Environment)
+│   │   └── db.js                    # PostgreSQL connection pool, query helper & connection test
+│   │
+│   ├── migrations/                  # DATABASE MIGRATIONS (DDL & Seed Data)
+│   │   ├── 001_create_initial_tables.sql # PostgreSQL schema for users, announcements & seed data
+│   │   └── runner.js                # Migration runner script (executed via npm run migrate)
+│   │
+│   ├── models/                      # MODEL LAYER (Data Access & Persistence)
+│   │   ├── announcementModel.js     # Announcement entity with PostgreSQL SQL CRUD operations
+│   │   └── userModel.js             # User entity with PostgreSQL SQL CRUD operations
 │   │
 │   ├── views/                       # VIEW LAYER (Presentation & UI)
 │   │   ├── announcementViews.js     # Server-rendered HTML templates for announcements (List, Detail, Form)
@@ -153,8 +160,8 @@ Alumni/
 
 #### 1. 🗄️ Model Layer (`src/models/`)
 - Encapsulates entity representation, data validation, and persistence operations completely decoupled from HTTP/controller logic.
-- **In-Memory Architecture (Zero Database Dependency):** Operates on an internal structured memory array (`users`), allowing instantaneous execution, rapid prototyping, and automated unit testing without requiring an active PostgreSQL or MongoDB database connection.
-- **`userModel.js`**: Features a robust, enterprise-grade class providing complete CRUD operations, schema validation, multi-criteria filtering, and data consistency safeguards.
+- **PostgreSQL Relational Persistence:** Directly connects to PostgreSQL 15 via a robust connection pool (`src/config/db.js`), executing parameterized SQL queries (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) with ACID transaction safety and persistent named volume storage.
+- **`userModel.js`**: Features complete async/await CRUD operations, schema validation, multi-criteria filtering, and data consistency safeguards.
 
 ##### 📋 User Entity Schema
 
@@ -172,13 +179,13 @@ Alumni/
 | `createdAt` | `ISO 8601 String` | System-generated | Timestamp of creation | `"2026-10-07T07:30:00.000Z"` |
 | `updatedAt` | `ISO 8601 String` | System-generated | Timestamp of last modification (PUT/PATCH) | `"2026-10-07T07:35:00.000Z"` |
 
-##### 🛠️ Implemented CRUD Functions
+##### 🛠️ Implemented CRUD Functions (Async / PostgreSQL)
 
 ```javascript
 const UserModel = require('../models/userModel');
 
 // 1. CREATE (C)
-const newUser = UserModel.create({
+const newUser = await UserModel.create({
   name: 'Ayşe Kaya',
   email: 'ayse@example.com',
   role: 'alumni',
@@ -187,18 +194,18 @@ const newUser = UserModel.create({
 });
 
 // 2. READ (R)
-const allUsers     = UserModel.findAll();                      // All records
-const filtered     = UserModel.findAll({ role: 'alumni' });   // Filter by role
-const searched     = UserModel.findAll({ search: 'Kaya' });   // Free text search
-const paginated    = UserModel.findAll({ page: 1, limit: 10 });// Pagination
-const userById     = UserModel.findById(1);                    // Find by primary ID
-const userByEmail  = UserModel.findByEmail('ayse@example.com');// Case-insensitive email
-const isExisting   = UserModel.exists(1);                      // Boolean existence check
-const totalCount   = UserModel.count({ role: 'alumni' });      // Filtered record count
+const allUsers     = await UserModel.findAll();                      // All records
+const filtered     = await UserModel.findAll({ role: 'alumni' });   // Filter by role
+const searched     = await UserModel.findAll({ search: 'Kaya' });   // Free text search
+const paginated    = await UserModel.findAll({ page: 1, limit: 10 });// Pagination
+const userById     = await UserModel.findById(1);                    // Find by primary ID
+const userByEmail  = await UserModel.findByEmail('ayse@example.com');// Case-insensitive email
+const isExisting   = await UserModel.exists(1);                      // Boolean existence check
+const totalCount   = await UserModel.count({ role: 'alumni' });      // Filtered record count
 
 // 3. UPDATE (U)
 // Full replacement (PUT semantics - requires name & email)
-const updatedUser  = UserModel.update(1, {
+const updatedUser  = await UserModel.update(1, {
   name: 'Ayşe Kaya Demir',
   email: 'ayse.demir@example.com',
   department: 'Computer Science',
@@ -206,27 +213,25 @@ const updatedUser  = UserModel.update(1, {
 });
 
 // Partial modification (PATCH semantics - modifies only provided keys)
-const patchedUser  = UserModel.patch(1, {
-  company: 'Global AI Lab',
-  jobTitle: 'Senior Research Engineer'
+const patchedUser  = await UserModel.patch(1, {
+  department: 'Software Engineering',
+  graduationYear: 2023
 });
 
 // 4. DELETE (D)
-const deletedUser  = UserModel.delete(1);                      // Delete by ID
-const deletedEmail = UserModel.deleteByEmail('ayse@example.com');// Delete by email
-UserModel.reset();                                             // Reset to seed dataset
+const deletedUser  = await UserModel.delete(1);                      // Delete by ID
 ```
 
 ##### 🛡️ Validation & Data Integrity Safeguards (User)
-- **Email Uniqueness:** Prevents duplicate registrations across `create`, `update`, and `patch`.
+- **Email Uniqueness:** Enforces unique emails across the database schema (`UNIQUE` constraint) and model validation.
 - **Format Validation:** RFC-compliant regex validation (`isValidEmail()`) ensures emails are structurally valid.
 - **Role Enforcement:** Restricts roles strictly to predefined whitelist (`alumni`, `student`, `faculty`, `admin`).
 - **Graduation Year Range:** Enforces realistic integer years between 1900 and 2100.
-- **Defensive Immutability:** CRUD methods return shallow clones to avoid unintended external memory mutations.
+- **ACID Transactions & Safe Queries:** Parameterized SQL queries via `pg.Pool` protect against SQL injection and guarantee transactional integrity.
 
 ---
 
-- **`announcementModel.js`**: Provides an in-memory datastore for institutional announcements, events, and news updates with full CRUD capabilities, defensive cloning, search, and category validation.
+- **`announcementModel.js`**: Provides persistent PostgreSQL data access for institutional announcements, events, and news updates with full async CRUD capabilities, parameterized SQL queries, search, and category validation.
 
 ##### 📋 Announcement Entity Schema
 
@@ -240,13 +245,13 @@ UserModel.reset();                                             // Reset to seed 
 | `createdAt` | `ISO 8601 String` | System-generated | Timestamp of creation | `"2026-10-01T10:00:00.000Z"` |
 | `updatedAt` | `ISO 8601 String` | System-generated | Timestamp of last modification | `"2026-10-01T10:00:00.000Z"` |
 
-##### 🛠️ Implemented Announcement CRUD Functions
+##### 🛠️ Implemented Announcement CRUD Functions (Async / PostgreSQL)
 
 ```javascript
 const AnnouncementModel = require('../models/announcementModel');
 
 // 1. CREATE (C)
-const newNotice = AnnouncementModel.create({
+const newNotice = await AnnouncementModel.create({
   title: 'Spring 2026 Career Fair',
   content: 'Join over 50 top employers on campus for internships and full-time hiring.',
   author: 'Career Development Center',
@@ -254,29 +259,28 @@ const newNotice = AnnouncementModel.create({
 });
 
 // 2. READ (R)
-const allNotices = AnnouncementModel.getAll();                      // All records (sorted newest first)
-const filtered   = AnnouncementModel.getAll({ category: 'Event' }); // Filter by category
-const searched   = AnnouncementModel.getAll({ search: 'Career' });  // Free text search in title/content/author
-const paginated  = AnnouncementModel.getAll({ page: 1, limit: 10 });// Pagination
-const noticeById = AnnouncementModel.getById(1);                    // Find by primary ID
-const isExisting = AnnouncementModel.exists(1);                    // Boolean existence check
-const count      = AnnouncementModel.count({ category: 'Career' }); // Filtered record count
+const allNotices = await AnnouncementModel.getAll();                      // All records (sorted newest first)
+const filtered   = await AnnouncementModel.getAll({ category: 'Event' }); // Filter by category
+const searched   = await AnnouncementModel.getAll({ search: 'Career' });  // Free text search in title/content/author
+const paginated  = await AnnouncementModel.getAll({ page: 1, limit: 10 });// Pagination
+const noticeById = await AnnouncementModel.getById(1);                    // Find by primary ID
+const isExisting = await AnnouncementModel.exists(1);                    // Boolean existence check
+const count      = await AnnouncementModel.count({ category: 'Career' }); // Filtered record count
 
 // 3. UPDATE (U)
-const updatedNotice = AnnouncementModel.update(1, {
+const updatedNotice = await AnnouncementModel.update(1, {
   title: 'Annual Alumni Homecoming 2026 - Registration Open',
   category: 'Event'
 });
 
 // 4. DELETE (D)
-const deletedNotice = AnnouncementModel.delete(1);                  // Delete by ID
-AnnouncementModel.reset();                                          // Reset to initial seed dataset
+const deletedNotice = await AnnouncementModel.delete(1);                  // Delete by ID
 ```
 
 ##### 🛡️ Validation & Data Integrity Safeguards (Announcement)
 - **Required Fields:** Enforces mandatory presence of non-empty `title` and `content`.
 - **Category Whitelist:** Restricts category values strictly to `General`, `Event`, `Career`, `Academic`, `News`, `Urgent`.
-- **Defensive Immutability:** CRUD methods return shallow clones to prevent unintended mutation of internal memory arrays.
+- **Relational Persistence & Automated Timestamps:** Records are persisted in PostgreSQL with automated `created_at` and `updated_at` timestamps.
 
 #### 2. 🎨 View Layer (`src/views/`)
 - Responsible for the presentation output sent to clients, cleanly decoupling UI layout, CSS styling, and HTML templates from controller orchestration.
@@ -339,14 +343,16 @@ AnnouncementModel.reset();                                          // Reset to 
 
 ## 🗄️ Data Design & Architecture
 
-The Alumni Tracking System employs a structured data design strictly encapsulated within the **Model Layer** (`src/models/`):
+The Alumni Tracking System employs a structured relational data model strictly encapsulated within the **Model Layer** (`src/models/`):
 
-- **In-Memory Operational Store:** Active models ([`userModel.js`](src/models/userModel.js) and [`announcementModel.js`](src/models/announcementModel.js)) operate on internal heap arrays with auto-incrementing integer IDs, defensive shallow-copy immutability, and full CRUD query filtering (search, categories, author, pagination).
+- **PostgreSQL Relational Persistence:** Active models ([`userModel.js`](src/models/userModel.js) and [`announcementModel.js`](src/models/announcementModel.js)) connect to PostgreSQL 15 (`alumni_db` container) via a robust connection pool (`src/config/db.js`), using parameterized SQL queries with ACID guarantees and named volume persistence (`postgres_data`).
+- **Database Migrations & Seed Data:** Automated SQL migration scripts ([`src/migrations/001_create_initial_tables.sql`](src/migrations/001_create_initial_tables.sql)) define table DDL and seed initial users (Said Hasan, Zeynep Naz, Ece, Rumeysa, Ceyda) and announcements idempotently. Migrations can be run anytime via `npm run migrate` or `docker compose exec app npm run migrate`.
 - **Domain Validation & Integrity Rules:**
-  - **User Entity:** Enforces mandatory RFC-compliant emails (case-insensitive uniqueness), whitelist role authorization (`alumni`, `student`, `faculty`, `admin`), and valid graduation years (1900–2100).
-  - **Announcement Entity:** Enforces mandatory title/content bodies, category whitelist (`General`, `Event`, `Career`, `Academic`, `News`, `Urgent`), and automatic ISO 8601 timestamps.
-- **Relational Persistence Target:** Full DDL mapping to PostgreSQL 15 (`alumni_db` container) with foreign keys (`announcements.author_id -> users.id`), indexes on lookup columns, and automated `updated_at` trigger functions.
-- **In-Memory Lifecycle Verification:** Proven via empirical "Forgetting Tests" where runtime state resets cleanly upon container reboot (`docker compose down && up`).
+  - **User Entity:** Enforces mandatory RFC-compliant emails (`UNIQUE` constraint & case-insensitive validation), whitelist role authorization (`alumni`, `student`, `faculty`, `admin`), and valid graduation years (1900–2100).
+  - **Announcement Entity:** Enforces mandatory title/content bodies, category whitelist (`General`, `Event`, `Career`, `Academic`, `News`, `Urgent`), and automated timestamps.
+- **Relational Schema:**
+  - `users`: `id` (SERIAL PK), `name` (VARCHAR), `email` (VARCHAR UNIQUE NOT NULL), `role` (VARCHAR), `department` (VARCHAR), `graduation_year` (INTEGER), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
+  - `announcements`: `id` (SERIAL PK), `title` (VARCHAR NOT NULL), `content` (TEXT NOT NULL), `author` (VARCHAR), `category` (VARCHAR), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
 
 📖 For comprehensive entity specifications, schema definitions, validation rules, Mermaid ER diagrams, and PostgreSQL migration DDL, see the full document:  
 👉 **[Data Design Documentation](docs/ddd.md)**
@@ -416,11 +422,18 @@ Launch the full containerized application stack orchestrated via `docker-compose
 # Build and start services in detached mode
 docker compose up -d --build
 
+# Run database migrations and seed default records
+docker compose exec app npm run migrate
+
 # Inspect container output and logs
 docker compose logs -f
 ```
 
 The application server will become reachable at `http://localhost:5001`.
+
+The migration automatically creates `users` and `announcements` tables and seeds default records:
+- **Users (5):** Said Hasan (Admin), Zeynep Naz (Alumni), Ece (Alumni), Rumeysa (Student), Ceyda (Faculty).
+- **Announcements (3):** Annual Alumni Homecoming 2026, Spring 2026 Mentorship Program Applications Open, Alumni Spotlight: Tech Innovations in Artificial Intelligence.
 
 To terminate containers and tear down the network:
 
@@ -437,6 +450,9 @@ To run the backend directly on your host machine:
 ```bash
 # Install dependencies
 npm install
+
+# Run database migrations (requires local PostgreSQL or alumni_db running)
+npm run migrate
 
 # Start the server with Node
 node index.js

@@ -18,9 +18,9 @@ class UserController {
    * GET /users
    * Read (R) - Lists users with view layer.
    */
-  static getAllUsers(req, res) {
+  static async getAllUsers(req, res) {
     try {
-      const users = UserModel.findAll(req.query);
+      const users = await UserModel.findAll(req.query);
       const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
       if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
@@ -50,7 +50,7 @@ class UserController {
    * GET /users/:id
    * Read (R) - Retrieves a single user profile with view layer.
    */
-  static getUserById(req, res) {
+  static async getUserById(req, res) {
     const userId = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -65,34 +65,45 @@ class UserController {
       });
     }
 
-    const user = UserModel.findById(userId);
-    if (!user) {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        if (isHtml) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        }
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(200).send(HtmlViews.renderUserProfile(user));
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: user
+      });
+    } catch (err) {
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        return res.status(500).send(HtmlViews.renderUserError(err.message));
       }
-      return res.status(404).json({
+      return res.status(500).json({
         status: 'error',
-        message: `User with ID ${userId} not found.`
+        message: err.message || 'Internal server error.'
       });
     }
-
-    if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(HtmlViews.renderUserProfile(user));
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      data: user
-    });
   }
 
   /**
    * GET /users/:id/edit
    * Update (U) - View Layer: Renders the edit form populated with current user data.
    */
-  static renderEditForm(req, res) {
+  static async renderEditForm(req, res) {
     const userId = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -104,24 +115,32 @@ class UserController {
       return res.status(400).json({ status: 'error', message: 'User ID must be a valid integer.' });
     }
 
-    const user = UserModel.findById(userId);
-    if (!user) {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        if (isHtml) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        }
+        return res.status(404).json({ status: 'error', message: `User with ID ${userId} not found.` });
+      }
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(HtmlViews.renderUserEditForm(user));
+    } catch (err) {
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        return res.status(500).send(HtmlViews.renderUserError(err.message));
       }
-      return res.status(404).json({ status: 'error', message: `User with ID ${userId} not found.` });
+      return res.status(500).json({ status: 'error', message: err.message });
     }
-
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(HtmlViews.renderUserEditForm(user));
   }
 
   /**
    * POST /users
    * Create (C) - Processes new user creation with view layer.
    */
-  static createUser(req, res) {
+  static async createUser(req, res) {
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
     const name = req.body?.name || req.query?.name;
     const email = req.body?.email || req.query?.email;
@@ -143,20 +162,8 @@ class UserController {
       });
     }
 
-    const existingUser = UserModel.findByEmail(email);
-    if (existingUser) {
-      if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(409).send(HtmlViews.renderUserError('A user with this email already exists.'));
-      }
-      return res.status(409).json({
-        status: 'error',
-        message: 'A user with this email already exists.'
-      });
-    }
-
     try {
-      const newUser = UserModel.create({
+      const newUser = await UserModel.create({
         name,
         email,
         role,
@@ -193,7 +200,7 @@ class UserController {
    * PUT /users/:id & POST /users/:id/edit
    * Update (U) - Fully updates user record and renders update view.
    */
-  static updateUserPut(req, res) {
+  static async updateUserPut(req, res) {
     const userId = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -205,18 +212,6 @@ class UserController {
       return res.status(400).json({
         status: 'error',
         message: 'User ID must be a valid integer.'
-      });
-    }
-
-    const existingUser = UserModel.findById(userId);
-    if (!existingUser) {
-      if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
-      }
-      return res.status(404).json({
-        status: 'error',
-        message: `User with ID ${userId} not found.`
       });
     }
 
@@ -240,20 +235,8 @@ class UserController {
       });
     }
 
-    const emailOwner = UserModel.findByEmail(email);
-    if (emailOwner && emailOwner.id !== userId) {
-      if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(409).send(HtmlViews.renderUserError('Email address is already in use by another user.', `/users/${userId}/edit`));
-      }
-      return res.status(409).json({
-        status: 'error',
-        message: 'Email address is already in use by another user.'
-      });
-    }
-
     try {
-      const updatedUser = UserModel.update(userId, {
+      const updatedUser = await UserModel.update(userId, {
         name,
         email,
         role,
@@ -263,6 +246,17 @@ class UserController {
         company,
         jobTitle
       });
+
+      if (!updatedUser) {
+        if (isHtml) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        }
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
 
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -290,7 +284,7 @@ class UserController {
    * PATCH /users/:id
    * Update (U) - Partially updates specific user fields with view layer.
    */
-  static updateUserPatch(req, res) {
+  static async updateUserPatch(req, res) {
     const userId = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -305,18 +299,6 @@ class UserController {
       });
     }
 
-    const existingUser = UserModel.findById(userId);
-    if (!existingUser) {
-      if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
-      }
-      return res.status(404).json({
-        status: 'error',
-        message: `User with ID ${userId} not found.`
-      });
-    }
-
     const name = req.body?.name || req.query?.name;
     const email = req.body?.email || req.query?.email;
     const role = req.body?.role || req.query?.role;
@@ -325,20 +307,6 @@ class UserController {
     const phone = req.body?.phone || req.query?.phone;
     const company = req.body?.company || req.query?.company;
     const jobTitle = req.body?.jobTitle || req.query?.jobTitle;
-
-    if (email) {
-      const emailOwner = UserModel.findByEmail(email);
-      if (emailOwner && emailOwner.id !== userId) {
-        if (isHtml) {
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          return res.status(409).send(HtmlViews.renderUserError('Email address is already in use by another user.', `/users/${userId}/edit`));
-        }
-        return res.status(409).json({
-          status: 'error',
-          message: 'Email address is already in use by another user.'
-        });
-      }
-    }
 
     const patchPayload = {};
     if (name !== undefined) patchPayload.name = name;
@@ -351,7 +319,18 @@ class UserController {
     if (jobTitle !== undefined) patchPayload.jobTitle = jobTitle;
 
     try {
-      const updatedUser = UserModel.patch(userId, patchPayload);
+      const updatedUser = await UserModel.patch(userId, patchPayload);
+
+      if (!updatedUser) {
+        if (isHtml) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        }
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
 
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -379,7 +358,7 @@ class UserController {
    * DELETE /users/:id & POST /users/:id/delete
    * Delete (D) - Deletes an existing user record and renders delete confirmation view.
    */
-  static deleteUser(req, res) {
+  static async deleteUser(req, res) {
     const userId = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -394,28 +373,39 @@ class UserController {
       });
     }
 
-    const deletedUser = UserModel.delete(userId);
-    if (!deletedUser) {
+    try {
+      const deletedUser = await UserModel.delete(userId);
+      if (!deletedUser) {
+        if (isHtml) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        }
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(HtmlViews.renderUserError(`User with ID ${userId} not found.`));
+        return res.status(200).send(HtmlViews.renderUserDeletedSuccess(deletedUser));
       }
-      return res.status(404).json({
+
+      return res.status(200).json({
+        status: 'success',
+        message: `User with ID ${userId} has been successfully deleted.`,
+        data: deletedUser
+      });
+    } catch (err) {
+      if (isHtml) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(500).send(HtmlViews.renderUserError(err.message || 'Internal server error.'));
+      }
+      return res.status(500).json({
         status: 'error',
-        message: `User with ID ${userId} not found.`
+        message: err.message || 'Internal server error.'
       });
     }
-
-    if (isHtml) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(HtmlViews.renderUserDeletedSuccess(deletedUser));
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      message: `User with ID ${userId} has been successfully deleted.`,
-      data: deletedUser
-    });
   }
 }
 

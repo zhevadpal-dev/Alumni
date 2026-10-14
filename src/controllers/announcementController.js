@@ -19,9 +19,9 @@ class AnnouncementController {
    * GET /announcements
    * UI List View: Table listing announcements with stats and embedded creation form.
    */
-  static list(req, res) {
+  static async list(req, res) {
     try {
-      const items = AnnouncementModel.getAll(req.query);
+      const items = await AnnouncementModel.getAll(req.query);
       const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
       // Default to HTML view for browsers or generic clients
@@ -45,7 +45,7 @@ class AnnouncementController {
    * GET /announcements/:id
    * UI Detail View: Single announcement reading card with action buttons.
    */
-  static detail(req, res) {
+  static async detail(req, res) {
     const id = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -57,21 +57,29 @@ class AnnouncementController {
       return res.status(400).json({ status: 'error', message: 'Announcement ID must be a valid integer.' });
     }
 
-    const item = AnnouncementModel.getById(id);
-    if (!item) {
+    try {
+      const item = await AnnouncementModel.getById(id);
+      if (!item) {
+        if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+        }
+        return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
+      }
+
       if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+        return res.status(200).send(AnnouncementViews.renderDetail(item));
       }
-      return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
-    }
 
-    if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(AnnouncementViews.renderDetail(item));
+      return res.status(200).json({ status: 'success', data: item });
+    } catch (err) {
+      if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(500).send(AnnouncementViews.renderError(err.message || 'Internal server error.'));
+      }
+      return res.status(500).json({ status: 'error', message: err.message });
     }
-
-    return res.status(200).json({ status: 'success', data: item });
   }
 
   /**
@@ -87,7 +95,7 @@ class AnnouncementController {
    * POST /announcements
    * Web Form Action: Create new announcement.
    */
-  static create(req, res) {
+  static async create(req, res) {
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
     const { title, content, author, category } = req.body || {};
 
@@ -100,7 +108,7 @@ class AnnouncementController {
     }
 
     try {
-      const created = AnnouncementModel.create({
+      const created = await AnnouncementModel.create({
         title,
         content,
         author,
@@ -130,7 +138,7 @@ class AnnouncementController {
    * GET /announcements/:id/edit
    * UI Form View: Pre-populated edit form page.
    */
-  static editForm(req, res) {
+  static async editForm(req, res) {
     const id = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -139,21 +147,26 @@ class AnnouncementController {
       return res.status(400).send(AnnouncementViews.renderError('Announcement ID must be a valid integer.'));
     }
 
-    const item = AnnouncementModel.getById(id);
-    if (!item) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
-    }
+    try {
+      const item = await AnnouncementModel.getById(id);
+      if (!item) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+      }
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(AnnouncementViews.renderEditForm(item));
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(AnnouncementViews.renderEditForm(item));
+    } catch (err) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(500).send(AnnouncementViews.renderError(err.message));
+    }
   }
 
   /**
    * POST /announcements/:id/edit & PUT /announcements/:id
    * Web Form Action: Update announcement record.
    */
-  static update(req, res) {
+  static async update(req, res) {
     const id = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -165,17 +178,15 @@ class AnnouncementController {
       return res.status(400).json({ status: 'error', message: 'Announcement ID must be a valid integer.' });
     }
 
-    const existing = AnnouncementModel.getById(id);
-    if (!existing) {
-      if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
-      }
-      return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
-    }
-
     try {
-      const updated = AnnouncementModel.update(id, req.body || {});
+      const updated = await AnnouncementModel.update(id, req.body || {});
+      if (!updated) {
+        if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+        }
+        return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
+      }
 
       if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -200,7 +211,7 @@ class AnnouncementController {
    * POST /announcements/:id/delete & DELETE /announcements/:id
    * Web Form Action: Delete announcement record.
    */
-  static deleteAction(req, res) {
+  static async deleteAction(req, res) {
     const id = parseInt(req.params.id, 10);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
@@ -212,25 +223,33 @@ class AnnouncementController {
       return res.status(400).json({ status: 'error', message: 'Announcement ID must be a valid integer.' });
     }
 
-    const deleted = AnnouncementModel.delete(id);
-    if (!deleted) {
+    try {
+      const deleted = await AnnouncementModel.delete(id);
+      if (!deleted) {
+        if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+        }
+        return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
+      }
+
       if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(404).send(AnnouncementViews.renderError(`Announcement with ID #${id} not found.`));
+        return res.status(200).send(AnnouncementViews.renderDeleteSuccess(deleted));
       }
-      return res.status(404).json({ status: 'error', message: `Announcement with ID #${id} not found.` });
-    }
 
-    if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(AnnouncementViews.renderDeleteSuccess(deleted));
+      return res.status(200).json({
+        status: 'success',
+        message: `Announcement with ID #${id} deleted successfully.`,
+        data: deleted
+      });
+    } catch (err) {
+      if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(500).send(AnnouncementViews.renderError(err.message));
+      }
+      return res.status(500).json({ status: 'error', message: err.message });
     }
-
-    return res.status(200).json({
-      status: 'success',
-      message: `Announcement with ID #${id} deleted successfully.`,
-      data: deleted
-    });
   }
 }
 

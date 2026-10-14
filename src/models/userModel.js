@@ -1,26 +1,13 @@
 /**
- * User Model (In-Memory Data Access & Entity Layer)
+ * User Model (PostgreSQL Persistence & Entity Layer)
  * 
- * Provides an in-memory data store simulating a database table without requiring
- * an external database connection. Implements full CRUD (Create, Read, Update, Delete)
- * operations, schema validation, query filtering, pagination, and data consistency safeguards.
+ * Provides relational database access and persistence for the User entity
+ * backed by PostgreSQL via the connection pool in src/config/db.js.
+ * Implements complete CRUD (Create, Read, Update, Delete) operations,
+ * schema validation, query filtering, pagination, and data consistency safeguards.
  */
 
-// Initial seed data for development and testing
-const initialSeedUsers = [
-  {
-    id: 1,
-    name: 'Sample Alumni',
-    email: 'alumni@example.com',
-    role: 'alumni',
-    department: 'Computer Science',
-    graduationYear: 2023,
-    createdAt: new Date().toISOString()
-  }
-];
-
-// In-memory data store array (mutable state)
-let users = JSON.parse(JSON.stringify(initialSeedUsers));
+const { query } = require('../config/db');
 
 class UserModel {
   /**
@@ -33,7 +20,7 @@ class UserModel {
   // ==========================================
 
   /**
-   * Create and persist a new user record in memory.
+   * Create and persist a new user record in PostgreSQL.
    * 
    * @param {Object} userData - User record attributes
    * @param {string} userData.name - Full name of the user (required)
@@ -44,10 +31,10 @@ class UserModel {
    * @param {string} [userData.phone] - Contact phone number
    * @param {string} [userData.company] - Current employer
    * @param {string} [userData.jobTitle] - Professional title
-   * @returns {Object} Newly created and persisted user object
+   * @returns {Promise<Object>} Newly created user record
    * @throws {Error} If validation fails or email already exists
    */
-  static create(userData) {
+  static async create(userData) {
     const validation = this.validate(userData, false);
     if (!validation.isValid) {
       const error = new Error(validation.errors.join('; '));
@@ -56,32 +43,34 @@ class UserModel {
     }
 
     const cleanEmail = userData.email.trim().toLowerCase();
-    if (this.findByEmail(cleanEmail)) {
+    const existing = await this.findByEmail(cleanEmail);
+    if (existing) {
       const error = new Error('A user with this email already exists.');
       error.statusCode = 409;
       throw error;
     }
 
-    // Auto-generate incrementing ID based on existing records
-    const nextId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+    const sql = `
+      INSERT INTO users (name, email, role, department, graduation_year, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+      RETURNING id, name, email, role, department, 
+                graduation_year AS "graduationYear", 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
 
-    const newUser = {
-      id: nextId,
-      name: userData.name.trim(),
-      email: cleanEmail,
-      role: userData.role && this.ROLES.includes(userData.role.trim().toLowerCase())
+    const values = [
+      userData.name.trim(),
+      cleanEmail,
+      userData.role && this.ROLES.includes(userData.role.trim().toLowerCase())
         ? userData.role.trim().toLowerCase()
         : 'alumni',
-      department: userData.department ? userData.department.trim() : null,
-      graduationYear: userData.graduationYear ? Number(userData.graduationYear) : null,
-      phone: userData.phone ? userData.phone.trim() : null,
-      company: userData.company ? userData.company.trim() : null,
-      jobTitle: userData.jobTitle ? userData.jobTitle.trim() : null,
-      createdAt: new Date().toISOString()
-    };
+      userData.department && userData.department.trim() ? userData.department.trim() : null,
+      userData.graduationYear ? parseInt(userData.graduationYear, 10) : null
+    ];
 
-    users.push(newUser);
-    return { ...newUser };
+    const res = await query(sql, values);
+    return res.rows[0];
   }
 
   // ==========================================
@@ -89,109 +78,115 @@ class UserModel {
   // ==========================================
 
   /**
-   * Retrieve all user records with optional filtering, search, and pagination.
+   * Retrieve all user records from PostgreSQL with optional filtering, search, and pagination.
    * 
    * @param {Object} [filter={}] - Query options
-   * @param {string} [filter.role] - Filter by role
+   * @param {string} [filter.role] - Filter by role (alumni, student, faculty, admin)
    * @param {string} [filter.department] - Filter by department
-   * @param {number|string} [filter.graduationYear] - Filter by graduation year
-   * @param {string} [filter.search] - Search substring in name or email
+   * @param {string} [filter.search] - Case-insensitive substring search in name, email, department
    * @param {string} [filter.q] - Alternative search query parameter
    * @param {number|string} [filter.limit] - Limit maximum returned records
    * @param {number|string} [filter.page=1] - Page number for pagination
-   * @returns {Array<Object>} Array of matching user records
+   * @returns {Promise<Array<Object>>} Matching user records
    */
-  static findAll(filter = {}) {
-    let result = [...users];
+  static async findAll(filter = {}) {
+    let sql = `
+      SELECT id, name, email, role, department, 
+             graduation_year AS "graduationYear", 
+             created_at AS "createdAt", 
+             updated_at AS "updatedAt"
+      FROM users
+    `;
+
+    const conditions = [];
+    const params = [];
 
     // Filter by role
     if (filter.role) {
-      const targetRole = String(filter.role).trim().toLowerCase();
-      result = result.filter(u => u.role && u.role.toLowerCase() === targetRole);
+      params.push(String(filter.role).trim().toLowerCase());
+      conditions.push(`LOWER(role) = $${params.length}`);
     }
 
     // Filter by department
     if (filter.department) {
-      const targetDept = String(filter.department).trim().toLowerCase();
-      result = result.filter(u => u.department && u.department.toLowerCase().includes(targetDept));
+      params.push(`%${String(filter.department).trim().toLowerCase()}%`);
+      conditions.push(`LOWER(department) LIKE $${params.length}`);
     }
 
-    // Filter by graduation year
-    if (filter.graduationYear) {
-      const targetYear = Number(filter.graduationYear);
-      if (!isNaN(targetYear)) {
-        result = result.filter(u => u.graduationYear === targetYear);
-      }
-    }
-
-    // Free text search in name or email
+    // Free-text search
     const searchQuery = filter.search || filter.q;
     if (searchQuery) {
-      const queryLower = String(searchQuery).trim().toLowerCase();
-      result = result.filter(u =>
-        (u.name && u.name.toLowerCase().includes(queryLower)) ||
-        (u.email && u.email.toLowerCase().includes(queryLower)) ||
-        (u.department && u.department.toLowerCase().includes(queryLower)) ||
-        (u.company && u.company.toLowerCase().includes(queryLower))
-      );
+      params.push(`%${String(searchQuery).trim().toLowerCase()}%`);
+      const pIdx = params.length;
+      conditions.push(`(LOWER(name) LIKE $${pIdx} OR LOWER(email) LIKE $${pIdx} OR LOWER(COALESCE(department, '')) LIKE $${pIdx})`);
     }
 
-    // Pagination: page and limit
+    if (conditions.length > 0) {
+      sql += ` WHERE ${conditions.join(' AND ')}`;
+    }
+
+    sql += ` ORDER BY id ASC`;
+
+    // Pagination
     if (filter.limit) {
       const limit = Math.max(1, parseInt(filter.limit, 10));
       const page = filter.page ? Math.max(1, parseInt(filter.page, 10)) : 1;
-      const startIndex = (page - 1) * limit;
-      result = result.slice(startIndex, startIndex + limit);
+      const offset = (page - 1) * limit;
+
+      params.push(limit);
+      sql += ` LIMIT $${params.length}`;
+
+      params.push(offset);
+      sql += ` OFFSET $${params.length}`;
     }
 
-    return result.map(u => ({ ...u }));
+    const res = await query(sql, params);
+    return res.rows;
   }
 
   /**
-   * Find a single user by numeric ID.
+   * Find a single user record by its numeric primary key ID.
    * 
    * @param {number|string} id - User ID
-   * @returns {Object|null} Matching user record or null if not found
+   * @returns {Promise<Object|null>} Matching user record or null if not found
    */
-  static findById(id) {
+  static async findById(id) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const user = users.find(u => u.id === numericId);
-    return user ? { ...user } : null;
+    const sql = `
+      SELECT id, name, email, role, department, 
+             graduation_year AS "graduationYear", 
+             created_at AS "createdAt", 
+             updated_at AS "updatedAt"
+      FROM users
+      WHERE id = $1
+    `;
+
+    const res = await query(sql, [numericId]);
+    return res.rows[0] || null;
   }
 
   /**
-   * Find a single user by email address (case-insensitive).
+   * Find a single user record by email address (case-insensitive).
    * 
    * @param {string} email - Email address
-   * @returns {Object|null} Matching user record or null if not found
+   * @returns {Promise<Object|null>} Matching user record or null if not found
    */
-  static findByEmail(email) {
+  static async findByEmail(email) {
     if (!email || typeof email !== 'string') return null;
-    const cleanEmail = email.trim().toLowerCase();
-    const user = users.find(u => u.email.toLowerCase() === cleanEmail);
-    return user ? { ...user } : null;
-  }
 
-  /**
-   * Check if a user with the specified ID exists in the store.
-   * 
-   * @param {number|string} id - User ID
-   * @returns {boolean} True if user exists, false otherwise
-   */
-  static exists(id) {
-    return this.findById(id) !== null;
-  }
+    const sql = `
+      SELECT id, name, email, role, department, 
+             graduation_year AS "graduationYear", 
+             created_at AS "createdAt", 
+             updated_at AS "updatedAt"
+      FROM users
+      WHERE LOWER(email) = LOWER($1)
+    `;
 
-  /**
-   * Return the total count of user records matching optional filter criteria.
-   * 
-   * @param {Object} [filter={}] - Filter criteria
-   * @returns {number}
-   */
-  static count(filter = {}) {
-    return this.findAll(filter).length;
+    const res = await query(sql, [email.trim()]);
+    return res.rows[0] || null;
   }
 
   // ==========================================
@@ -199,116 +194,106 @@ class UserModel {
   // ==========================================
 
   /**
-   * Completely replace/update an existing user record (PUT semantics).
-   * Requires mandatory fields (name, email).
+   * Replace all fields of an existing user record (PUT semantics).
    * 
    * @param {number|string} id - User ID
-   * @param {Object} updateData - Replacement user data
-   * @returns {Object|null} Updated user record or null if not found
+   * @param {Object} userData - Complete updated user payload
+   * @returns {Promise<Object|null>} Updated user record or null if not found
    * @throws {Error} If validation fails or email conflicts with another user
    */
-  static update(id, updateData) {
+  static async update(id, userData) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const userIndex = users.findIndex(u => u.id === numericId);
-    if (userIndex === -1) return null;
+    const existing = await this.findById(numericId);
+    if (!existing) return null;
 
-    const validation = this.validate(updateData, false);
+    const validation = this.validate(userData, false);
     if (!validation.isValid) {
       const error = new Error(validation.errors.join('; '));
       error.statusCode = 400;
       throw error;
     }
 
-    const cleanEmail = updateData.email.trim().toLowerCase();
-    const emailOwner = this.findByEmail(cleanEmail);
-    if (emailOwner && emailOwner.id !== numericId) {
-      const error = new Error('Email address is already in use by another user.');
+    const cleanEmail = userData.email.trim().toLowerCase();
+    const emailConflict = await this.findByEmail(cleanEmail);
+    if (emailConflict && emailConflict.id !== numericId) {
+      const error = new Error('Another user is already registered with this email.');
       error.statusCode = 409;
       throw error;
     }
 
-    users[userIndex] = {
-      ...users[userIndex],
-      name: updateData.name.trim(),
-      email: cleanEmail,
-      role: updateData.role && this.ROLES.includes(updateData.role.trim().toLowerCase())
-        ? updateData.role.trim().toLowerCase()
-        : 'alumni',
-      department: updateData.department ? updateData.department.trim() : null,
-      graduationYear: updateData.graduationYear ? Number(updateData.graduationYear) : null,
-      phone: updateData.phone ? updateData.phone.trim() : null,
-      company: updateData.company ? updateData.company.trim() : null,
-      jobTitle: updateData.jobTitle ? updateData.jobTitle.trim() : null,
-      updatedAt: new Date().toISOString()
-    };
+    const sql = `
+      UPDATE users
+      SET name = $1,
+          email = $2,
+          role = $3,
+          department = $4,
+          graduation_year = $5,
+          updated_at = NOW()
+      WHERE id = $6
+      RETURNING id, name, email, role, department, 
+                graduation_year AS "graduationYear", 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
 
-    return { ...users[userIndex] };
+    const values = [
+      userData.name.trim(),
+      cleanEmail,
+      userData.role && this.ROLES.includes(userData.role.trim().toLowerCase())
+        ? userData.role.trim().toLowerCase()
+        : existing.role,
+      userData.department !== undefined ? (userData.department ? userData.department.trim() : null) : existing.department,
+      userData.graduationYear !== undefined ? (userData.graduationYear ? parseInt(userData.graduationYear, 10) : null) : existing.graduationYear,
+      numericId
+    ];
+
+    const res = await query(sql, values);
+    return res.rows[0] || null;
   }
 
   /**
-   * Partially update an existing user record (PATCH semantics).
-   * Only modifies the specific fields provided in patchData.
+   * Partially update specific fields of an existing user record (PATCH semantics).
    * 
    * @param {number|string} id - User ID
-   * @param {Object} patchData - Partial attributes to update
-   * @returns {Object|null} Updated user record or null if not found
-   * @throws {Error} If validation fails or email conflicts with another user
+   * @param {Object} partialData - Subset of user fields to modify
+   * @returns {Promise<Object|null>} Updated user record or null if not found
+   * @throws {Error} If validation fails or email conflicts
    */
-  static patch(id, patchData) {
+  static async patch(id, partialData) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const userIndex = users.findIndex(u => u.id === numericId);
-    if (userIndex === -1) return null;
+    const existing = await this.findById(numericId);
+    if (!existing) return null;
 
-    const validation = this.validate(patchData, true);
+    const validation = this.validate(partialData, true);
     if (!validation.isValid) {
       const error = new Error(validation.errors.join('; '));
       error.statusCode = 400;
       throw error;
     }
 
-    if (patchData.email) {
-      const cleanEmail = patchData.email.trim().toLowerCase();
-      const emailOwner = this.findByEmail(cleanEmail);
-      if (emailOwner && emailOwner.id !== numericId) {
-        const error = new Error('Email address is already in use by another user.');
+    if (partialData.email) {
+      const cleanEmail = partialData.email.trim().toLowerCase();
+      const emailConflict = await this.findByEmail(cleanEmail);
+      if (emailConflict && emailConflict.id !== numericId) {
+        const error = new Error('Another user is already registered with this email.');
         error.statusCode = 409;
         throw error;
       }
-      users[userIndex].email = cleanEmail;
     }
 
-    if (patchData.name !== undefined) {
-      users[userIndex].name = patchData.name.trim();
-    }
-    if (patchData.role !== undefined) {
-      const cleanRole = patchData.role.trim().toLowerCase();
-      if (this.ROLES.includes(cleanRole)) {
-        users[userIndex].role = cleanRole;
-      }
-    }
-    if (patchData.department !== undefined) {
-      users[userIndex].department = patchData.department ? patchData.department.trim() : null;
-    }
-    if (patchData.graduationYear !== undefined) {
-      users[userIndex].graduationYear = patchData.graduationYear ? Number(patchData.graduationYear) : null;
-    }
-    if (patchData.phone !== undefined) {
-      users[userIndex].phone = patchData.phone ? patchData.phone.trim() : null;
-    }
-    if (patchData.company !== undefined) {
-      users[userIndex].company = patchData.company ? patchData.company.trim() : null;
-    }
-    if (patchData.jobTitle !== undefined) {
-      users[userIndex].jobTitle = patchData.jobTitle ? patchData.jobTitle.trim() : null;
-    }
+    const updatedData = {
+      name: partialData.name !== undefined ? partialData.name : existing.name,
+      email: partialData.email !== undefined ? partialData.email : existing.email,
+      role: partialData.role !== undefined ? partialData.role : existing.role,
+      department: partialData.department !== undefined ? partialData.department : existing.department,
+      graduationYear: partialData.graduationYear !== undefined ? partialData.graduationYear : existing.graduationYear
+    };
 
-    users[userIndex].updatedAt = new Date().toISOString();
-
-    return { ...users[userIndex] };
+    return this.update(numericId, updatedData);
   }
 
   // ==========================================
@@ -316,79 +301,85 @@ class UserModel {
   // ==========================================
 
   /**
-   * Delete an existing user record by numeric ID.
+   * Delete a user record by numeric ID.
    * 
    * @param {number|string} id - User ID
-   * @returns {Object|null} The deleted user record, or null if not found
+   * @returns {Promise<Object|null>} Deleted user record or null if not found
    */
-  static delete(id) {
+  static async delete(id) {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) return null;
 
-    const userIndex = users.findIndex(u => u.id === numericId);
-    if (userIndex === -1) return null;
+    const sql = `
+      DELETE FROM users
+      WHERE id = $1
+      RETURNING id, name, email, role, department, 
+                graduation_year AS "graduationYear", 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
 
-    const [deletedUser] = users.splice(userIndex, 1);
-    return { ...deletedUser };
+    const res = await query(sql, [numericId]);
+    return res.rows[0] || null;
   }
 
   /**
-   * Delete a user by email address.
+   * Delete a user record by email address.
    * 
-   * @param {string} email - Email address
-   * @returns {Object|null} The deleted user record, or null if not found
+   * @param {string} email - User email
+   * @returns {Promise<Object|null>} Deleted user record or null if not found
    */
-  static deleteByEmail(email) {
-    const user = this.findByEmail(email);
-    if (!user) return null;
-    return this.delete(user.id);
-  }
+  static async deleteByEmail(email) {
+    if (!email || typeof email !== 'string') return null;
 
-  /**
-   * Reset in-memory storage to initial seed state (useful for tests or teardown).
-   * 
-   * @returns {void}
-   */
-  static reset() {
-    users = JSON.parse(JSON.stringify(initialSeedUsers));
+    const sql = `
+      DELETE FROM users
+      WHERE LOWER(email) = LOWER($1)
+      RETURNING id, name, email, role, department, 
+                graduation_year AS "graduationYear", 
+                created_at AS "createdAt", 
+                updated_at AS "updatedAt"
+    `;
+
+    const res = await query(sql, [email.trim()]);
+    return res.rows[0] || null;
   }
 
   // ==========================================
-  // SCHEMA VALIDATION & UTILITIES
+  // UTILITIES & VALIDATION
   // ==========================================
 
   /**
-   * Validate user input fields.
+   * Validate user input fields against domain constraints.
    * 
-   * @param {Object} data - Attributes to validate
-   * @param {boolean} [isPartial=false] - Whether partial attributes are acceptable (PATCH)
-   * @returns {{isValid: boolean, errors: Array<string>}} Validation result
+   * @param {Object} data - User input payload
+   * @param {boolean} [isPartial=false] - Whether partial fields are allowed (PATCH)
+   * @returns {{isValid: boolean, errors: Array<string>}}
    */
   static validate(data, isPartial = false) {
     const errors = [];
 
     if (!data || typeof data !== 'object') {
-      return { isValid: false, errors: ['Request payload must be a non-empty object.'] };
+      return { isValid: false, errors: ['Request body must be a valid JSON object or form data.'] };
     }
 
-    // Required fields check (for non-partial requests: create, update)
-    if (!isPartial) {
+    // Name validation
+    if (!isPartial || data.name !== undefined) {
       if (!data.name || typeof data.name !== 'string' || !data.name.trim()) {
         errors.push('Field "name" is required and cannot be empty.');
       }
+    }
+
+    // Email validation
+    if (!isPartial || data.email !== undefined) {
       if (!data.email || typeof data.email !== 'string' || !data.email.trim()) {
         errors.push('Field "email" is required and cannot be empty.');
+      } else if (!this.isValidEmail(data.email.trim())) {
+        errors.push('Field "email" must be a structurally valid email address.');
       }
     }
 
-    // Format check if email is provided
-    if (data.email !== undefined) {
-      if (typeof data.email !== 'string' || !this.isValidEmail(data.email)) {
-        errors.push('Field "email" must be a valid email address (e.g. user@example.com).');
-      }
-    }
-
-    // Role check if provided
+    // Role validation
     if (data.role !== undefined) {
       const cleanRole = String(data.role).trim().toLowerCase();
       if (!this.ROLES.includes(cleanRole)) {
@@ -396,9 +387,9 @@ class UserModel {
       }
     }
 
-    // Graduation year check if provided
+    // Graduation year validation
     if (data.graduationYear !== undefined && data.graduationYear !== null && data.graduationYear !== '') {
-      const year = Number(data.graduationYear);
+      const year = parseInt(data.graduationYear, 10);
       if (isNaN(year) || year < 1900 || year > 2100) {
         errors.push('Field "graduationYear" must be a valid 4-digit year between 1900 and 2100.');
       }
@@ -411,16 +402,41 @@ class UserModel {
   }
 
   /**
-   * Simple RFC-compliant email regex validator.
-   * 
+   * Check if an email matches standard RFC format
    * @param {string} email
    * @returns {boolean}
    */
   static isValidEmail(email) {
-    if (!email || typeof email !== 'string') return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
+    return emailRegex.test(email);
+  }
+
+  /**
+   * Check if a user with the specified ID exists in the database.
+   * 
+   * @param {number|string} id - User ID
+   * @returns {Promise<boolean>}
+   */
+  static async exists(id) {
+    const user = await this.findById(id);
+    return user !== null;
+  }
+
+  /**
+   * Count users matching optional filter criteria.
+   * 
+   * @param {Object} [filter={}] - Filter criteria
+   * @returns {Promise<number>}
+   */
+  static async count(filter = {}) {
+    const users = await this.findAll(filter);
+    return users.length;
   }
 }
+
+// Aliases for compatibility
+UserModel.getAll = UserModel.findAll;
+UserModel.getById = UserModel.findById;
+UserModel.remove = UserModel.delete;
 
 module.exports = UserModel;
