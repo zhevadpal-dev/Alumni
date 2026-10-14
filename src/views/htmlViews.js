@@ -94,6 +94,7 @@ class HtmlViews {
       }
       .badge.student { background: #fef3c7; color: #92400e; }
       .badge.faculty { background: #f3e8ff; color: #6b21a8; }
+      .badge.teacher { background: #ede9fe; color: #5b21b6; }
       .badge.admin { background: #fee2e2; color: #991b1b; }
       .form-grid {
         display: grid;
@@ -218,6 +219,7 @@ class HtmlViews {
                     <option value="alumni" selected>Alumni</option>
                     <option value="student">Student</option>
                     <option value="faculty">Faculty</option>
+                    <option value="teacher">Teacher</option>
                     <option value="admin">Admin</option>
                   </select>
                 </div>
@@ -396,6 +398,7 @@ class HtmlViews {
                     <option value="alumni" ${user.role === 'alumni' ? 'selected' : ''}>Alumni</option>
                     <option value="student" ${user.role === 'student' ? 'selected' : ''}>Student</option>
                     <option value="faculty" ${user.role === 'faculty' ? 'selected' : ''}>Faculty</option>
+                    <option value="teacher" ${user.role === 'teacher' ? 'selected' : ''}>Teacher</option>
                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
                   </select>
                 </div>

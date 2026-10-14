@@ -74,8 +74,8 @@ const swaggerSpec = {
             name: 'role',
             in: 'query',
             required: false,
-            description: 'Filter users by role (alumni, student, faculty, admin)',
-            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'admin'] }
+            description: 'Filter users by role (alumni, student, faculty, teacher, admin)',
+            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'teacher', 'admin'] }
           },
           {
             name: 'department',
@@ -429,7 +429,7 @@ const swaggerSpec = {
             name: 'role',
             in: 'query',
             required: false,
-            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'admin'] }
+            schema: { type: 'string', enum: ['alumni', 'student', 'faculty', 'teacher', 'admin'] }
           },
           {
             name: 'department',

@@ -13,7 +13,7 @@ class UserModel {
   /**
    * Allowed user roles within the platform
    */
-  static ROLES = ['alumni', 'student', 'faculty', 'admin'];
+  static ROLES = ['alumni', 'student', 'faculty', 'teacher', 'admin'];
 
   // ==========================================
   // CREATE (C)

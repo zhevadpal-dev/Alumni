@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "migrate": "node src/migrations/runner.js"
+    "migrate": "node src/migrations/runner.js",
+    "seed": "node src/seeds/seed.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

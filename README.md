@@ -105,6 +105,13 @@ Alumni/
 │   │   ├── 001_create_initial_tables.sql # PostgreSQL schema for users, announcements & seed data
 │   │   └── runner.js                # Migration runner script (executed via npm run migrate)
 │   │
+│   ├── factories/                   # FACTORY LAYER (Test & Mock Data Generation)
+│   │   ├── announcementFactory.js   # Announcement factory (buildAnnouncement, createAnnouncements)
+│   │   └── userFactory.js           # User factory (buildUser, createUsers)
+│   │
+│   ├── seeds/                       # DATABASE SEEDERS
+│   │   └── seed.js                  # Database seeder (safe truncate, default data + factory generation)
+│   │
 │   ├── models/                      # MODEL LAYER (Data Access & Persistence)
 │   │   ├── announcementModel.js     # Announcement entity with PostgreSQL SQL CRUD operations
 │   │   └── userModel.js             # User entity with PostgreSQL SQL CRUD operations
@@ -346,9 +353,14 @@ const deletedNotice = await AnnouncementModel.delete(1);                  // Del
 The Alumni Tracking System employs a structured relational data model strictly encapsulated within the **Model Layer** (`src/models/`):
 
 - **PostgreSQL Relational Persistence:** Active models ([`userModel.js`](src/models/userModel.js) and [`announcementModel.js`](src/models/announcementModel.js)) connect to PostgreSQL 15 (`alumni_db` container) via a robust connection pool (`src/config/db.js`), using parameterized SQL queries with ACID guarantees and named volume persistence (`postgres_data`).
-- **Database Migrations & Seed Data:** Automated SQL migration scripts ([`src/migrations/001_create_initial_tables.sql`](src/migrations/001_create_initial_tables.sql)) define table DDL and seed initial users (Said Hasan, Zeynep Naz, Ece, Rumeysa, Ceyda) and announcements idempotently. Migrations can be run anytime via `npm run migrate` or `docker compose exec app npm run migrate`.
+- **Factory Pattern & Mock Generators (`src/factories/`):**
+  - **`userFactory.js`**: Implements `buildUser(overrides)` and `createUsers(count, overrides)` to generate realistic mock users with normalized ASCII emails, randomized roles (`alumni`, `student`, `teacher`), departments, and graduation years.
+  - **`announcementFactory.js`**: Implements `buildAnnouncement(overrides)` and `createAnnouncements(count, overrides)` to generate institutional announcements with realistic titles, bodies, authors, and whitelisted categories.
+- **Database Migrations & Seeding:**
+  - **DDL Migration (`src/migrations/runner.js`):** Runs `001_create_initial_tables.sql` via `npm run migrate` or `docker compose exec app npm run migrate`.
+  - **Database Seeder (`src/seeds/seed.js`):** Safely truncates tables (`TRUNCATE ... RESTART IDENTITY CASCADE`) and populates default users (Said Hasan, Zeynep Naz, Ece, Rumeysa, Ceyda) alongside factory-generated alumni records and initial announcements via `npm run seed` or `docker compose exec app npm run seed`.
 - **Domain Validation & Integrity Rules:**
-  - **User Entity:** Enforces mandatory RFC-compliant emails (`UNIQUE` constraint & case-insensitive validation), whitelist role authorization (`alumni`, `student`, `faculty`, `admin`), and valid graduation years (1900–2100).
+  - **User Entity:** Enforces mandatory RFC-compliant emails (`UNIQUE` constraint & case-insensitive validation), whitelist role authorization (`alumni`, `student`, `faculty`, `teacher`, `admin`), and valid graduation years (1900–2100).
   - **Announcement Entity:** Enforces mandatory title/content bodies, category whitelist (`General`, `Event`, `Career`, `Academic`, `News`, `Urgent`), and automated timestamps.
 - **Relational Schema:**
   - `users`: `id` (SERIAL PK), `name` (VARCHAR), `email` (VARCHAR UNIQUE NOT NULL), `role` (VARCHAR), `department` (VARCHAR), `graduation_year` (INTEGER), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
@@ -422,8 +434,11 @@ Launch the full containerized application stack orchestrated via `docker-compose
 # Build and start services in detached mode
 docker compose up -d --build
 
-# Run database migrations and seed default records
+# Run database migrations (creates tables and initial seeds)
 docker compose exec app npm run migrate
+
+# Run database seeder (cleans & populates default records + factory data)
+docker compose exec app npm run seed
 
 # Inspect container output and logs
 docker compose logs -f
@@ -431,9 +446,10 @@ docker compose logs -f
 
 The application server will become reachable at `http://localhost:5001`.
 
-The migration automatically creates `users` and `announcements` tables and seeds default records:
-- **Users (5):** Said Hasan (Admin), Zeynep Naz (Alumni), Ece (Alumni), Rumeysa (Student), Ceyda (Faculty).
-- **Announcements (3):** Annual Alumni Homecoming 2026, Spring 2026 Mentorship Program Applications Open, Alumni Spotlight: Tech Innovations in Artificial Intelligence.
+The seeder automatically populates:
+- **Default Core Users (5):** Said Hasan (Admin), Zeynep Naz (Alumni), Ece (Alumni), Rumeysa (Student), Ceyda (Faculty).
+- **Factory-Generated Alumni Records (5+):** Realistic alumni with academic departments and graduation years.
+- **Initial Announcements (5):** "Welcome to Alumni Portal", "Upcoming Career Fair", "Mentorship Program", plus factory-generated updates.
 
 To terminate containers and tear down the network:
 
@@ -453,6 +469,9 @@ npm install
 
 # Run database migrations (requires local PostgreSQL or alumni_db running)
 npm run migrate
+
+# Run database seeder
+npm run seed
 
 # Start the server with Node
 node index.js
