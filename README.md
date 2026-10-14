@@ -141,7 +141,8 @@ Alumni/
 ├── alumni-api.postman_collection.json # Complete Postman API collection (v2.1 format)
 ├── tests/                           # TEST SUITE & VERIFICATION
 │   └── forgetting-test.sh           # Automated in-memory lifecycle verification script (Forgetting Test)
-├── DATA_DESIGN.md                   # Comprehensive Data Design & Persistence Architecture documentation
+├── docs/                            # ARCHITECTURAL DOCUMENTATION
+│   └── ddd.md                       # Comprehensive Data Design & Architecture Documentation (DDD)
 ├── package.json                     # Node.js project manifest, dependencies, and npm scripts
 └── README.md                        # Master project documentation
 ```
@@ -333,6 +334,22 @@ AnnouncementModel.reset();                                          // Reset to 
 #### 5. ⚙️ Application & Server Configuration (`src/app.js` & `index.js`)
 - **`src/app.js`**: Configures middleware pipelines (CORS, JSON parser, urlencoded parser, multipart form parser) and mounts the master router. Decoupled from the port listener for seamless integration testing with supertest/jest.
 - **`index.js`**: Server bootstrap entry point that imports `app.js`, reads the `PORT` environment variable (`5001`), and binds the HTTP server.
+
+---
+
+## 🗄️ Data Design & Architecture
+
+The Alumni Tracking System employs a structured data design strictly encapsulated within the **Model Layer** (`src/models/`):
+
+- **In-Memory Operational Store:** Active models ([`userModel.js`](src/models/userModel.js) and [`announcementModel.js`](src/models/announcementModel.js)) operate on internal heap arrays with auto-incrementing integer IDs, defensive shallow-copy immutability, and full CRUD query filtering (search, categories, author, pagination).
+- **Domain Validation & Integrity Rules:**
+  - **User Entity:** Enforces mandatory RFC-compliant emails (case-insensitive uniqueness), whitelist role authorization (`alumni`, `student`, `faculty`, `admin`), and valid graduation years (1900–2100).
+  - **Announcement Entity:** Enforces mandatory title/content bodies, category whitelist (`General`, `Event`, `Career`, `Academic`, `News`, `Urgent`), and automatic ISO 8601 timestamps.
+- **Relational Persistence Target:** Full DDL mapping to PostgreSQL 15 (`alumni_postgres` container) with foreign keys (`announcements.author_id -> users.id`), indexes on lookup columns, and automated `updated_at` trigger functions.
+- **In-Memory Lifecycle Verification:** Proven via empirical "Forgetting Tests" where runtime state resets cleanly upon container reboot (`docker compose down && up`).
+
+📖 For comprehensive entity specifications, schema definitions, validation rules, Mermaid ER diagrams, and PostgreSQL migration DDL, see the full document:  
+👉 **[Data Design Documentation](docs/ddd.md)**
 
 ---
 
