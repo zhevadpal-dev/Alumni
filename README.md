@@ -382,16 +382,26 @@ cp .env.example .env
 Default configuration values:
 
 ```env
-PORT=5001
+# Server Configuration
 NODE_ENV=development
+PORT=5001
+HOST=0.0.0.0
 
 # PostgreSQL Database Configuration
 DB_HOST=db
 DB_PORT=5432
-DB_NAME=alumni_db
 DB_USER=alumni_user
-DB_PASSWORD=alumni_secret_password
-DATABASE_URL=postgres://alumni_user:alumni_secret_password@db:5432/alumni_db
+DB_PASSWORD=alumni_password
+DB_NAME=alumni_db
+DATABASE_URL=postgresql://alumni_user:alumni_password@db:5432/alumni_db
+
+# Security & Authentication (JWT)
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_EXPIRES_IN=7d
+
+# Documentation Configuration
+SWAGGER_ENABLED=true
+SWAGGER_ROUTE=/api/swagger
 ```
 
 ---
