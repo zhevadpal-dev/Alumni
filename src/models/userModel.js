@@ -69,8 +69,17 @@ class UserModel {
       userData.graduationYear ? parseInt(userData.graduationYear, 10) : null
     ];
 
-    const res = await query(sql, values);
-    return res.rows[0];
+    try {
+      const res = await query(sql, values);
+      return res.rows[0];
+    } catch (dbErr) {
+      if (dbErr.code === '23505') {
+        const error = new Error(`A user with email "${cleanEmail}" already exists in the database.`);
+        error.statusCode = 409;
+        throw error;
+      }
+      throw dbErr;
+    }
   }
 
   // ==========================================
@@ -249,8 +258,17 @@ class UserModel {
       numericId
     ];
 
-    const res = await query(sql, values);
-    return res.rows[0] || null;
+    try {
+      const res = await query(sql, values);
+      return res.rows[0] || null;
+    } catch (dbErr) {
+      if (dbErr.code === '23505') {
+        const error = new Error(`A user with email "${cleanEmail}" already exists in the database.`);
+        error.statusCode = 409;
+        throw error;
+      }
+      throw dbErr;
+    }
   }
 
   /**

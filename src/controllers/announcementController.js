@@ -69,7 +69,7 @@ class AnnouncementController {
 
       if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(AnnouncementViews.renderDetail(item));
+        return res.status(200).send(AnnouncementViews.renderDetail(item, req.query));
       }
 
       return res.status(200).json({ status: 'success', data: item });
@@ -116,8 +116,11 @@ class AnnouncementController {
       });
 
       if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(201).send(AnnouncementViews.renderCreateSuccess(created));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(201).send(AnnouncementViews.renderCreateSuccess(created));
+        }
+        return res.redirect(`/announcements?msg=Announcement%20%22${encodeURIComponent(created.title)}%22%20published%20successfully!&type=success`);
       }
 
       return res.status(201).json({
@@ -155,7 +158,7 @@ class AnnouncementController {
       }
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(AnnouncementViews.renderEditForm(item));
+      return res.status(200).send(AnnouncementViews.renderEditForm(item, req.query));
     } catch (err) {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(500).send(AnnouncementViews.renderError(err.message));
@@ -189,8 +192,11 @@ class AnnouncementController {
       }
 
       if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(AnnouncementViews.renderUpdateSuccess(updated));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(200).send(AnnouncementViews.renderUpdateSuccess(updated));
+        }
+        return res.redirect(`/announcements/${id}?msg=Announcement%20updated%20successfully!&type=success`);
       }
 
       return res.status(200).json({
@@ -234,8 +240,11 @@ class AnnouncementController {
       }
 
       if (isHtml || req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(AnnouncementViews.renderDeleteSuccess(deleted));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(200).send(AnnouncementViews.renderDeleteSuccess(deleted));
+        }
+        return res.redirect(`/announcements?msg=Announcement%20%22${encodeURIComponent(deleted.title)}%22%20deleted%20successfully&type=success`);
       }
 
       return res.status(200).json({

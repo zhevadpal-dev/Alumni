@@ -175,6 +175,31 @@ class AnnouncementViews {
     `;
   }
 
+  /**
+   * Render dismissible flash message banner
+   * @param {Object} [query={}]
+   * @returns {string} HTML markup
+   */
+  static renderFlashBanner(query = {}) {
+    if (!query || (!query.msg && !query.success && !query.error)) return '';
+    const isError = Boolean(query.error) || query.type === 'error';
+    const bgColor = isError ? '#fef2f2' : '#f0fdf4';
+    const borderColor = isError ? '#fecaca' : '#bbf7d0';
+    const textColor = isError ? '#991b1b' : '#166534';
+    const icon = isError ? '⚠️' : '✅';
+    const msg = query.msg || (query.success ? `Operation successful: ${query.success}` : query.error);
+
+    return `
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.25rem;">${icon}</span>
+          <span>${msg}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove();" style="background: transparent; border: none; color: ${textColor}; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px;" title="Dismiss">&times;</button>
+      </div>
+    `;
+  }
+
   // ==========================================
   // LIST VIEW: /announcements
   // ==========================================
@@ -187,6 +212,7 @@ class AnnouncementViews {
    * @returns {string} HTML markup
    */
   static renderList(announcements = [], filter = {}) {
+    const flashBanner = this.renderFlashBanner(filter);
     const tableRows = announcements.map(a => {
       const formattedDate = new Date(a.createdAt).toLocaleDateString(undefined, {
         year: 'numeric',
@@ -235,7 +261,10 @@ class AnnouncementViews {
           <div class="header">
             <div>
               <h1 class="title">📢 Announcement Management</h1>
-              <p class="subtitle">Publish institutional news, event broadcasts, and career opportunities (${announcements.length} active)</p>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+                <span style="background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 9999px; font-size: 0.78rem; font-weight: 600;">🐘 PostgreSQL Database: Connected</span>
+                <span style="color: #64748b; font-size: 0.85rem;">${announcements.length} records persisted</span>
+              </div>
             </div>
             <div class="nav-links">
               <a href="#new-announcement" class="btn btn-success" style="color: #fff;">➕ New Announcement</a>
@@ -244,6 +273,8 @@ class AnnouncementViews {
               <a href="/api/announcements" class="secondary" target="_blank">REST API JSON</a>
             </div>
           </div>
+
+          ${flashBanner}
 
           <!-- Stats Bar -->
           <div class="stats-bar">
@@ -341,9 +372,11 @@ class AnnouncementViews {
    * Render HTML view for GET /announcements/:id
    * 
    * @param {Object} announcement
+   * @param {Object} [query={}]
    * @returns {string} HTML markup
    */
-  static renderDetail(announcement) {
+  static renderDetail(announcement, query = {}) {
+    const flashBanner = this.renderFlashBanner(query);
     const badgeClass = `badge-${announcement.category || 'General'}`;
     const createdStr = new Date(announcement.createdAt).toLocaleString(undefined, {
       year: 'numeric',
@@ -373,6 +406,7 @@ class AnnouncementViews {
       </head>
       <body>
         <div class="container" style="max-width: 720px; margin-top: 24px;">
+          ${flashBanner}
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
               <a href="/announcements" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Announcements</a>
@@ -424,7 +458,8 @@ class AnnouncementViews {
    * @param {Object} announcement
    * @returns {string} HTML markup
    */
-  static renderEditForm(announcement) {
+  static renderEditForm(announcement, query = {}) {
+    const flashBanner = this.renderFlashBanner(query);
     const categories = ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'];
 
     const categoryOptions = categories.map(cat => `
@@ -442,6 +477,7 @@ class AnnouncementViews {
       </head>
       <body>
         <div class="container" style="max-width: 720px; margin-top: 24px;">
+          ${flashBanner}
           <div class="card">
             <div style="margin-bottom: 16px;">
               <a href="/announcements/${announcement.id}" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Announcement #${announcement.id}</a>

@@ -291,41 +291,40 @@ const deletedNotice = await AnnouncementModel.delete(1);                  // Del
 
 #### 2. 🎨 View Layer (`src/views/`)
 - Responsible for the presentation output sent to clients, cleanly decoupling UI layout, CSS styling, and HTML templates from controller orchestration.
+- **Direct PostgreSQL Integration & Live Feedback:** All views are connected directly to PostgreSQL data queries, featuring live database connection badges (`🐘 PostgreSQL Database: Connected`), dismissible flash alert banners (`renderFlashBanner`), and defensive error styling for database constraint failures.
 - **`announcementViews.js`**: Generates responsive, modern server-rendered HTML management interfaces:
-  - **`GET /announcements` (Directory & Management View):** Renders `renderList(announcements, stats)` with analytical summary cards (Total Announcements, Categories, Latest update), categorized card grid, tabular listings with action buttons, and an embedded quick-publish form.
+  - **`GET /announcements` (Directory & Management View):** Renders `renderList(announcements, filter)` with analytical summary cards, live PostgreSQL records count, visual flash feedback alerts, tabular listings with action buttons, and an embedded quick-publish form.
   - **`GET /announcements/new` (Creation Form):** Renders `renderNewForm()` with accessible inputs, category selector, author override, and responsive design.
-  - **`GET /announcements/:id` (Detail View):** Renders `renderDetail(announcement)` with category badges, author attribution, publication timestamps, full text formatting, and contextual navigation.
-  - **`GET /announcements/:id/edit` (Edit Form):** Renders `renderEditForm(announcement)` pre-populated with current values for streamlined updates.
-  - **Success & Confirmation Views:** `renderCreateSuccess(announcement)`, `renderUpdateSuccess(announcement)`, `renderDeleteSuccess(announcement)` providing clear feedback and links back to the directory.
+  - **`GET /announcements/:id` (Detail View):** Renders `renderDetail(announcement, query)` directly fetching from PostgreSQL by primary key ID with timestamps, author attribution, and flash status banners.
+  - **`GET /announcements/:id/edit` (Edit Form):** Renders `renderEditForm(announcement, query)` pre-populated with live database values for updates.
+  - **Success & Confirmation Views:** `renderCreateSuccess(announcement)`, `renderUpdateSuccess(announcement)`, `renderDeleteSuccess(announcement)` or automatic redirect with immediate table re-rendering.
 - **`htmlViews.js`**: Generates responsive, server-rendered HTML view templates:
-  - **`GET /users` (Directory & Form View):** Renders `renderUsersList(users)` displaying registered alumni member cards and an embedded interactive HTML registration form (`<form action="/users" method="POST">`) allowing users to register new alumni directly from the browser.
-  - **`POST /users` (Success / Error Views):**
-    - `renderUserCreatedSuccess(user)`: Displays a confirmation view with user details, status badges, and quick links (`Back to Directory`, `View Profile`, `Add Another`).
-    - `renderUserError(message)`: Displays an error card if validation fails (e.g. missing required fields or duplicate email) with a link back to the form.
-  - **`GET /users/:id` (Profile View):** Renders `renderUserProfile(user)` showing full profile attributes, metadata, and department/graduation history.
+  - **`GET /users` (Directory & Form View):** Renders `renderUsersList(users, query)` displaying live database records, dismissible status alerts, and an embedded interactive HTML registration form (`<form action="/users" method="POST">`) inserting directly into PostgreSQL.
+  - **`POST /users` (Create Action):** Inserts new records into PostgreSQL, automatically enforcing email uniqueness and role validation, then re-renders directory with flash confirmation.
+  - **`GET /users/:id` (Profile View):** Renders `renderUserProfile(user, query)` directly fetching by ID from PostgreSQL with full attributes, timestamps, and edit/delete actions.
+  - **`GET /users/:id/edit` (Edit View):** Renders `renderUserEditForm(user, query)` pre-populated with existing database attributes.
+  - **`POST /users/:id/delete` (Delete Action):** Executes SQL `DELETE` in PostgreSQL and immediately redirects back to the directory table with the record removed and a green flash indicator.
   - **`GET /` & `GET /about`:** Renders baseline layout templates (`renderHome()`, `renderAbout()`).
 
 #### 3. 🧠 Controller Layer (`src/controllers/`)
-- Acts as the intermediary orchestrating the application flow.
-- Accepts parsed HTTP requests from routes, executes defensive input validation, invokes appropriate Model methods, selects output views or JSON representations, and emits HTTP status codes.
+- Acts as the intermediary orchestrating application flow directly with the PostgreSQL connection pool.
+- Accepts parsed HTTP requests from routes, executes defensive input validation, invokes appropriate database Model methods, selects output views or JSON representations, and emits HTTP status codes.
 - **`apiAnnouncementController.js` (REST API Controller):**
   - Dedicated to `/api/announcements` and `/api/announcements/:id`.
-  - Implements complete JSON CRUD operations: `getAll` (with filtering by category, search, author, pagination), `getById`, `create`, `update`, `remove`.
+  - Implements complete database-backed JSON CRUD operations: `getAll` (with SQL filtering by category, search, author, pagination), `getById`, `create`, `update`, `remove`.
   - Emits standardized JSON response contracts (`{ status: 'success', data: ... }`) and HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `204 No Content`).
 - **`announcementController.js` (Web / MVC View Controller):**
   - Dedicated to `/announcements`, `/announcements/new`, `/announcements/:id`, `/announcements/:id/edit`, `/announcements/:id/delete`.
-  - Implements web-oriented CRUD operations and content negotiation.
-  - When accessed via web browsers (`Accept: text/html`), renders rich HTML views (`AnnouncementViews.renderList`, `renderDetail`, `renderNewForm`, `renderEditForm`).
-  - When accessed programmatically or via form submission, executes CRUD workflows on `AnnouncementModel` and returns appropriate web/JSON payloads.
+  - Implements web-oriented CRUD operations backed directly by PostgreSQL tables.
+  - Form submissions write real rows into PostgreSQL; deletions execute SQL deletes and immediately redirect to the re-rendered table with flash notifications.
 - **`apiUserController.js` (REST API Controller):**
   - Dedicated to `/api/users` and `/api/users/:id`.
-  - Implements complete JSON CRUD operations: `getAllUsers` (with filtering, search, pagination), `getUserById`, `createUser`, `updateUserPut`, `updateUserPatch`, `deleteUser`.
+  - Implements complete database-backed JSON CRUD operations: `getAllUsers` (with SQL filtering, search, pagination), `getUserById`, `createUser`, `updateUserPut`, `updateUserPatch`, `deleteUser`.
   - Emits standardized JSON response contracts (`{ status: 'success', data: ... }`) and HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`).
 - **`userController.js` (Web / MVC View Controller):**
-  - Dedicated to `/users` and `/users/:id`.
-  - Implements web-oriented CRUD operations and content negotiation.
-  - When accessed via web browsers (`Accept: text/html`), renders rich HTML views (`HtmlViews.renderUsersList` and `HtmlViews.renderUserProfile`).
-  - When accessed programmatically or via form submission, executes CRUD workflows on `UserModel` and returns appropriate web/JSON payloads.
+  - Dedicated to `/users`, `/users/:id`, `/users/:id/edit`, `/users/:id/delete`.
+  - Implements web-oriented CRUD operations backed directly by PostgreSQL tables.
+  - Form submissions persist real rows; deletions execute SQL deletes and immediately reflect in the directory table with visual feedback; constraint violations (e.g. duplicate email) are caught and presented gracefully.
 - **`healthController.js`**: Extracts node process uptime, platform architecture, and memory usage metrics (`rss`, `heapTotal`, `heapUsed`) for monitoring systems.
 - **`coreController.js`**: Handles base endpoints, content-negotiated responses, arithmetic calculations (`/sum/:num1/:num2`), and personalized greetings.
 - **`swaggerController.js`**: Serves the interactive Swagger UI and OpenAPI 3.0 specification JSON.

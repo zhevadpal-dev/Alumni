@@ -144,6 +144,31 @@ class HtmlViews {
     `;
   }
 
+  /**
+   * Render dismissible flash message banner
+   * @param {Object} [query={}]
+   * @returns {string} HTML markup
+   */
+  static renderFlashBanner(query = {}) {
+    if (!query || (!query.msg && !query.success && !query.error)) return '';
+    const isError = Boolean(query.error) || query.type === 'error';
+    const bgColor = isError ? '#fef2f2' : '#f0fdf4';
+    const borderColor = isError ? '#fecaca' : '#bbf7d0';
+    const textColor = isError ? '#991b1b' : '#166534';
+    const icon = isError ? '⚠️' : '✅';
+    const msg = query.msg || (query.success ? `Operation successful: ${query.success}` : query.error);
+
+    return `
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.25rem;">${icon}</span>
+          <span>${msg}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove();" style="background: transparent; border: none; color: ${textColor}; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px;" title="Dismiss">&times;</button>
+      </div>
+    `;
+  }
+
   // ==========================================
   // READ (R) - LIST VIEW WITH CREATE FORM
   // ==========================================
@@ -152,9 +177,11 @@ class HtmlViews {
    * Render HTML view for GET /users
    * 
    * @param {Array<Object>} users
+   * @param {Object} [query={}]
    * @returns {string} HTML markup
    */
-  static renderUsersList(users = []) {
+  static renderUsersList(users = [], query = {}) {
+    const flashBanner = this.renderFlashBanner(query);
     const userCards = users.map(u => `
       <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div style="flex: 1; min-width: 250px;">
@@ -190,13 +217,19 @@ class HtmlViews {
           <div class="header">
             <div>
               <h1 class="title">🎓 Alumni Directory & User Management</h1>
-              <p class="subtitle">Complete MVC View Layer: Read, Create, Edit, and Delete operations (${users.length} members)</p>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+                <span style="background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 9999px; font-size: 0.78rem; font-weight: 600;">🐘 PostgreSQL Database: Connected</span>
+                <span style="color: #64748b; font-size: 0.85rem;">${users.length} members persisted</span>
+              </div>
             </div>
             <div class="nav-links">
+              <a href="/announcements" class="secondary">📢 Announcements</a>
               <a href="/api/swagger" target="_blank">Swagger Docs</a>
               <a href="/api/users" class="secondary" target="_blank">REST API JSON</a>
             </div>
           </div>
+
+          ${flashBanner}
 
           <!-- CREATE SECTION: POST /users Form -->
           <div class="card" id="create-user-form">
@@ -271,9 +304,11 @@ class HtmlViews {
    * Render HTML view for GET /users/:id
    * 
    * @param {Object} user
+   * @param {Object} [query={}]
    * @returns {string} HTML markup
    */
-  static renderUserProfile(user) {
+  static renderUserProfile(user, query = {}) {
+    const flashBanner = this.renderFlashBanner(query);
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -285,6 +320,7 @@ class HtmlViews {
       </head>
       <body>
         <div class="container" style="max-width: 650px; margin-top: 24px;">
+          ${flashBanner}
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <a href="/users" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Directory</a>
@@ -360,9 +396,11 @@ class HtmlViews {
    * Render HTML view for GET /users/:id/edit
    * 
    * @param {Object} user - The user record to edit
+   * @param {Object} [query={}]
    * @returns {string} HTML markup
    */
-  static renderUserEditForm(user) {
+  static renderUserEditForm(user, query = {}) {
+    const flashBanner = this.renderFlashBanner(query);
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -374,6 +412,7 @@ class HtmlViews {
       </head>
       <body>
         <div class="container" style="max-width: 750px; margin-top: 24px;">
+          ${flashBanner}
           <div class="card">
             <div style="margin-bottom: 16px;">
               <a href="/users/${user.id}" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Profile</a>

@@ -25,7 +25,7 @@ class UserController {
 
       if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(HtmlViews.renderUsersList(users));
+        return res.status(200).send(HtmlViews.renderUsersList(users, req.query));
       }
 
       return res.status(200).json({
@@ -80,7 +80,7 @@ class UserController {
 
       if (isHtml || !req.headers.accept || req.headers.accept.includes('*/*')) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(HtmlViews.renderUserProfile(user));
+        return res.status(200).send(HtmlViews.renderUserProfile(user, req.query));
       }
 
       return res.status(200).json({
@@ -126,7 +126,7 @@ class UserController {
       }
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(HtmlViews.renderUserEditForm(user));
+      return res.status(200).send(HtmlViews.renderUserEditForm(user, req.query));
     } catch (err) {
       if (isHtml) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -175,8 +175,11 @@ class UserController {
       });
 
       if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(201).send(HtmlViews.renderUserCreatedSuccess(newUser));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(201).send(HtmlViews.renderUserCreatedSuccess(newUser));
+        }
+        return res.redirect(`/users?msg=User%20%22${encodeURIComponent(newUser.name)}%22%20created%20successfully!&type=success`);
       }
 
       return res.status(201).json({
@@ -259,8 +262,11 @@ class UserController {
       }
 
       if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(HtmlViews.renderUserUpdatedSuccess(updatedUser));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(200).send(HtmlViews.renderUserUpdatedSuccess(updatedUser));
+        }
+        return res.redirect(`/users/${userId}?msg=User%20%22${encodeURIComponent(updatedUser.name)}%22%20updated%20successfully!&type=success`);
       }
 
       return res.status(200).json({
@@ -387,8 +393,11 @@ class UserController {
       }
 
       if (isHtml) {
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(HtmlViews.renderUserDeletedSuccess(deletedUser));
+        if (req.query.view === 'card') {
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(200).send(HtmlViews.renderUserDeletedSuccess(deletedUser));
+        }
+        return res.redirect(`/users?msg=User%20%22${encodeURIComponent(deletedUser.name)}%22%20deleted%20successfully&type=success`);
       }
 
       return res.status(200).json({
