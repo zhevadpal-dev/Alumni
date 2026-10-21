@@ -103,6 +103,7 @@ Alumni/
 │   │
 │   ├── migrations/                  # DATABASE MIGRATIONS (DDL & Seed Data)
 │   │   ├── 001_create_initial_tables.sql # PostgreSQL schema for users, announcements & seed data
+│   │   ├── 002_create_job_postings_table.sql # PostgreSQL schema for job_postings, indexes & seed data
 │   │   └── runner.js                # Migration runner script (executed via npm run migrate)
 │   │
 │   ├── factories/                   # FACTORY LAYER (Test & Mock Data Generation)
@@ -356,7 +357,7 @@ The Alumni Tracking System employs a structured relational data model strictly e
   - **`userFactory.js`**: Implements `buildUser(overrides)` and `createUsers(count, overrides)` to generate realistic mock users with normalized ASCII emails, randomized roles (`alumni`, `student`, `teacher`), departments, and graduation years.
   - **`announcementFactory.js`**: Implements `buildAnnouncement(overrides)` and `createAnnouncements(count, overrides)` to generate institutional announcements with realistic titles, bodies, authors, and whitelisted categories.
 - **Database Migrations & Seeding:**
-  - **DDL Migration (`src/migrations/runner.js`):** Runs `001_create_initial_tables.sql` via `npm run migrate` or `docker compose exec app npm run migrate`.
+  - **DDL Migration (`src/migrations/runner.js`):** Sequentially executes all pending `.sql` migration files (`001_create_initial_tables.sql`, `002_create_job_postings_table.sql`) via `npm run migrate` or `docker compose exec app npm run migrate`.
   - **Database Seeder (`src/seeds/seed.js`):** Safely truncates tables (`TRUNCATE ... RESTART IDENTITY CASCADE`) and populates default users (Said Hasan, Zeynep Naz, Ece, Rumeysa, Ceyda) alongside factory-generated alumni records and initial announcements via `npm run seed` or `docker compose exec app npm run seed`.
 - **Domain Validation & Integrity Rules:**
   - **User Entity:** Enforces mandatory RFC-compliant emails (`UNIQUE` constraint & case-insensitive validation), whitelist role authorization (`alumni`, `student`, `faculty`, `teacher`, `admin`), and valid graduation years (1900–2100).
