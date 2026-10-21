@@ -1,0 +1,14 @@
+$kind: http-request
+description: Partially modify application status or review notes.
+url: "{{baseUrl}}/api/applications/1"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "Accepted",
+      "notes": "Candidate accepted offer."
+    }
+order: 9500

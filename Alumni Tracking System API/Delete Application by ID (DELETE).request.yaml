@@ -1,0 +1,5 @@
+$kind: http-request
+description: Delete or withdraw a job application.
+url: "{{baseUrl}}/api/applications/1"
+method: DELETE
+order: 9600

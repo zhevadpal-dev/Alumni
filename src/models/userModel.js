@@ -508,24 +508,123 @@ class UserModel {
   }
 
   /**
+   * Retrieve all applications submitted by this user (1-to-Many).
+   * Includes details of the target job posting.
+   * 
+   * @param {number|string} userId - User ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} List of applications with job posting summary
+   */
+  static async getApplications(userId, filter = {}) {
+    const numericId = parseInt(userId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT a.id,
+             a.user_id AS "userId",
+             a.job_id AS "jobId",
+             a.status,
+             a.cover_letter AS "coverLetter",
+             a.resume_url AS "resumeUrl",
+             a.notes,
+             a.applied_at AS "appliedAt",
+             a.created_at AS "createdAt",
+             a.updated_at AS "updatedAt",
+             j.title AS "jobTitle",
+             j.company AS "jobCompany",
+             j.location AS "jobLocation",
+             j.job_type AS "jobType",
+             j.status AS "jobStatus",
+             j.deadline AS "jobDeadline"
+      FROM applications a
+      JOIN job_postings j ON a.job_id = j.id
+      WHERE a.user_id = $1
+    `;
+
+    const params = [numericId];
+
+    if (filter.status) {
+      params.push(String(filter.status).trim().toLowerCase());
+      sql += ` AND LOWER(a.status) = $${params.length}`;
+    }
+
+    sql += ` ORDER BY a.applied_at DESC, a.id DESC`;
+
+    const res = await query(sql, params);
+    return res.rows;
+  }
+
+  /**
+   * Retrieve all job postings that this user has applied to (Many-to-Many through applications).
+   * 
+   * @param {number|string} userId - User ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} List of applied job postings with application metadata
+   */
+  static async getAppliedJobs(userId, filter = {}) {
+    const numericId = parseInt(userId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT j.id,
+             j.title,
+             j.company,
+             j.location,
+             j.job_type AS "jobType",
+             j.description,
+             j.requirements,
+             j.salary_range AS "salaryRange",
+             j.application_url AS "applicationUrl",
+             j.contact_email AS "contactEmail",
+             j.poster_id AS "posterId",
+             j.status,
+             j.deadline,
+             j.created_at AS "createdAt",
+             j.updated_at AS "updatedAt",
+             a.id AS "applicationId",
+             a.status AS "applicationStatus",
+             a.applied_at AS "appliedAt"
+      FROM job_postings j
+      JOIN applications a ON a.job_id = j.id
+      WHERE a.user_id = $1
+    `;
+
+    const params = [numericId];
+
+    if (filter.status) {
+      params.push(String(filter.status).trim().toLowerCase());
+      sql += ` AND LOWER(a.status) = $${params.length}`;
+    }
+
+    sql += ` ORDER BY a.applied_at DESC, j.id DESC`;
+
+    const res = await query(sql, params);
+    return res.rows;
+  }
+
+  /**
    * Retrieve a user along with all associated entity collections (eager loaded relations).
    * 
    * @param {number|string} id - User ID
-   * @returns {Promise<Object|null>} User record with announcements and jobPostings arrays
+   * @returns {Promise<Object|null>} User record with announcements, jobPostings, and applications
    */
   static async findByIdWithRelations(id) {
     const user = await this.findById(id);
     if (!user) return null;
 
-    const [announcements, jobPostings] = await Promise.all([
+    const [announcements, jobPostings, applications, appliedJobs] = await Promise.all([
       this.getAnnouncements(user.id),
-      this.getJobPostings(user.id)
+      this.getJobPostings(user.id),
+      this.getApplications(user.id),
+      this.getAppliedJobs(user.id)
     ]);
 
     return {
       ...user,
       announcements,
-      jobPostings
+      jobPostings,
+      applications,
+      appliedJobs
     };
   }
 }

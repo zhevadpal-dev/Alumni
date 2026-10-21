@@ -1,0 +1,16 @@
+$kind: http-request
+description: Candidate submits an application directly for job #1.
+url: "{{baseUrl}}/api/jobs/1/apply"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": 3,
+      "coverLetter": "Applying directly for this role.",
+      "resumeUrl": "https://storage.example.com/resumes/ece-cv.pdf",
+      "notes": "Candidate direct application."
+    }
+order: 9850

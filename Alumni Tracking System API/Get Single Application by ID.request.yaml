@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieve single application record by ID with joined applicant User and JobPosting.
+url: "{{baseUrl}}/api/applications/1"
+method: GET
+headers:
+  Accept: application/json
+order: 9300

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning all applications submitted for job #1.
+url: "{{baseUrl}}/api/jobs/1/applications"
+method: GET
+headers:
+  Accept: application/json
+order: 9700

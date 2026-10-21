@@ -48,8 +48,12 @@ const swaggerSpec = {
       description: 'RESTful API job posting endpoints returning standard JSON payloads (/api/jobs)'
     },
     {
+      name: 'API Applications (ApiApplicationController)',
+      description: 'RESTful API job application endpoints managing Many-to-Many candidate submissions and statuses (/api/applications)'
+    },
+    {
       name: 'Domain Relations & Sub-Resources',
-      description: 'Relational query endpoints navigating associations between Users, Announcements, and Job Postings'
+      description: 'Relational query endpoints navigating associations between Users, Announcements, Job Postings, and Applications'
     }
   ],
   paths: {
@@ -1746,6 +1750,513 @@ const swaggerSpec = {
           '404': { description: 'Announcement or author user not found' }
         }
       }
+    },
+    '/api/applications': {
+      get: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'List all job applications',
+        description: 'Retrieves all job applications with optional filtering by user, job, review status, and pagination.',
+        parameters: [
+          {
+            name: 'userId',
+            in: 'query',
+            required: false,
+            description: 'Filter applications by applicant user ID',
+            schema: { type: 'integer', example: 2 }
+          },
+          {
+            name: 'jobId',
+            in: 'query',
+            required: false,
+            description: 'Filter applications by target job posting ID',
+            schema: { type: 'integer', example: 1 }
+          },
+          {
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Filter by application status',
+            schema: {
+              type: 'string',
+              enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'],
+              example: 'Submitted'
+            }
+          },
+          {
+            name: 'withDetails',
+            in: 'query',
+            required: false,
+            description: 'Eagerly include nested applicant User and target JobPosting entity objects',
+            schema: { type: 'boolean', example: false }
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            description: 'Limit maximum returned records',
+            schema: { type: 'integer', example: 10 }
+          },
+          {
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Pagination page index (default: 1)',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of matching applications returned successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    count: { type: 'integer', example: 2 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/Application' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'Submit a new job application',
+        description: 'Creates a new application row in PostgreSQL. Enforces composite uniqueness (user cannot apply twice to the same job).',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApplicationInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Application submitted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Application submitted successfully.' },
+                    data: { $ref: '#/components/schemas/Application' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Missing required fields or invalid payload' },
+          '409': { description: 'Conflict: user has already applied for this job posting' }
+        }
+      }
+    },
+    '/api/applications/{id}': {
+      get: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'Get application by ID with nested details',
+        description: 'Retrieves an application record by its primary key with joined candidate User and target JobPosting objects.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the application',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Application found and returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/ApplicationWithDetails' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Application not found' }
+        }
+      },
+      put: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'Update application record',
+        description: 'Full update of an existing application record.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the application',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: {
+                    type: 'string',
+                    enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'],
+                    example: 'Under Review'
+                  },
+                  coverLetter: { type: 'string', example: 'Updated cover letter details...' },
+                  resumeUrl: { type: 'string', format: 'uri', example: 'https://storage.example.com/resumes/v2.pdf' },
+                  notes: { type: 'string', example: 'Recruiter phone screening passed.' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Application updated successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Application updated successfully.' },
+                    data: { $ref: '#/components/schemas/Application' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Invalid payload' },
+          '404': { description: 'Application not found' }
+        }
+      },
+      patch: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'Partially modify an application',
+        description: 'Update subset of fields (e.g. status transition from Submitted to Under Review or Accepted).',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the application',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: {
+                    type: 'string',
+                    enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'],
+                    example: 'Accepted'
+                  },
+                  notes: { type: 'string', example: 'Candidate accepted verbal offer.' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Application updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Application modified successfully.' },
+                    data: { $ref: '#/components/schemas/Application' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Application not found' }
+        }
+      },
+      delete: {
+        tags: ['API Applications (ApiApplicationController)'],
+        summary: 'Delete or withdraw an application',
+        description: 'Permanently deletes an application record from PostgreSQL.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the application',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Application deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Application #1 deleted successfully.' },
+                    data: { $ref: '#/components/schemas/Application' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Application not found' }
+        }
+      }
+    },
+    '/api/jobs/{id}/applications': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get all applications for a job posting',
+        description: 'Relational 1-to-Many endpoint returning applications submitted for the specified job posting, including applicant user summary.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          },
+          {
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Filter applications by status',
+            schema: { type: 'string', example: 'Submitted' }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of applications for the job posting',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    jobId: { type: 'integer', example: 1 },
+                    count: { type: 'integer', example: 2 },
+                    data: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'integer', example: 1 },
+                          userId: { type: 'integer', example: 2 },
+                          jobId: { type: 'integer', example: 1 },
+                          status: { type: 'string', example: 'Under Review' },
+                          applicantName: { type: 'string', example: 'Zeynep Naz' },
+                          applicantEmail: { type: 'string', example: 'zeynep@example.com' },
+                          appliedAt: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Job posting not found' }
+        }
+      }
+    },
+    '/api/jobs/{id}/applicants': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get applicant users for a job posting (Many-to-Many)',
+        description: 'Direct Many-to-Many resolution returning candidate User profiles who applied to this job posting.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of applicant users returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    jobId: { type: 'integer', example: 1 },
+                    count: { type: 'integer', example: 2 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/User' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Job posting not found' }
+        }
+      }
+    },
+    '/api/jobs/{id}/apply': {
+      post: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Candidate applies to a job posting',
+        description: 'Direct endpoint for a user to submit an application to the specified job posting.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting to apply to',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApplicationApplyInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Application successfully created for this job posting',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Application submitted successfully for this job posting.' },
+                    data: { $ref: '#/components/schemas/Application' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Invalid request or missing userId' },
+          '404': { description: 'Job posting not found' },
+          '409': { description: 'Conflict: user has already applied for this job' }
+        }
+      }
+    },
+    '/api/users/{id}/applications': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get all applications submitted by a user',
+        description: 'Relational 1-to-Many query returning all applications submitted by the specified candidate User, including target job details.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the candidate user',
+            schema: { type: 'integer', example: 2 }
+          },
+          {
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Filter applications by status',
+            schema: { type: 'string', example: 'Under Review' }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of submitted applications returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    userId: { type: 'integer', example: 2 },
+                    count: { type: 'integer', example: 1 },
+                    data: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'integer', example: 1 },
+                          userId: { type: 'integer', example: 2 },
+                          jobId: { type: 'integer', example: 1 },
+                          status: { type: 'string', example: 'Under Review' },
+                          jobTitle: { type: 'string', example: 'Senior Backend Engineer' },
+                          jobCompany: { type: 'string', example: 'TechCorp Solutions' },
+                          appliedAt: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/api/users/{id}/applied-jobs': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get job postings applied to by a user (Many-to-Many)',
+        description: 'Direct Many-to-Many resolution returning all JobPosting records that the candidate User has applied to.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the candidate user',
+            schema: { type: 'integer', example: 2 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of applied job postings returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    userId: { type: 'integer', example: 2 },
+                    count: { type: 'integer', example: 1 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/JobPosting' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
+        }
+      }
     }
   },
   components: {
@@ -1843,6 +2354,69 @@ const swaggerSpec = {
           posterId: { type: 'integer', example: 1 },
           status: { type: 'string', enum: ['Active', 'Closed', 'Draft', 'Expired'], example: 'Active' },
           deadline: { type: 'string', format: 'date-time', example: '2026-12-31T23:59:59.000Z' }
+        }
+      },
+      Application: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          userId: { type: 'integer', example: 2 },
+          jobId: { type: 'integer', example: 1 },
+          status: {
+            type: 'string',
+            enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'],
+            example: 'Submitted'
+          },
+          coverLetter: { type: 'string', example: 'Excited to apply for this backend engineering role...' },
+          resumeUrl: { type: 'string', format: 'uri', example: 'https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf' },
+          notes: { type: 'string', example: 'Candidate screening in progress.' },
+          appliedAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          createdAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          updatedAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' }
+        }
+      },
+      ApplicationWithDetails: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          userId: { type: 'integer', example: 2 },
+          jobId: { type: 'integer', example: 1 },
+          status: { type: 'string', example: 'Under Review' },
+          coverLetter: { type: 'string', example: 'Excited to apply for this backend engineering role...' },
+          resumeUrl: { type: 'string', format: 'uri', example: 'https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf' },
+          notes: { type: 'string', example: 'First-round screening passed.' },
+          appliedAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          createdAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          updatedAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          applicant: { $ref: '#/components/schemas/User' },
+          job: { $ref: '#/components/schemas/JobPosting' }
+        }
+      },
+      ApplicationInput: {
+        type: 'object',
+        required: ['userId', 'jobId'],
+        properties: {
+          userId: { type: 'integer', example: 2 },
+          jobId: { type: 'integer', example: 1 },
+          status: {
+            type: 'string',
+            enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'],
+            example: 'Submitted'
+          },
+          coverLetter: { type: 'string', example: 'Excited to apply for this backend engineering role...' },
+          resumeUrl: { type: 'string', format: 'uri', example: 'https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf' },
+          notes: { type: 'string', example: 'Referred via alumni network.' }
+        }
+      },
+      ApplicationApplyInput: {
+        type: 'object',
+        required: ['userId'],
+        properties: {
+          userId: { type: 'integer', example: 2 },
+          status: { type: 'string', example: 'Submitted' },
+          coverLetter: { type: 'string', example: 'Applying directly for this role...' },
+          resumeUrl: { type: 'string', format: 'uri', example: 'https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf' },
+          notes: { type: 'string', example: 'Candidate self-submission.' }
         }
       },
       UserWithRelations: {

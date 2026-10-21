@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning all JobPostings that user #2 applied to (Many-to-Many).
+url: "{{baseUrl}}/api/users/2/applied-jobs"
+method: GET
+headers:
+  Accept: application/json
+order: 9950

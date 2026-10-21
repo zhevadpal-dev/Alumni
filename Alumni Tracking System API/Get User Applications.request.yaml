@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning all applications submitted by user #2.
+url: "{{baseUrl}}/api/users/2/applications"
+method: GET
+headers:
+  Accept: application/json
+order: 9900

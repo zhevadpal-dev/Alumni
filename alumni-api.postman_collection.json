@@ -959,6 +959,265 @@
         "description": "Relational sub-route returning the author User entity for announcement #1."
       },
       "response": []
+    },
+    {
+      "name": "Get All Applications (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications"
+          ]
+        },
+        "description": "Retrieve all job applications with optional status, userId, and jobId filters."
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Job Application (API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 2,\n  \"jobId\": 1,\n  \"status\": \"Submitted\",\n  \"coverLetter\": \"Excited to apply for this backend engineering opening.\",\n  \"resumeUrl\": \"https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf\",\n  \"notes\": \"Candidate referred via alumni portal.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications"
+          ]
+        },
+        "description": "Submit a new job application linking User and JobPosting."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Application by ID (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/applications/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications",
+            "1"
+          ]
+        },
+        "description": "Retrieve single application record by ID with joined applicant User and JobPosting."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Application Completely (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Under Review\",\n  \"coverLetter\": \"Updated cover letter details.\",\n  \"resumeUrl\": \"https://storage.example.com/resumes/updated.pdf\",\n  \"notes\": \"Screening completed successfully.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications",
+            "1"
+          ]
+        },
+        "description": "Full update of an existing application record."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Application Partially (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Accepted\",\n  \"notes\": \"Candidate accepted offer.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications",
+            "1"
+          ]
+        },
+        "description": "Partially modify application status or review notes."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Application by ID (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/applications/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications",
+            "1"
+          ]
+        },
+        "description": "Delete or withdraw a job application."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Job Applications (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1",
+            "applications"
+          ]
+        },
+        "description": "Relational sub-route returning all applications submitted for job #1."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Job Applicants (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1/applicants",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1",
+            "applicants"
+          ]
+        },
+        "description": "Relational sub-route returning candidate User profiles who applied for job #1."
+      },
+      "response": []
+    },
+    {
+      "name": "Apply for Job Posting (API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 3,\n  \"coverLetter\": \"Applying directly for this role.\",\n  \"resumeUrl\": \"https://storage.example.com/resumes/ece-cv.pdf\",\n  \"notes\": \"Candidate direct application.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1/apply",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1",
+            "apply"
+          ]
+        },
+        "description": "Candidate submits an application directly for job #1."
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Applications (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/2/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "2",
+            "applications"
+          ]
+        },
+        "description": "Relational sub-route returning all applications submitted by user #2."
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Applied Jobs (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/2/applied-jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "2",
+            "applied-jobs"
+          ]
+        },
+        "description": "Relational sub-route returning all JobPostings that user #2 applied to (Many-to-Many)."
+      },
+      "response": []
     }
   ]
 }

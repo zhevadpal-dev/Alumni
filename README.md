@@ -104,11 +104,13 @@ Alumni/
 │   ├── migrations/                  # DATABASE MIGRATIONS (DDL & Seed Data)
 │   │   ├── 001_create_initial_tables.sql # PostgreSQL schema for users, announcements & seed data
 │   │   ├── 002_create_job_postings_table.sql # PostgreSQL schema for job_postings, indexes & seed data
+│   │   ├── 003_create_applications_table.sql # PostgreSQL schema for applications, composite uniqueness & seed data
 │   │   └── runner.js                # Migration runner script (executed via npm run migrate)
 │   │
 │   ├── factories/                   # FACTORY LAYER (Test & Mock Data Generation)
 │   │   ├── announcementFactory.js   # Announcement factory (buildAnnouncement, createAnnouncements)
 │   │   ├── jobPostingFactory.js     # Job posting factory (buildJobPosting, createJobPostings)
+│   │   ├── applicationFactory.js    # Application factory (buildApplication, createApplications)
 │   │   └── userFactory.js           # User factory (buildUser, createUsers)
 │   │
 │   ├── seeds/                       # DATABASE SEEDERS
@@ -117,7 +119,8 @@ Alumni/
 │   ├── models/                      # MODEL LAYER (Data Access & Relational Persistence)
 │   │   ├── announcementModel.js     # Announcement entity with PostgreSQL CRUD & User relations
 │   │   ├── jobPostingModel.js       # JobPosting entity with PostgreSQL CRUD & User relations
-│   │   ├── userModel.js             # User entity with PostgreSQL CRUD & Announcement/Job relations
+│   │   ├── applicationModel.js      # Application entity (Many-to-Many action table with PostgreSQL CRUD & joins)
+│   │   ├── userModel.js             # User entity with PostgreSQL CRUD & Announcement/Job/Application relations
 │   │   └── index.js                 # Central model aggregator & relational registry (RELATIONS)
 │   │
 │   ├── views/                       # VIEW LAYER (Presentation & UI)
@@ -129,6 +132,8 @@ Alumni/
 │   │   ├── announcementController.js    # Web MVC controller for /announcements (HTML views & web responses)
 │   │   ├── apiUserController.js     # RESTful API controller for /api/users (JSON CRUD, status codes)
 │   │   ├── userController.js        # Web MVC controller for /users (HTML views & web responses)
+│   │   ├── apiJobController.js      # RESTful API controller for /api/jobs (JSON CRUD, status codes)
+│   │   ├── apiApplicationController.js # RESTful API controller for /api/applications (JSON CRUD, Many-to-Many actions)
 │   │   ├── healthController.js      # System health telemetry, uptime, memory & OS metrics
 │   │   ├── coreController.js        # Lab endpoints, greeting generators, math calculations
 │   │   └── swaggerController.js     # Swagger UI page rendering & OpenAPI JSON provider
@@ -139,6 +144,8 @@ Alumni/
 │   │   ├── announcementRoutes.js    # Web MVC announcement routes (/announcements, /announcements/:id)
 │   │   ├── apiUserRoutes.js         # RESTful API user routes (/api/users, /api/users/:id)
 │   │   ├── userRoutes.js            # Web MVC user routes (/users, /users/:id)
+│   │   ├── apiJobRoutes.js          # RESTful API job posting routes (/api/jobs, /api/jobs/:id)
+│   │   ├── apiApplicationRoutes.js  # RESTful API application routes (/api/applications, /api/applications/:id)
 │   │   ├── healthRoutes.js          # Health check endpoints (/api/health, /health)
 │   │   ├── coreRoutes.js            # Base routes (/, /home, /about, /hello, /sum)
 │   │   └── swaggerRoutes.js         # Documentation routes (/api/swagger, /api/swagger.json)
@@ -316,31 +323,49 @@ const deletedNotice = await AnnouncementModel.delete(1);                  // Del
 | `status` | `String` | No (Default: `'Active'`) | Publication status | `"Active"`, `"Closed"` |
 | `deadline` | `TIMESTAMPTZ` | No | Application closing timestamp | `"2026-12-31T23:59:59Z"` |
 
+- **`applicationModel.js`**: Implements the Many-to-Many action table connecting `User` (candidate) and `JobPosting` (career opening). Features full async CRUD, composite uniqueness safeguards (`uq_applications_user_job`), review lifecycle transitions, and eager-loaded detail joins.
+
+##### 📋 Application Entity Schema
+
+| Attribute | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `Integer` | System-generated | Unique auto-increment primary key | `1` |
+| `userId` | `Integer` | Yes (FK) | Candidate User ID (`users.id` with `CASCADE` delete) | `2` |
+| `jobId` | `Integer` | Yes (FK) | Target Job Posting ID (`job_postings.id` with `CASCADE` delete) | `1` |
+| `status` | `String` | No (Default: `'Submitted'`) | Review status: `Submitted`, `Under Review`, `Shortlisted`, `Interview Scheduled`, `Accepted`, `Rejected`, `Withdrawn` | `"Submitted"` |
+| `coverLetter` | `String` | No | Candidate introductory statement | `"Excited to apply for this backend role..."` |
+| `resumeUrl` | `String` | No | Link to candidate CV / resume | `"https://storage.example.com/resumes/cv.pdf"` |
+| `notes` | `String` | No | Reviewer / recruiter notes | `"Initial phone screening passed."` |
+| `appliedAt` | `TIMESTAMPTZ` | System-generated | Application timestamp | `"2026-10-21T10:00:00.000Z"` |
+| `createdAt` | `TIMESTAMPTZ` | System-generated | Database row creation timestamp | `"2026-10-21T10:00:00.000Z"` |
+| `updatedAt` | `TIMESTAMPTZ` | System-generated | Last modification timestamp | `"2026-10-21T10:00:00.000Z"` |
+
 ##### 💻 Model Relations & Relational Methods (`src/models/index.js`)
 
-The system establishes explicit domain associations across all three entities:
+The system establishes explicit domain associations across all platform entities:
 
 ```javascript
-const { UserModel, AnnouncementModel, JobPostingModel, RELATIONS } = require('./models');
+const { UserModel, AnnouncementModel, JobPostingModel, ApplicationModel, RELATIONS } = require('./models');
 
-// 1. One-to-Many: User -> Announcements & JobPostings
-const user = await UserModel.findByIdWithRelations(1);
-// user.announcements -> Array of announcements authored by User #1
-// user.jobPostings   -> Array of job postings posted by User #1
+// 1. One-to-Many & Many-to-Many via UserModel:
+const userWithRelations = await UserModel.findByIdWithRelations(1);
+// userWithRelations.announcements -> Announcements authored by User #1
+// userWithRelations.jobPostings   -> Job postings posted by User #1
+// userWithRelations.applications  -> Applications submitted by User #1
+// userWithRelations.appliedJobs   -> Job postings User #1 applied to (Many-to-Many)
 
-// Direct relation accessors:
-const userNotices = await UserModel.getAnnouncements(1);
-const userJobs    = await UserModel.getJobPostings(1);
+const userApps = await UserModel.getApplications(1);
+const appliedJobs = await UserModel.getAppliedJobs(1);
 
-// 2. Belongs-To: Announcement -> User (Author)
-const noticeWithAuthor = await AnnouncementModel.getByIdWithAuthor(1);
-// noticeWithAuthor.authorUser -> { id, name, email, role, department }
+// 2. One-to-Many & Many-to-Many via JobPostingModel:
+const jobApps = await JobPostingModel.getApplications(1); // Applications submitted for Job #1
+const applicants = await JobPostingModel.getApplicants(1); // Users who applied for Job #1 (Many-to-Many)
+const jobPoster = await JobPostingModel.getPoster(1);     // User who posted Job #1
 
-// 3. Belongs-To: JobPosting -> User (Poster)
-const jobWithPoster = await JobPostingModel.getByIdWithPoster(1);
-// jobWithPoster.poster -> { id, name, email, role, department, company }
-
-const allJobsWithPosters = await JobPostingModel.getAllWithPoster({ status: 'Active' });
+// 3. Application Entity with Eager-Loaded Joins:
+const appWithDetails = await ApplicationModel.getByIdWithDetails(1);
+// appWithDetails.applicant -> { id, name, email, role, department }
+// appWithDetails.job       -> { id, title, company, location, jobType, status }
 ```
 
 #### 2. 🎨 View Layer (`src/views/`)
@@ -609,15 +634,31 @@ npm run dev
 | `PATCH` | `/api/jobs/:id` | Partial update of job posting fields | Body: fields to update (e.g. `status: 'Closed'`) |
 | `DELETE` | `/api/jobs/:id` | Delete job posting by ID | Returns deleted job posting JSON |
 
+### 📝 REST API Application Endpoints (`ApiApplicationController` ➡️ `/api/applications`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/applications` | List applications (supports `userId`, `jobId`, `status`, `withDetails`, `limit`, `page`) | Returns JSON array of application records |
+| `POST` | `/api/applications` | Submit new job application (enforces `UNIQUE(user_id, job_id)`) | Body: `userId`, `jobId`, `coverLetter`, `resumeUrl`, `notes` |
+| `GET` | `/api/applications/:id` | Retrieve application by ID with nested applicant User & JobPosting | Returns JSON application joined with candidate and job |
+| `PUT` | `/api/applications/:id` | Full update of application record | Body: `status`, `coverLetter`, `resumeUrl`, `notes` |
+| `PATCH` | `/api/applications/:id` | Partial update (e.g. status transition to `Under Review`, `Accepted`) | Body: `status`, `notes` |
+| `DELETE` | `/api/applications/:id` | Delete / withdraw job application by ID | Returns deleted application JSON |
+
 ### 🔗 Domain Relational Endpoints (Direct Sub-Resources)
 
 | Method | Endpoint | Association Type | Description | Output |
 | :--- | :--- | :--- | :--- | :--- |
 | `GET` | `/api/users/:id/announcements` | **1-to-Many** | Retrieve all announcements authored by user `:id` | JSON array of announcements |
 | `GET` | `/api/users/:id/jobs` | **1-to-Many** | Retrieve all job postings created by user `:id` | JSON array of job postings |
-| `GET` | `/api/users/:id/relations` | **Full Composite** | Retrieve user with eager-loaded `announcements` and `jobPostings` | JSON user object with nested arrays |
+| `GET` | `/api/users/:id/applications` | **1-to-Many** | Retrieve all job applications submitted by candidate `:id` | JSON array of applications with job info |
+| `GET` | `/api/users/:id/applied-jobs` | **Many-to-Many** | Retrieve all job postings that user `:id` applied to | JSON array of applied job postings |
+| `GET` | `/api/users/:id/relations` | **Full Composite** | Retrieve user with eager-loaded announcements, jobs, applications | JSON user object with nested collections |
 | `GET` | `/api/announcements/:id/author` | **Belongs-To** | Retrieve author User profile for announcement `:id` | JSON author user object |
 | `GET` | `/api/jobs/:id/poster` | **Belongs-To** | Retrieve poster User profile for job posting `:id` | JSON poster user object |
+| `GET` | `/api/jobs/:id/applications` | **1-to-Many** | Retrieve all applications submitted for job posting `:id` | JSON array of applications with candidate info |
+| `GET` | `/api/jobs/:id/applicants` | **Many-to-Many** | Retrieve all candidate Users who applied for job posting `:id` | JSON array of applicant user profiles |
+| `POST` | `/api/jobs/:id/apply` | **Action Creation** | Submit application directly for job posting `:id` | Body: `userId`, `coverLetter`, `resumeUrl`, `notes` |
 
 ### Planned Future Endpoints
 

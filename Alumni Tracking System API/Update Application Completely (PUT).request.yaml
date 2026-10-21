@@ -1,0 +1,16 @@
+$kind: http-request
+description: Full update of an existing application record.
+url: "{{baseUrl}}/api/applications/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "Under Review",
+      "coverLetter": "Updated cover letter details.",
+      "resumeUrl": "https://storage.example.com/resumes/updated.pdf",
+      "notes": "Screening completed successfully."
+    }
+order: 9400

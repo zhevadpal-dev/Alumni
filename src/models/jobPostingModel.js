@@ -324,6 +324,93 @@ class JobPostingModel {
     return res.rows[0] || null;
   }
 
+  /**
+   * Fetch all applications submitted for this job posting (1-to-Many).
+   * Includes details of applicant User.
+   * 
+   * @param {number|string} jobPostingId - Job posting ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} Applications list with applicant user details
+   */
+  static async getApplications(jobPostingId, filter = {}) {
+    const numericId = parseInt(jobPostingId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT a.id,
+             a.user_id AS "userId",
+             a.job_id AS "jobId",
+             a.status,
+             a.cover_letter AS "coverLetter",
+             a.resume_url AS "resumeUrl",
+             a.notes,
+             a.applied_at AS "appliedAt",
+             a.created_at AS "createdAt",
+             a.updated_at AS "updatedAt",
+             u.name AS "applicantName",
+             u.email AS "applicantEmail",
+             u.role AS "applicantRole",
+             u.department AS "applicantDepartment",
+             u.graduation_year AS "applicantGraduationYear"
+      FROM applications a
+      JOIN users u ON a.user_id = u.id
+      WHERE a.job_id = $1
+    `;
+
+    const params = [numericId];
+
+    if (filter.status) {
+      params.push(String(filter.status).trim().toLowerCase());
+      sql += ` AND LOWER(a.status) = $${params.length}`;
+    }
+
+    sql += ` ORDER BY a.applied_at DESC, a.id DESC`;
+
+    const res = await query(sql, params);
+    return res.rows;
+  }
+
+  /**
+   * Fetch all applicant Users for this job posting (Many-to-Many through applications).
+   * 
+   * @param {number|string} jobPostingId - Job posting ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} Applicant users list with application metadata
+   */
+  static async getApplicants(jobPostingId, filter = {}) {
+    const numericId = parseInt(jobPostingId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT u.id,
+             u.name,
+             u.email,
+             u.role,
+             u.department,
+             u.graduation_year AS "graduationYear",
+             a.id AS "applicationId",
+             a.status AS "applicationStatus",
+             a.cover_letter AS "coverLetter",
+             a.resume_url AS "resumeUrl",
+             a.applied_at AS "appliedAt"
+      FROM users u
+      JOIN applications a ON a.user_id = u.id
+      WHERE a.job_id = $1
+    `;
+
+    const params = [numericId];
+
+    if (filter.status) {
+      params.push(String(filter.status).trim().toLowerCase());
+      sql += ` AND LOWER(a.status) = $${params.length}`;
+    }
+
+    sql += ` ORDER BY a.applied_at DESC, u.id ASC`;
+
+    const res = await query(sql, params);
+    return res.rows;
+  }
+
   // ==========================================
   // CREATE (C)
   // ==========================================

@@ -370,6 +370,80 @@ class ApiUserController {
       });
     }
   }
+
+  /**
+   * GET /api/users/:id/applications
+   * Retrieve all job applications submitted by a specific user.
+   */
+  static async getUserApplications(req, res) {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await UserModel.exists(userId);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      const applications = await UserModel.getApplications(userId, req.query);
+      return res.status(200).json({
+        status: 'success',
+        userId,
+        count: applications.length,
+        data: applications
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching user applications.'
+      });
+    }
+  }
+
+  /**
+   * GET /api/users/:id/applied-jobs
+   * Retrieve all job postings that a specific user has applied to (Many-to-Many).
+   */
+  static async getUserAppliedJobs(req, res) {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await UserModel.exists(userId);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      const jobs = await UserModel.getAppliedJobs(userId, req.query);
+      return res.status(200).json({
+        status: 'success',
+        userId,
+        count: jobs.length,
+        data: jobs
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching user applied jobs.'
+      });
+    }
+  }
 }
 
 // REST Resource Aliases for standard MVC frameworks

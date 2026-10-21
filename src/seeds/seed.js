@@ -10,6 +10,8 @@ const { pool, query } = require('../config/db');
 const { createUsers } = require('../factories/userFactory');
 const { createAnnouncements } = require('../factories/announcementFactory');
 const { createJobPostings } = require('../factories/jobPostingFactory');
+const { createApplications } = require('../factories/applicationFactory');
+
 
 /**
  * Default primary users
@@ -178,11 +180,25 @@ async function seedDatabase(options = {}) {
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS applications (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      job_id INTEGER NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
+      status VARCHAR(50) NOT NULL DEFAULT 'Submitted',
+      cover_letter TEXT,
+      resume_url VARCHAR(500),
+      notes TEXT,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)
+    );
   `);
 
   // Safely truncate existing tables and restart identity sequence
-  console.log('🧹 Truncating existing tables (job_postings, announcements, users)...');
-  await query('TRUNCATE TABLE job_postings, announcements, users RESTART IDENTITY CASCADE;');
+  console.log('🧹 Truncating existing tables (applications, job_postings, announcements, users)...');
+  await query('TRUNCATE TABLE applications, job_postings, announcements, users RESTART IDENTITY CASCADE;');
 
   // Prepare users list (default users + factory generated alumni records)
   const factoryUsers = createUsers(factoryUsersCount, { role: 'alumni' });
@@ -223,17 +239,19 @@ async function seedDatabase(options = {}) {
   const allJobPostings = [...DEFAULT_JOB_POSTINGS, ...factoryJobs];
 
   console.log(`💼 Inserting ${allJobPostings.length} job postings with poster_id relations...`);
+  const insertedJobIds = [];
   for (let i = 0; i < allJobPostings.length; i += 1) {
     const job = allJobPostings[i];
     // Rotate posters among created users
     const posterId = insertedUserIds[i % insertedUserIds.length] || null;
-    await query(
+    const res = await query(
       `INSERT INTO job_postings (
         title, company, location, job_type, description, requirements,
         salary_range, application_url, contact_email, poster_id, status, deadline,
         created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW() + INTERVAL '45 days', NOW(), NOW())`,
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW() + INTERVAL '45 days', NOW(), NOW())
+      RETURNING id`,
       [
         job.title,
         job.company,
@@ -248,28 +266,102 @@ async function seedDatabase(options = {}) {
         job.status || 'Active'
       ]
     );
+    insertedJobIds.push(res.rows[0].id);
+  }
+
+  // Prepare initial core applications (Many-to-Many candidate action records)
+  console.log('📝 Inserting applications (Many-to-Many User <-> JobPosting)...');
+  const appliedPairs = new Set();
+  const seedApplicationList = [
+    {
+      userId: insertedUserIds[1] || 2,
+      jobId: insertedJobIds[0] || 1,
+      status: 'Under Review',
+      coverLetter: 'Excited to apply for this backend engineering role with strong Node.js and PostgreSQL experience.',
+      resumeUrl: 'https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf',
+      notes: 'First-round screening passed.'
+    },
+    {
+      userId: insertedUserIds[2] || 3,
+      jobId: insertedJobIds[1] || 2,
+      status: 'Interview Scheduled',
+      coverLetter: 'Applying for Full Stack Developer position with extensive React and cloud systems background.',
+      resumeUrl: 'https://storage.alumni-portal.example.com/resumes/ece-resume.pdf',
+      notes: 'Technical interview set for next week.'
+    },
+    {
+      userId: insertedUserIds[3] || 4,
+      jobId: insertedJobIds[2] || 3,
+      status: 'Submitted',
+      coverLetter: 'Eager to contribute to machine learning research and distributed dataset benchmarking pipelines.',
+      resumeUrl: 'https://storage.alumni-portal.example.com/resumes/rumeysa-resume.pdf',
+      notes: 'Faculty academic reference attached.'
+    },
+    {
+      userId: insertedUserIds[0] || 1,
+      jobId: insertedJobIds[1] || 2,
+      status: 'Accepted',
+      coverLetter: 'Senior systems engineer looking forward to collaborating on cloud-native financial platform architectures.',
+      resumeUrl: 'https://storage.alumni-portal.example.com/resumes/said-resume.pdf',
+      notes: 'Offer letter signed.'
+    }
+  ];
+
+  for (const app of seedApplicationList) {
+    const pairKey = `${app.userId}-${app.jobId}`;
+    if (!appliedPairs.has(pairKey)) {
+      appliedPairs.add(pairKey);
+      await query(
+        `INSERT INTO applications (user_id, job_id, status, cover_letter, resume_url, notes, applied_at, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW() - INTERVAL '3 days', NOW(), NOW())
+         ON CONFLICT (user_id, job_id) DO NOTHING`,
+        [app.userId, app.jobId, app.status, app.coverLetter, app.resumeUrl, app.notes]
+      );
+    }
+  }
+
+  // Insert factory applications ensuring uniqueness
+  const factoryApps = createApplications(4);
+  for (let i = 0; i < factoryApps.length; i += 1) {
+    const app = factoryApps[i];
+    const candidateId = insertedUserIds[(i + 2) % insertedUserIds.length];
+    const targetJobId = insertedJobIds[(i + 1) % insertedJobIds.length];
+    const pairKey = `${candidateId}-${targetJobId}`;
+    if (!appliedPairs.has(pairKey) && candidateId && targetJobId) {
+      appliedPairs.add(pairKey);
+      await query(
+        `INSERT INTO applications (user_id, job_id, status, cover_letter, resume_url, notes, applied_at, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW() - INTERVAL '1 day', NOW(), NOW())
+         ON CONFLICT (user_id, job_id) DO NOTHING`,
+        [candidateId, targetJobId, app.status, app.coverLetter, app.resumeUrl, app.notes]
+      );
+    }
   }
 
   // Verify counts
   const userCountRes = await query('SELECT COUNT(*) as count FROM users');
   const announcementCountRes = await query('SELECT COUNT(*) as count FROM announcements');
   const jobCountRes = await query('SELECT COUNT(*) as count FROM job_postings');
+  const applicationCountRes = await query('SELECT COUNT(*) as count FROM applications');
 
   const seededUsers = parseInt(userCountRes.rows[0].count, 10);
   const seededAnnouncements = parseInt(announcementCountRes.rows[0].count, 10);
   const seededJobs = parseInt(jobCountRes.rows[0].count, 10);
+  const seededApplications = parseInt(applicationCountRes.rows[0].count, 10);
 
   console.log('====================================================');
   console.log(`✅ Database seeding completed successfully!`);
   console.log(`   - Users seeded:         ${seededUsers}`);
   console.log(`   - Announcements seeded: ${seededAnnouncements}`);
   console.log(`   - Job Postings seeded:  ${seededJobs}`);
+  console.log(`   - Applications seeded:  ${seededApplications}`);
   console.log('====================================================');
 
   return {
     usersCount: seededUsers,
     announcementsCount: seededAnnouncements,
-    jobPostingsCount: seededJobs
+    jobPostingsCount: seededJobs,
+    applicationsCount: seededApplications
   };
 }
 

@@ -1,0 +1,18 @@
+$kind: http-request
+description: Submit a new job application linking User and JobPosting.
+url: "{{baseUrl}}/api/applications"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": 2,
+      "jobId": 1,
+      "status": "Submitted",
+      "coverLetter": "Excited to apply for this backend engineering opening.",
+      "resumeUrl": "https://storage.alumni-portal.example.com/resumes/zeynep-resume.pdf",
+      "notes": "Candidate referred via alumni portal."
+    }
+order: 9200

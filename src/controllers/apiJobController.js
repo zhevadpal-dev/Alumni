@@ -15,6 +15,7 @@
  */
 
 const JobPostingModel = require('../models/jobPostingModel');
+const ApplicationModel = require('../models/applicationModel');
 
 class ApiJobController {
   /**
@@ -222,6 +223,121 @@ class ApiJobController {
       return res.status(500).json({
         status: 'error',
         message: err.message || 'Internal server error while deleting job posting.'
+      });
+    }
+  }
+
+  /**
+   * GET /api/jobs/:id/applications
+   * Retrieve all applications submitted for this job posting (1-to-Many).
+   */
+  static async getApplications(req, res) {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Job posting ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await JobPostingModel.exists(id);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Job posting with ID ${id} not found.`
+        });
+      }
+
+      const applications = await JobPostingModel.getApplications(id, req.query);
+      return res.status(200).json({
+        status: 'success',
+        jobId: id,
+        count: applications.length,
+        data: applications
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching job applications.'
+      });
+    }
+  }
+
+  /**
+   * GET /api/jobs/:id/applicants
+   * Retrieve all applicant users for this job posting (Many-to-Many).
+   */
+  static async getApplicants(req, res) {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Job posting ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await JobPostingModel.exists(id);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Job posting with ID ${id} not found.`
+        });
+      }
+
+      const applicants = await JobPostingModel.getApplicants(id, req.query);
+      return res.status(200).json({
+        status: 'success',
+        jobId: id,
+        count: applicants.length,
+        data: applicants
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching job applicants.'
+      });
+    }
+  }
+
+  /**
+   * POST /api/jobs/:id/apply
+   * Submit an application for this specific job posting.
+   */
+  static async apply(req, res) {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Job posting ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await JobPostingModel.exists(id);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Job posting with ID ${id} not found.`
+        });
+      }
+
+      const applicationData = {
+        ...req.body,
+        jobId: id
+      };
+
+      const application = await ApplicationModel.create(applicationData);
+      return res.status(201).json({
+        status: 'success',
+        message: 'Application submitted successfully for this job posting.',
+        data: application
+      });
+    } catch (err) {
+      return res.status(err.statusCode || 400).json({
+        status: 'error',
+        message: err.message
       });
     }
   }

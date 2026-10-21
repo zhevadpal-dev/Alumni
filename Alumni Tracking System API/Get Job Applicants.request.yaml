@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning candidate User profiles who applied for job #1.
+url: "{{baseUrl}}/api/jobs/1/applicants"
+method: GET
+headers:
+  Accept: application/json
+order: 9800

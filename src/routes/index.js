@@ -14,6 +14,7 @@ const userRoutes = require('./userRoutes');
 const apiAnnouncementRoutes = require('./apiAnnouncementRoutes');
 const announcementRoutes = require('./announcementRoutes');
 const apiJobRoutes = require('./apiJobRoutes');
+const apiApplicationRoutes = require('./apiApplicationRoutes');
 
 // Mount modular sub-routers
 router.use(coreRoutes);
@@ -24,5 +25,6 @@ router.use(userRoutes);
 router.use(apiAnnouncementRoutes);
 router.use(announcementRoutes);
 router.use(apiJobRoutes);
+router.use(apiApplicationRoutes);
 
 module.exports = router;

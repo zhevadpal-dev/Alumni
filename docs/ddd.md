@@ -2,7 +2,7 @@
 
 > **Platform:** Alumni Tracking System  
 > **Status:** Active (PostgreSQL 15 Relational Persistence & In-Memory Fallback)  
-> **Version:** 1.2.0  
+> **Version:** 1.3.0  
 > **Author:** Alumni Engineering Team  
 
 ---
@@ -14,12 +14,14 @@
    - [3.1 User Entity](#31-user-entity)
    - [3.2 Announcement Entity](#32-announcement-entity)
    - [3.3 Job Posting Entity](#33-job-posting-entity)
+   - [3.4 Application Entity (Many-to-Many Action Join)](#34-application-entity-many-to-many-action-join)
 4. [Entity Relationship Diagram (ERD)](#4-entity-relationship-diagram-erd)
 5. [In-Memory Store vs. Target Relational Schema](#5-in-memory-store-vs-target-relational-schema)
 6. [Validation & Business Rules](#6-validation--business-rules)
    - [6.1 User Domain Constraints](#61-user-domain-constraints)
    - [6.2 Announcement Domain Constraints](#62-announcement-domain-constraints)
    - [6.3 Job Posting Domain Constraints](#63-job-posting-domain-constraints)
+   - [6.4 Application Domain Constraints](#64-application-domain-constraints)
 7. [Data Lifecycle & State Transitions](#7-data-lifecycle--state-transitions)
 8. [Target PostgreSQL DDL Specification](#8-target-postgresql-ddl-specification)
 9. [Migration Strategy & Zero-Downtime Roadmap](#9-migration-strategy--zero-downtime-roadmap)
@@ -134,6 +136,26 @@ The `JobPosting` entity represents career opportunities, internships, and profes
 | `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Initial posting timestamp |
 | `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last record modification timestamp |
 
+### 3.4 Application Entity (Many-to-Many Action Join)
+
+The `Application` entity models the many-to-many relationship between `User` (applicant) and `JobPosting` (career listing), serving as an audit and workflow tracking table for recruitment lifecycles.
+
+| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique application record ID |
+| `userId` | `Number` (Integer) | `INTEGER` | **No** | — | `FK` referencing `users(id)` ON DELETE CASCADE | Applicant user ID |
+| `jobId` | `Number` (Integer) | `INTEGER` | **No** | — | `FK` referencing `job_postings(id)` ON DELETE CASCADE | Targeted job posting ID |
+| `status` | `String` | `VARCHAR(50)` | **No** | `'Submitted'` | Whitelist: `'Submitted'`, `'Under Review'`, `'Shortlisted'`, `'Interview Scheduled'`, `'Accepted'`, `'Rejected'`, `'Withdrawn'` | Workflow / review stage |
+| `coverLetter` | `String` \| `null` | `TEXT` | Yes | `null` | Candidate pitch or cover note | Optional cover letter / introduction |
+| `resumeUrl` | `String` \| `null` | `VARCHAR(500)` | Yes | `null` | Valid `http://` or `https://` URL | Digital CV / resume link |
+| `notes` | `String` \| `null` | `TEXT` | Yes | `null` | Internal review remarks | Employer / reviewer feedback |
+| `appliedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Application submission timestamp |
+| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Record creation timestamp |
+| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last status change timestamp |
+
+> [!IMPORTANT]
+> **Many-to-Many Integrity:** The composite unique constraint `UNIQUE(user_id, job_id)` prevents candidate spam by enforcing that an individual user can only submit one active application per job listing.
+
 ---
 
 ## 4. Entity Relationship Diagram (ERD)
@@ -141,7 +163,9 @@ The `JobPosting` entity represents career opportunities, internships, and profes
 ```mermaid
 erDiagram
     USER ||--o{ ANNOUNCEMENT : "publishes / authors"
-    USER ||--o{ JOB_POSTING : "posts"
+    USER ||--o{ JOB_POSTING : "posts / creates"
+    USER ||--o{ APPLICATION : "submits"
+    JOB_POSTING ||--o{ APPLICATION : "receives"
     USER ||--o{ EVENT_RSVP : "registers"
 
     USER {
@@ -185,6 +209,19 @@ erDiagram
         timestamptz deadline "Application closing timestamp"
         timestamptz createdAt "Listing creation timestamp"
         timestamptz updatedAt "Last update timestamp"
+    }
+
+    APPLICATION {
+        int id PK "Serial primary key"
+        int userId FK "References USER(id) ON DELETE CASCADE"
+        int jobId FK "References JOB_POSTING(id) ON DELETE CASCADE"
+        string status "Submitted | Under Review | Shortlisted | Interview Scheduled | Accepted | Rejected | Withdrawn"
+        string coverLetter "Candidate pitch statement"
+        string resumeUrl "URL to uploaded resume / CV"
+        string notes "Internal evaluation remarks"
+        timestamptz appliedAt "Application submission timestamp"
+        timestamptz createdAt "Record creation timestamp"
+        timestamptz updatedAt "Last status modification timestamp"
     }
 
     EVENT_RSVP {
@@ -256,6 +293,21 @@ erDiagram
    - For an active posting, at least one point of contact (`applicationUrl` or `contactEmail`) is recommended.
 5. **Referential Integrity & User Linking:**
    - `posterId` references `users(id)`. If the posting author's account is removed, the foreign key cascades via `ON DELETE SET NULL` to preserve historical job archives.
+
+### 6.4 Application Domain Constraints
+1. **Many-to-Many Uniqueness Safeguard:**
+   - Enforced by database constraint `CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)`.
+   - A single candidate cannot submit redundant duplicate applications for the same job posting.
+   - Violation produces `HTTP 409 Conflict`.
+2. **Referential Integrity & Cascade Action:**
+   - `userId` must reference a valid `users.id`. If the user account is purged, their applications cascade delete (`ON DELETE CASCADE`).
+   - `jobId` must reference an active `job_postings.id`. If the job posting is deleted, all submitted applications cascade delete (`ON DELETE CASCADE`).
+3. **Application Status Workflow Whitelist:**
+   - Must match case-insensitively one of: `['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn']`.
+   - Defaults to `'Submitted'` on creation.
+   - Status transitions are recorded via automated `updatedAt` triggers.
+4. **URL Format Verification:**
+   - `resumeUrl` (when supplied) must begin with `http://` or `https://`.
 
 ---
 
@@ -385,6 +437,33 @@ EXECUTE FUNCTION update_timestamp_column();
 
 CREATE TRIGGER set_timestamp_job_postings
 BEFORE UPDATE ON job_postings
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp_column();
+
+-- 4. Applications Table (Many-to-Many Action Join)
+CREATE TABLE IF NOT EXISTS applications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    job_id INTEGER NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL DEFAULT 'Submitted'
+        CHECK (status IN ('Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn')),
+    cover_letter TEXT,
+    resume_url VARCHAR(500),
+    notes TEXT,
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)
+);
+
+-- Indexes for applications
+CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
+CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
+CREATE INDEX IF NOT EXISTS idx_applications_applied_at ON applications(applied_at DESC);
+
+CREATE TRIGGER set_timestamp_applications
+BEFORE UPDATE ON applications
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp_column();
 ```

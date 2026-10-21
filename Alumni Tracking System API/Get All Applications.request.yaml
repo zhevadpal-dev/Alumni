@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieve all job applications with optional status, userId, and jobId filters.
+url: "{{baseUrl}}/api/applications"
+method: GET
+headers:
+  Accept: application/json
+order: 9100
