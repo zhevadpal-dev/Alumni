@@ -1,0 +1,7 @@
+$kind: http-request
+description: Candidate application dossier view with profile card, cover letter, resume, and review workflow transition.
+url: "{{baseUrl}}/applications/1"
+method: GET
+headers:
+  Accept: text/html
+order: 12700

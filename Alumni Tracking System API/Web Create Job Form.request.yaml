@@ -1,0 +1,7 @@
+$kind: http-request
+description: Standalone HTML form page for publishing a new career opportunity.
+url: "{{baseUrl}}/jobs/new"
+method: GET
+headers:
+  Accept: text/html
+order: 12200

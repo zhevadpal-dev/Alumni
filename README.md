@@ -125,7 +125,9 @@ Alumni/
 │   │
 │   ├── views/                       # VIEW LAYER (Presentation & UI)
 │   │   ├── announcementViews.js     # Server-rendered HTML templates for announcements (List, Detail, Form)
-│   │   └── htmlViews.js             # Server-rendered HTML page templates (Home, About, Users)
+│   │   ├── htmlViews.js             # Server-rendered HTML page templates (Home, About, Users)
+│   │   ├── jobViews.js              # Server-rendered HTML templates for Job Board UI (List, Detail, Form)
+│   │   └── applicationViews.js      # Server-rendered HTML templates for Application Tracking UI (Dashboard, Dossier)
 │   │
 │   ├── controllers/                 # CONTROLLER LAYER (Application & Business Logic)
 │   │   ├── apiAnnouncementController.js # RESTful API controller for /api/announcements (JSON CRUD, status codes)
@@ -133,7 +135,9 @@ Alumni/
 │   │   ├── apiUserController.js     # RESTful API controller for /api/users (JSON CRUD, status codes)
 │   │   ├── userController.js        # Web MVC controller for /users (HTML views & web responses)
 │   │   ├── apiJobController.js      # RESTful API controller for /api/jobs (JSON CRUD, status codes)
+│   │   ├── jobController.js         # Web MVC controller for /jobs (HTML job board & apply form)
 │   │   ├── apiApplicationController.js # RESTful API controller for /api/applications (JSON CRUD, Many-to-Many actions)
+│   │   ├── applicationController.js # Web MVC controller for /applications (HTML candidate tracking dashboard)
 │   │   ├── healthController.js      # System health telemetry, uptime, memory & OS metrics
 │   │   ├── coreController.js        # Lab endpoints, greeting generators, math calculations
 │   │   └── swaggerController.js     # Swagger UI page rendering & OpenAPI JSON provider
@@ -145,7 +149,9 @@ Alumni/
 │   │   ├── apiUserRoutes.js         # RESTful API user routes (/api/users, /api/users/:id)
 │   │   ├── userRoutes.js            # Web MVC user routes (/users, /users/:id)
 │   │   ├── apiJobRoutes.js          # RESTful API job posting routes (/api/jobs, /api/jobs/:id)
+│   │   ├── jobRoutes.js             # Web MVC job posting routes (/jobs, /jobs/:id)
 │   │   ├── apiApplicationRoutes.js  # RESTful API application routes (/api/applications, /api/applications/:id)
+│   │   ├── applicationRoutes.js     # Web MVC application routes (/applications, /applications/:id)
 │   │   ├── healthRoutes.js          # Health check endpoints (/api/health, /health)
 │   │   ├── coreRoutes.js            # Base routes (/, /home, /about, /hello, /sum)
 │   │   └── swaggerRoutes.js         # Documentation routes (/api/swagger, /api/swagger.json)
@@ -649,6 +655,29 @@ npm run dev
 | `PUT` | `/api/applications/:id` | Full update of application record | Body: `status`, `coverLetter`, `resumeUrl`, `notes` |
 | `PATCH` | `/api/applications/:id` | Partial update (e.g. status transition to `Under Review`, `Accepted`) | Body: `status`, `notes` |
 | `DELETE` | `/api/applications/:id` | Delete / withdraw job application by ID | Returns deleted application JSON |
+
+### 🌐 Web MVC Job Posting Endpoints with View Layer (`JobController` ➡️ `/jobs`)
+
+| Method | Endpoint | CRUD Role | View Layer Output | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/jobs` | **Read (List)** | `renderList(jobs, stats, filter, users)` | Responsive HTML job board with metrics, search filter, and quick-post form |
+| `GET` | `/jobs/new` | **Create (Form)** | `renderNewForm(users)` | Standalone HTML form for publishing a new career opportunity |
+| `POST` | `/jobs` | **Create (Action)** | Redirect `/jobs?status=created` | Processes job creation and redirects with flash notification |
+| `GET` | `/jobs/:id` | **Read (Detail)** | `renderDetail(job, applications, users)` | Single job overview with embedded candidate application form & received applications list |
+| `GET` | `/jobs/:id/edit` | **Update (Form)** | `renderEditForm(job, users)` | Pre-populated HTML form for editing job posting |
+| `POST` / `PUT` | `/jobs/:id` & `/jobs/:id/edit` | **Update (Action)** | Redirect `/jobs/:id?status=updated` | Updates job posting details in PostgreSQL and redirects to detail view |
+| `POST` / `DELETE` | `/jobs/:id` & `/jobs/:id/delete` | **Delete (Action)** | Redirect `/jobs?status=deleted` | Deletes job posting from PostgreSQL and redirects to job board |
+| `POST` | `/jobs/:id/apply` | **Apply (Action)** | Redirect `/jobs/:id?status=applied` | Submits candidate application directly from the job detail view |
+
+### 🌐 Web MVC Application Tracking Endpoints with View Layer (`ApplicationController` ➡️ `/applications`)
+
+| Method | Endpoint | CRUD Role | View Layer Output | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/applications` | **Read (List)** | `renderList(applications, stats, filter, jobs, users)` | Application tracking dashboard with metrics, review filters, and registration form |
+| `POST` | `/applications` | **Create (Action)** | Redirect `/applications?status=created` | Registers candidate application directly in PostgreSQL |
+| `GET` | `/applications/:id` | **Read (Detail)** | `renderDetail(application)` | Candidate dossier with profile, cover letter, resume, and review workflow panel |
+| `POST` / `PUT` | `/applications/:id/status` | **Update (Status)** | Redirect `/applications/:id?status=updated` | Advances review status (`Under Review`, `Shortlisted`, `Interview Scheduled`, `Accepted`, etc.) |
+| `POST` / `DELETE` | `/applications/:id` & `/applications/:id/delete` | **Delete (Action)** | Redirect `/applications?status=deleted` | Withdraws or removes candidate application record from PostgreSQL |
 
 ### 🔗 Domain Relational Endpoints (Direct Sub-Resources)
 

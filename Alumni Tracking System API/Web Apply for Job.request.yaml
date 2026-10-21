@@ -1,0 +1,13 @@
+$kind: http-request
+description: Submit candidate job application directly from the web interface.
+url: "{{baseUrl}}/jobs/1/apply"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: form-urlencoded
+  data:
+    userId: "2"
+    coverLetter: "Excited to apply for this opening!"
+    notes: "Applied via web UI"
+order: 12500

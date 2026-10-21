@@ -1,0 +1,7 @@
+$kind: http-request
+description: Server-rendered HTML job detail view with candidate application form and received applications list.
+url: "{{baseUrl}}/jobs/1"
+method: GET
+headers:
+  Accept: text/html
+order: 12300

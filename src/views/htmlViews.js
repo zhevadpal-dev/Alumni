@@ -224,6 +224,8 @@ class HtmlViews {
             </div>
             <div class="nav-links">
               <a href="/announcements" class="secondary">📢 Announcements</a>
+              <a href="/jobs" class="secondary">💼 Jobs</a>
+              <a href="/applications" class="secondary">📝 Applications</a>
               <a href="/api/swagger" target="_blank">Swagger Docs</a>
               <a href="/api/users" class="secondary" target="_blank">REST API JSON</a>
             </div>

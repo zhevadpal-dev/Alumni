@@ -1,0 +1,12 @@
+$kind: http-request
+description: Advance candidate application review workflow status via web action.
+url: "{{baseUrl}}/applications/1/status"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: form-urlencoded
+  data:
+    status: "Shortlisted"
+    notes: "Candidate passed initial review"
+order: 12800

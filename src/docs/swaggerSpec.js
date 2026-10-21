@@ -54,6 +54,14 @@ const swaggerSpec = {
     {
       name: 'Domain Relations & Sub-Resources',
       description: 'Relational query endpoints navigating associations between Users, Announcements, Job Postings, and Applications'
+    },
+    {
+      name: 'Web Job Postings (JobController)',
+      description: 'Web MVC job board and opportunity management interface endpoints (/jobs)'
+    },
+    {
+      name: 'Web Applications (ApplicationController)',
+      description: 'Web MVC candidate tracking dashboard and review workflow endpoints (/applications)'
     }
   ],
   paths: {
@@ -2255,6 +2263,260 @@ const swaggerSpec = {
             }
           },
           '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/jobs': {
+      get: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Web job opportunities board (HTML or JSON)',
+        description: 'Returns server-rendered responsive job opportunities board with metrics cards, search filters, and embedded quick-post form.',
+        parameters: [
+          { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search keywords in title, company, or description' },
+          { name: 'jobType', in: 'query', schema: { type: 'string', enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote'] }, description: 'Filter by job type' },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['Active', 'Closed'] }, description: 'Filter by status' }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML job board or JSON array of jobs',
+            content: { 'text/html': {}, 'application/json': {} }
+          }
+        }
+      },
+      post: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Create new job posting via web form',
+        description: 'Submits new job posting from web UI, persists to PostgreSQL, and redirects to job board.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['title', 'company', 'description'],
+                properties: {
+                  title: { type: 'string', example: 'Senior DevOps Architect' },
+                  company: { type: 'string', example: 'CloudWave Systems' },
+                  location: { type: 'string', example: 'Istanbul / Remote' },
+                  jobType: { type: 'string', enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote'], example: 'Full-Time' },
+                  description: { type: 'string', example: 'Managing cloud infrastructure and CI/CD pipelines.' },
+                  requirements: { type: 'string', example: '5+ years Kubernetes, Terraform, AWS experience.' },
+                  salaryRange: { type: 'string', example: '$90,000 - $120,000' },
+                  applicationUrl: { type: 'string', example: 'https://careers.cloudwave.com/apply' },
+                  contactEmail: { type: 'string', example: 'recruiting@cloudwave.com' },
+                  posterId: { type: 'integer', example: 1 },
+                  status: { type: 'string', enum: ['Active', 'Draft', 'Closed'], example: 'Active' },
+                  deadline: { type: 'string', format: 'date', example: '2026-12-31' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '302': { description: 'Redirect to /jobs?status=created' },
+          '201': { description: 'Job posting created (JSON clients)' },
+          '400': { description: 'Validation error' }
+        }
+      }
+    },
+    '/jobs/new': {
+      get: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Standalone job posting creation form view',
+        description: 'Renders standalone HTML creation form for publishing a new career opportunity.',
+        responses: {
+          '200': { description: 'Rendered creation form HTML' }
+        }
+      }
+    },
+    '/jobs/{id}': {
+      get: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Web job posting detail, apply form, and applicant list',
+        description: 'Renders detailed view of a job posting including candidate application submission form and list of applicants.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Job posting ID' }
+        ],
+        responses: {
+          '200': { description: 'Rendered detail view HTML' },
+          '404': { description: 'Job posting not found' }
+        }
+      }
+    },
+    '/jobs/{id}/edit': {
+      get: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Web job posting edit form view',
+        description: 'Renders pre-populated HTML form for editing an existing job posting.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Job posting ID' }
+        ],
+        responses: {
+          '200': { description: 'Rendered edit form HTML' },
+          '404': { description: 'Job posting not found' }
+        }
+      },
+      post: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Update job posting via web form submission',
+        description: 'Updates job posting attributes and redirects back to job detail view.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Job posting ID' }
+        ],
+        responses: {
+          '302': { description: 'Redirect to /jobs/{id}?status=updated' },
+          '200': { description: 'Job posting updated' },
+          '400': { description: 'Validation error' }
+        }
+      }
+    },
+    '/jobs/{id}/delete': {
+      post: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Delete job posting via web action',
+        description: 'Deletes job posting from PostgreSQL and redirects to job board.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Job posting ID' }
+        ],
+        responses: {
+          '302': { description: 'Redirect to /jobs?status=deleted' },
+          '200': { description: 'Job posting deleted' }
+        }
+      }
+    },
+    '/jobs/{id}/apply': {
+      post: {
+        tags: ['Web Job Postings (JobController)'],
+        summary: 'Submit candidate job application from job detail view',
+        description: 'Registers candidate application linking User profile with this job opening.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Job posting ID' }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['userId'],
+                properties: {
+                  userId: { type: 'integer', example: 2, description: 'Candidate User ID' },
+                  coverLetter: { type: 'string', example: 'Very interested in joining CloudWave Systems!' },
+                  resumeUrl: { type: 'string', example: 'https://storage.example.com/resumes/candidate.pdf' },
+                  notes: { type: 'string', example: 'Faculty referral' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '302': { description: 'Redirect to /jobs/{id}?status=applied#apply-form' },
+          '201': { description: 'Application registered successfully' },
+          '409': { description: 'Candidate has already applied for this job' }
+        }
+      }
+    },
+    '/applications': {
+      get: {
+        tags: ['Web Applications (ApplicationController)'],
+        summary: 'Web candidate applications tracking dashboard (HTML or JSON)',
+        description: 'Renders application tracking board with review metrics, status filters, and manual registration form.',
+        parameters: [
+          { name: 'status', in: 'query', schema: { type: 'string' }, description: 'Filter by review status' },
+          { name: 'jobId', in: 'query', schema: { type: 'integer' }, description: 'Filter by job posting ID' },
+          { name: 'userId', in: 'query', schema: { type: 'integer' }, description: 'Filter by candidate user ID' }
+        ],
+        responses: {
+          '200': {
+            description: 'Rendered HTML tracking dashboard or JSON array',
+            content: { 'text/html': {}, 'application/json': {} }
+          }
+        }
+      },
+      post: {
+        tags: ['Web Applications (ApplicationController)'],
+        summary: 'Register candidate application via web form',
+        description: 'Submits new candidate application and persists to PostgreSQL.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['userId', 'jobId'],
+                properties: {
+                  userId: { type: 'integer', example: 3 },
+                  jobId: { type: 'integer', example: 1 },
+                  status: { type: 'string', enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted'], example: 'Submitted' },
+                  coverLetter: { type: 'string', example: 'Applying through tracking dashboard.' },
+                  resumeUrl: { type: 'string', example: 'https://storage.example.com/resumes/candidate.pdf' },
+                  notes: { type: 'string', example: 'Direct alumni referral' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '302': { description: 'Redirect to /applications?status=created' },
+          '201': { description: 'Application registered' },
+          '409': { description: 'Candidate has already applied for this job' }
+        }
+      }
+    },
+    '/applications/{id}': {
+      get: {
+        tags: ['Web Applications (ApplicationController)'],
+        summary: 'Web application dossier view and review workflow panel',
+        description: 'Renders complete candidate dossier with profile, cover letter, resume, and review status transition controls.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Application ID' }
+        ],
+        responses: {
+          '200': { description: 'Rendered application dossier HTML' },
+          '404': { description: 'Application not found' }
+        }
+      }
+    },
+    '/applications/{id}/status': {
+      post: {
+        tags: ['Web Applications (ApplicationController)'],
+        summary: 'Advance application review status via web form',
+        description: 'Updates application review status (Under Review, Shortlisted, Interview Scheduled, Accepted, Rejected, Withdrawn) and notes.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Application ID' }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['status'],
+                properties: {
+                  status: { type: 'string', enum: ['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn'], example: 'Shortlisted' },
+                  notes: { type: 'string', example: 'Candidate cleared preliminary screen.' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '302': { description: 'Redirect to /applications/{id}?status=updated' },
+          '200': { description: 'Status updated' }
+        }
+      }
+    },
+    '/applications/{id}/delete': {
+      post: {
+        tags: ['Web Applications (ApplicationController)'],
+        summary: 'Withdraw / delete candidate application',
+        description: 'Removes application record from PostgreSQL.',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' }, description: 'Application ID' }
+        ],
+        responses: {
+          '302': { description: 'Redirect to /applications?status=deleted' },
+          '200': { description: 'Application removed' }
         }
       }
     }

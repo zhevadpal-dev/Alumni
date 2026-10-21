@@ -1,0 +1,7 @@
+$kind: http-request
+description: Returns server-rendered HTML job opportunities board with metrics, search filters, and quick-post form.
+url: "{{baseUrl}}/jobs"
+method: GET
+headers:
+  Accept: text/html
+order: 12100

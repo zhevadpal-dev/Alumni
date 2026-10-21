@@ -1,0 +1,7 @@
+$kind: http-request
+description: Pre-populated HTML form for editing an existing job posting.
+url: "{{baseUrl}}/jobs/1/edit"
+method: GET
+headers:
+  Accept: text/html
+order: 12400

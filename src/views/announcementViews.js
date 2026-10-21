@@ -269,6 +269,8 @@ class AnnouncementViews {
             <div class="nav-links">
               <a href="#new-announcement" class="btn btn-success" style="color: #fff;">➕ New Announcement</a>
               <a href="/users" class="secondary">🎓 Alumni Directory</a>
+              <a href="/jobs" class="secondary">💼 Jobs</a>
+              <a href="/applications" class="secondary">📝 Applications</a>
               <a href="/api/swagger" target="_blank">Swagger API</a>
               <a href="/api/announcements" class="secondary" target="_blank">REST API JSON</a>
             </div>

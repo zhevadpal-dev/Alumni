@@ -1,0 +1,7 @@
+$kind: http-request
+description: Application tracking dashboard with metrics, review status filters, and candidate registration form.
+url: "{{baseUrl}}/applications"
+method: GET
+headers:
+  Accept: text/html
+order: 12600

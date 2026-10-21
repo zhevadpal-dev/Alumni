@@ -1218,6 +1218,234 @@
         "description": "Relational sub-route returning all JobPostings that user #2 applied to (Many-to-Many)."
       },
       "response": []
+    },
+    {
+      "name": "Web Job Board (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs"
+          ]
+        },
+        "description": "Server-rendered responsive HTML job board with metrics, filters, and quick-post form."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Create Job Form (HTML)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/jobs/new",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "new"
+          ]
+        },
+        "description": "Standalone HTML form page for publishing a new career opportunity."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Single Job Detail (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/jobs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "1"
+          ]
+        },
+        "description": "Server-rendered HTML job detail view with applicant list and candidate apply form."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Edit Job Form (HTML)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/jobs/1/edit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "1",
+            "edit"
+          ]
+        },
+        "description": "Pre-populated HTML edit form for job posting."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Apply for Job (Form Action)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "userId",
+              "value": "2",
+              "type": "text"
+            },
+            {
+              "key": "coverLetter",
+              "value": "Excited to apply for this opening!",
+              "type": "text"
+            },
+            {
+              "key": "notes",
+              "value": "Applied via web UI",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/1/apply",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "1",
+            "apply"
+          ]
+        },
+        "description": "Submit candidate job application directly from the job detail view."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Applications Tracking Dashboard (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications"
+          ]
+        },
+        "description": "Application tracking dashboard with metrics, review status filters, and candidate registration form."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Single Application Dossier (HTML / MVC)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/applications/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications",
+            "1"
+          ]
+        },
+        "description": "Candidate application dossier view with profile card, cover letter, resume, and review workflow transition."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Advance Application Status (Form Action)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "status",
+              "value": "Shortlisted",
+              "type": "text"
+            },
+            {
+              "key": "notes",
+              "value": "Candidate passed initial review",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/applications/1/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "applications",
+            "1",
+            "status"
+          ]
+        },
+        "description": "Advance candidate application review workflow status via web action."
+      },
+      "response": []
     }
   ]
 }
