@@ -108,14 +108,17 @@ Alumni/
 │   │
 │   ├── factories/                   # FACTORY LAYER (Test & Mock Data Generation)
 │   │   ├── announcementFactory.js   # Announcement factory (buildAnnouncement, createAnnouncements)
+│   │   ├── jobPostingFactory.js     # Job posting factory (buildJobPosting, createJobPostings)
 │   │   └── userFactory.js           # User factory (buildUser, createUsers)
 │   │
 │   ├── seeds/                       # DATABASE SEEDERS
 │   │   └── seed.js                  # Database seeder (safe truncate, default data + factory generation)
 │   │
-│   ├── models/                      # MODEL LAYER (Data Access & Persistence)
-│   │   ├── announcementModel.js     # Announcement entity with PostgreSQL SQL CRUD operations
-│   │   └── userModel.js             # User entity with PostgreSQL SQL CRUD operations
+│   ├── models/                      # MODEL LAYER (Data Access & Relational Persistence)
+│   │   ├── announcementModel.js     # Announcement entity with PostgreSQL CRUD & User relations
+│   │   ├── jobPostingModel.js       # JobPosting entity with PostgreSQL CRUD & User relations
+│   │   ├── userModel.js             # User entity with PostgreSQL CRUD & Announcement/Job relations
+│   │   └── index.js                 # Central model aggregator & relational registry (RELATIONS)
 │   │
 │   ├── views/                       # VIEW LAYER (Presentation & UI)
 │   │   ├── announcementViews.js     # Server-rendered HTML templates for announcements (List, Detail, Form)
@@ -288,7 +291,57 @@ const deletedNotice = await AnnouncementModel.delete(1);                  // Del
 ##### 🛡️ Validation & Data Integrity Safeguards (Announcement)
 - **Required Fields:** Enforces mandatory presence of non-empty `title` and `content`.
 - **Category Whitelist:** Restricts category values strictly to `General`, `Event`, `Career`, `Academic`, `News`, `Urgent`.
+- **Relational Integrity (`author_id`):** Links each notice to a verified author user in PostgreSQL with `ON DELETE SET NULL` cascade safety.
 - **Relational Persistence & Automated Timestamps:** Records are persisted in PostgreSQL with automated `created_at` and `updated_at` timestamps.
+
+---
+
+- **`jobPostingModel.js`**: Provides persistent PostgreSQL data access for career postings and opportunities shared by alumni and recruiters, featuring full CRUD, relational poster joins, filtering, and constraint validation.
+
+##### 📋 JobPosting Entity Schema
+
+| Attribute | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `Integer` | System-generated | Unique auto-increment primary key | `1` |
+| `title` | `String` | Yes | Job position title | `"Senior Backend Engineer"` |
+| `company` | `String` | Yes | Hiring enterprise name | `"TechCorp Solutions"` |
+| `location` | `String` | No (Default: `'Remote'`) | Workplace location | `"Istanbul / Remote"` |
+| `jobType` | `String` | No (Default: `'Full-Time'`) | Employment category | `"Full-Time"`, `"Internship"` |
+| `description` | `String` | Yes | Role responsibilities & overview | `"Architect high-throughput microservices..."` |
+| `requirements` | `String` | No | Qualifications & prerequisites | `"3+ years Node.js, PostgreSQL, Docker"` |
+| `salaryRange` | `String` | No | Compensation package | `"$85,000 - $115,000"` |
+| `applicationUrl`| `String` | No | External application portal link | `"https://careers.example.com/apply"` |
+| `contactEmail` | `String` | No | Recruiter / inquiry email | `"recruiting@example.com"` |
+| `posterId` | `Integer` | No (Relational FK) | ID of User posting the opportunity | `1` |
+| `status` | `String` | No (Default: `'Active'`) | Publication status | `"Active"`, `"Closed"` |
+| `deadline` | `TIMESTAMPTZ` | No | Application closing timestamp | `"2026-12-31T23:59:59Z"` |
+
+##### 💻 Model Relations & Relational Methods (`src/models/index.js`)
+
+The system establishes explicit domain associations across all three entities:
+
+```javascript
+const { UserModel, AnnouncementModel, JobPostingModel, RELATIONS } = require('./models');
+
+// 1. One-to-Many: User -> Announcements & JobPostings
+const user = await UserModel.findByIdWithRelations(1);
+// user.announcements -> Array of announcements authored by User #1
+// user.jobPostings   -> Array of job postings posted by User #1
+
+// Direct relation accessors:
+const userNotices = await UserModel.getAnnouncements(1);
+const userJobs    = await UserModel.getJobPostings(1);
+
+// 2. Belongs-To: Announcement -> User (Author)
+const noticeWithAuthor = await AnnouncementModel.getByIdWithAuthor(1);
+// noticeWithAuthor.authorUser -> { id, name, email, role, department }
+
+// 3. Belongs-To: JobPosting -> User (Poster)
+const jobWithPoster = await JobPostingModel.getByIdWithPoster(1);
+// jobWithPoster.poster -> { id, name, email, role, department, company }
+
+const allJobsWithPosters = await JobPostingModel.getAllWithPoster({ status: 'Active' });
+```
 
 #### 2. 🎨 View Layer (`src/views/`)
 - Responsible for the presentation output sent to clients, cleanly decoupling UI layout, CSS styling, and HTML templates from controller orchestration.

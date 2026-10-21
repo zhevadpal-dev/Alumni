@@ -2,15 +2,17 @@
  * Database Seeder
  * 
  * Cleans up and seeds the PostgreSQL database with default data and
- * factory-generated records for users and announcements.
+ * factory-generated records for users, announcements, and job postings,
+ * preserving relational foreign key integrity.
  */
 
 const { pool, query } = require('../config/db');
 const { createUsers } = require('../factories/userFactory');
 const { createAnnouncements } = require('../factories/announcementFactory');
+const { createJobPostings } = require('../factories/jobPostingFactory');
 
 /**
- Default primary users
+ * Default primary users
  */
 const DEFAULT_USERS = [
   {
@@ -75,20 +77,64 @@ const DEFAULT_ANNOUNCEMENTS = [
 ];
 
 /**
- * Seed the database with users and announcements
+ * Default initial job postings
+ */
+const DEFAULT_JOB_POSTINGS = [
+  {
+    title: 'Senior Backend Engineer',
+    company: 'TechCorp Solutions',
+    location: 'Istanbul / Remote',
+    jobType: 'Full-Time',
+    description: 'Design and operate scalable distributed cloud microservices, maintain relational PostgreSQL databases, and lead architecture reviews.',
+    requirements: '3+ years experience with Node.js/TypeScript, PostgreSQL, and Docker containerization.',
+    salaryRange: '$85,000 - $115,000',
+    applicationUrl: 'https://careers.techcorp.example.com/apply/senior-backend',
+    contactEmail: 'recruiting@techcorp.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'Full Stack Cloud Developer',
+    company: 'FinTech Innovations',
+    location: 'Remote',
+    jobType: 'Full-Time',
+    description: 'Build responsive financial dashboard web applications and resilient REST backend APIs for institutional clients.',
+    requirements: 'Proficiency in React, Express/Node.js, SQL, and cloud infrastructure.',
+    salaryRange: '$75,000 - $100,000',
+    applicationUrl: 'https://fintechinnovations.example.com/apply',
+    contactEmail: 'careers@fintechinnovations.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'Machine Learning Research Intern',
+    company: 'Applied AI Labs',
+    location: 'Ankara / Hybrid',
+    jobType: 'Internship',
+    description: 'Participate in model benchmarking, dataset engineering pipelines, and university research collaborations.',
+    requirements: 'Enrolled in Computer Science or Electrical Engineering. Python, PyTorch background.',
+    salaryRange: '$2,500 / month stipend',
+    applicationUrl: 'https://ailabs.example.com/internships',
+    contactEmail: 'internships@ailabs.example.com',
+    status: 'Active'
+  }
+];
+
+/**
+ * Seed the database with users, announcements, and job postings
  * 
  * @param {Object} [options={}]
  * @param {number} [options.factoryUsersCount=5] - Number of factory users to generate
  * @param {number} [options.factoryAnnouncementsCount=2] - Number of factory announcements to generate
- * @returns {Promise<{usersCount: number, announcementsCount: number}>}
+ * @param {number} [options.factoryJobPostingsCount=3] - Number of factory job postings to generate
+ * @returns {Promise<{usersCount: number, announcementsCount: number, jobPostingsCount: number}>}
  */
 async function seedDatabase(options = {}) {
   const factoryUsersCount = options.factoryUsersCount !== undefined ? options.factoryUsersCount : 5;
   const factoryAnnouncementsCount = options.factoryAnnouncementsCount !== undefined ? options.factoryAnnouncementsCount : 2;
+  const factoryJobPostingsCount = options.factoryJobPostingsCount !== undefined ? options.factoryJobPostingsCount : 3;
 
   console.log('🌱 Starting database seeding process...');
 
-  // Ensure tables exist before truncating
+  // Ensure tables and columns exist before truncating
   await query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -97,6 +143,9 @@ async function seedDatabase(options = {}) {
       role VARCHAR(50) DEFAULT 'alumni',
       department VARCHAR(255),
       graduation_year INTEGER,
+      phone VARCHAR(50),
+      company VARCHAR(255),
+      job_title VARCHAR(255),
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
@@ -106,58 +155,121 @@ async function seedDatabase(options = {}) {
       title VARCHAR(255) NOT NULL,
       content TEXT NOT NULL,
       author VARCHAR(255) DEFAULT 'Alumni Relations Office',
+      author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
       category VARCHAR(50) DEFAULT 'General',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS job_postings (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      company VARCHAR(255) NOT NULL,
+      location VARCHAR(255) DEFAULT 'Remote',
+      job_type VARCHAR(50) DEFAULT 'Full-Time',
+      description TEXT NOT NULL,
+      requirements TEXT,
+      salary_range VARCHAR(100),
+      application_url VARCHAR(500),
+      contact_email VARCHAR(255),
+      poster_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      status VARCHAR(50) DEFAULT 'Active',
+      deadline TIMESTAMPTZ,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
   `);
 
   // Safely truncate existing tables and restart identity sequence
-  console.log('🧹 Truncating existing users and announcements tables...');
-  await query('TRUNCATE TABLE announcements, users RESTART IDENTITY CASCADE;');
+  console.log('🧹 Truncating existing tables (job_postings, announcements, users)...');
+  await query('TRUNCATE TABLE job_postings, announcements, users RESTART IDENTITY CASCADE;');
 
   // Prepare users list (default users + factory generated alumni records)
   const factoryUsers = createUsers(factoryUsersCount, { role: 'alumni' });
   const allUsers = [...DEFAULT_USERS, ...factoryUsers];
 
   console.log(`👤 Inserting ${allUsers.length} users (${DEFAULT_USERS.length} core + ${factoryUsers.length} factory generated)...`);
+  const insertedUserIds = [];
   for (const user of allUsers) {
-    await query(
+    const res = await query(
       `INSERT INTO users (name, email, role, department, graduation_year, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+       RETURNING id`,
       [user.name, user.email, user.role, user.department, user.graduationYear]
     );
+    insertedUserIds.push(res.rows[0].id);
   }
+
+  const adminUserId = insertedUserIds[0] || null; // Said Hasan (admin)
+  const alumniUserId = insertedUserIds[1] || null; // Zeynep Naz (alumni)
 
   // Prepare announcements list (default announcements + factory generated announcements)
   const factoryAnnouncements = createAnnouncements(factoryAnnouncementsCount);
   const allAnnouncements = [...DEFAULT_ANNOUNCEMENTS, ...factoryAnnouncements];
 
-  console.log(`📢 Inserting ${allAnnouncements.length} announcements (${DEFAULT_ANNOUNCEMENTS.length} core + ${factoryAnnouncements.length} factory generated)...`);
-  for (const notice of allAnnouncements) {
+  console.log(`📢 Inserting ${allAnnouncements.length} announcements with author_id relations...`);
+  for (let i = 0; i < allAnnouncements.length; i += 1) {
+    const notice = allAnnouncements[i];
+    const authorId = (i % 2 === 0) ? adminUserId : alumniUserId;
     await query(
-      `INSERT INTO announcements (title, content, author, category, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, NOW(), NOW())`,
-      [notice.title, notice.content, notice.author, notice.category]
+      `INSERT INTO announcements (title, content, author, author_id, category, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+      [notice.title, notice.content, notice.author, authorId, notice.category]
+    );
+  }
+
+  // Prepare job postings list (default postings + factory generated job postings)
+  const factoryJobs = createJobPostings(factoryJobPostingsCount);
+  const allJobPostings = [...DEFAULT_JOB_POSTINGS, ...factoryJobs];
+
+  console.log(`💼 Inserting ${allJobPostings.length} job postings with poster_id relations...`);
+  for (let i = 0; i < allJobPostings.length; i += 1) {
+    const job = allJobPostings[i];
+    // Rotate posters among created users
+    const posterId = insertedUserIds[i % insertedUserIds.length] || null;
+    await query(
+      `INSERT INTO job_postings (
+        title, company, location, job_type, description, requirements,
+        salary_range, application_url, contact_email, poster_id, status, deadline,
+        created_at, updated_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW() + INTERVAL '45 days', NOW(), NOW())`,
+      [
+        job.title,
+        job.company,
+        job.location || 'Remote',
+        job.jobType || 'Full-Time',
+        job.description,
+        job.requirements || null,
+        job.salaryRange || null,
+        job.applicationUrl || null,
+        job.contactEmail || null,
+        posterId,
+        job.status || 'Active'
+      ]
     );
   }
 
   // Verify counts
   const userCountRes = await query('SELECT COUNT(*) as count FROM users');
   const announcementCountRes = await query('SELECT COUNT(*) as count FROM announcements');
+  const jobCountRes = await query('SELECT COUNT(*) as count FROM job_postings');
 
   const seededUsers = parseInt(userCountRes.rows[0].count, 10);
   const seededAnnouncements = parseInt(announcementCountRes.rows[0].count, 10);
+  const seededJobs = parseInt(jobCountRes.rows[0].count, 10);
 
   console.log('====================================================');
   console.log(`✅ Database seeding completed successfully!`);
   console.log(`   - Users seeded:         ${seededUsers}`);
   console.log(`   - Announcements seeded: ${seededAnnouncements}`);
+  console.log(`   - Job Postings seeded:  ${seededJobs}`);
   console.log('====================================================');
 
   return {
     usersCount: seededUsers,
-    announcementsCount: seededAnnouncements
+    announcementsCount: seededAnnouncements,
+    jobPostingsCount: seededJobs
   };
 }
 
@@ -178,5 +290,6 @@ if (require.main === module) {
 module.exports = {
   seedDatabase,
   DEFAULT_USERS,
-  DEFAULT_ANNOUNCEMENTS
+  DEFAULT_ANNOUNCEMENTS,
+  DEFAULT_JOB_POSTINGS
 };

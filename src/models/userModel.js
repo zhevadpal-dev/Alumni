@@ -450,6 +450,84 @@ class UserModel {
     const users = await this.findAll(filter);
     return users.length;
   }
+
+  // ==========================================
+  // RELATIONS (hasMany Associations)
+  // ==========================================
+
+  /**
+   * Retrieve all announcements authored by this user (1-to-Many).
+   * 
+   * @param {number|string} userId - User ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} Announcements list authored by the user
+   */
+  static async getAnnouncements(userId, filter = {}) {
+    const numericId = parseInt(userId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT id, title, content, author, author_id AS "authorId", category,
+             created_at AS "createdAt", updated_at AS "updatedAt"
+      FROM announcements
+      WHERE author_id = $1
+      ORDER BY id DESC
+    `;
+    const res = await query(sql, [numericId]);
+    return res.rows;
+  }
+
+  /**
+   * Retrieve all job postings created by this user (1-to-Many).
+   * 
+   * @param {number|string} userId - User ID
+   * @param {Object} [filter={}] - Query options
+   * @returns {Promise<Array<Object>>} Job postings list posted by the user
+   */
+  static async getJobPostings(userId, filter = {}) {
+    const numericId = parseInt(userId, 10);
+    if (isNaN(numericId)) return [];
+
+    let sql = `
+      SELECT id, title, company, location,
+             job_type AS "jobType",
+             description, requirements,
+             salary_range AS "salaryRange",
+             application_url AS "applicationUrl",
+             contact_email AS "contactEmail",
+             poster_id AS "posterId",
+             status, deadline,
+             created_at AS "createdAt",
+             updated_at AS "updatedAt"
+      FROM job_postings
+      WHERE poster_id = $1
+      ORDER BY id DESC
+    `;
+    const res = await query(sql, [numericId]);
+    return res.rows;
+  }
+
+  /**
+   * Retrieve a user along with all associated entity collections (eager loaded relations).
+   * 
+   * @param {number|string} id - User ID
+   * @returns {Promise<Object|null>} User record with announcements and jobPostings arrays
+   */
+  static async findByIdWithRelations(id) {
+    const user = await this.findById(id);
+    if (!user) return null;
+
+    const [announcements, jobPostings] = await Promise.all([
+      this.getAnnouncements(user.id),
+      this.getJobPostings(user.id)
+    ]);
+
+    return {
+      ...user,
+      announcements,
+      jobPostings
+    };
+  }
 }
 
 // Aliases for compatibility

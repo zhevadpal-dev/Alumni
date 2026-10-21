@@ -32,6 +32,17 @@ CREATE INDEX IF NOT EXISTS idx_job_postings_job_type ON job_postings(job_type);
 CREATE INDEX IF NOT EXISTS idx_job_postings_company ON job_postings(company);
 CREATE INDEX IF NOT EXISTS idx_job_postings_created_at ON job_postings(created_at DESC);
 
+-- 3. Ensure Announcements Table Has author_id FK to Users (Relational Integrity)
+ALTER TABLE announcements 
+ADD COLUMN IF NOT EXISTS author_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS idx_announcements_author_id ON announcements(author_id);
+
+-- Optional: Link initial announcements without author_id to default admin user
+UPDATE announcements
+SET author_id = (SELECT id FROM users WHERE role = 'admin' LIMIT 1)
+WHERE author_id IS NULL;
+
 -- 3. Automatic Timestamp Trigger Function & Trigger
 CREATE OR REPLACE FUNCTION update_timestamp_column()
 RETURNS TRIGGER AS $$
