@@ -185,7 +185,7 @@ class JobPostingModel {
              u.email AS "u_email",
              u.role AS "u_role",
              u.department AS "u_department",
-             u.company AS "u_company"
+             u.graduation_year AS "u_graduationYear"
       FROM job_postings jp
       LEFT JOIN users u ON jp.poster_id = u.id
       WHERE jp.id = $1
@@ -195,7 +195,7 @@ class JobPostingModel {
     if (!res.rows[0]) return null;
 
     const row = res.rows[0];
-    const { u_id, u_name, u_email, u_role, u_department, u_company, ...posting } = row;
+    const { u_id, u_name, u_email, u_role, u_department, u_graduationYear, ...posting } = row;
 
     posting.poster = u_id ? {
       id: u_id,
@@ -203,7 +203,7 @@ class JobPostingModel {
       email: u_email,
       role: u_role,
       department: u_department,
-      company: u_company
+      graduationYear: u_graduationYear
     } : null;
 
     return posting;
@@ -232,7 +232,7 @@ class JobPostingModel {
              u.email AS "u_email",
              u.role AS "u_role",
              u.department AS "u_department",
-             u.company AS "u_company"
+             u.graduation_year AS "u_graduationYear"
       FROM job_postings jp
       LEFT JOIN users u ON jp.poster_id = u.id
     `;
@@ -289,14 +289,14 @@ class JobPostingModel {
 
     const res = await query(sql, params);
     return res.rows.map(row => {
-      const { u_id, u_name, u_email, u_role, u_department, u_company, ...posting } = row;
+      const { u_id, u_name, u_email, u_role, u_department, u_graduationYear, ...posting } = row;
       posting.poster = u_id ? {
         id: u_id,
         name: u_name,
         email: u_email,
         role: u_role,
         department: u_department,
-        company: u_company
+        graduationYear: u_graduationYear
       } : null;
       return posting;
     });
@@ -315,7 +315,6 @@ class JobPostingModel {
     const sql = `
       SELECT id, name, email, role, department, 
              graduation_year AS "graduationYear",
-             phone, company, job_title AS "jobTitle",
              created_at AS "createdAt", updated_at AS "updatedAt"
       FROM users
       WHERE id = $1

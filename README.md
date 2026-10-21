@@ -519,6 +519,9 @@ docker compose exec app npm run migrate
 # Run database seeder (cleans & populates default records + factory data)
 docker compose exec app npm run seed
 
+# Or run dedicated job postings seeder
+docker compose exec app npm run seed:jobs
+
 # Inspect container output and logs
 docker compose logs -f
 ```
@@ -529,6 +532,8 @@ The seeder automatically populates:
 - **Default Core Users (5):** Said Hasan (Admin), Zeynep Naz (Alumni), Ece (Alumni), Rumeysa (Student), Ceyda (Faculty).
 - **Factory-Generated Alumni Records (5+):** Realistic alumni with academic departments and graduation years.
 - **Initial Announcements (5):** "Welcome to Alumni Portal", "Upcoming Career Fair", "Mentorship Program", plus factory-generated updates.
+- **Initial Job Postings (12+):** Senior Backend Engineer, Full Stack Cloud Developer, ML Research Intern, DevOps Lead, Frontend UI/UX, Cybersecurity SOC Analyst, Data Platform Engineer, AI Robotics Engineer, plus factory-generated roles.
+- **Initial Job Applications (6+):** Action records connecting candidate users to target job postings.
 
 To terminate containers and tear down the network:
 

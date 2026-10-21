@@ -7,7 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "migrate": "node src/migrations/runner.js",
-    "seed": "node src/seeds/seed.js"
+    "seed": "node src/seeds/seed.js",
+    "seed:jobs": "node src/seeds/seedJobs.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

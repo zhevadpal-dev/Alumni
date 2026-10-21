@@ -117,22 +117,82 @@ const DEFAULT_JOB_POSTINGS = [
     applicationUrl: 'https://ailabs.example.com/internships',
     contactEmail: 'internships@ailabs.example.com',
     status: 'Active'
+  },
+  {
+    title: 'DevOps & Cloud Infrastructure Lead',
+    company: 'CloudScale Systems',
+    location: 'London, UK / Remote',
+    jobType: 'Full-Time',
+    description: 'Automate CI/CD delivery pipelines, manage Kubernetes clusters on AWS/GCP, and ensure 99.99% system availability.',
+    requirements: 'Experience with Terraform, Docker, Kubernetes, Prometheus, and multi-region cloud networks.',
+    salaryRange: '$95,000 - $130,000',
+    applicationUrl: 'https://cloudscale.example.com/careers/devops-lead',
+    contactEmail: 'hiring@cloudscale.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'Frontend UI/UX Engineer (React / TypeScript)',
+    company: 'Nexus Data Labs',
+    location: 'Berlin, Germany / Hybrid',
+    jobType: 'Full-Time',
+    description: 'Design responsive web applications, component libraries, and interactive analytical dashboards for enterprise clients.',
+    requirements: 'Proficiency in React, Next.js, TypeScript, TailwindCSS, and state management.',
+    salaryRange: '$70,000 - $95,000',
+    applicationUrl: 'https://nexusdata.example.com/jobs/frontend',
+    contactEmail: 'jobs@nexusdata.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'Cybersecurity SOC Analyst',
+    company: 'CyberShield Security',
+    location: 'Izmir / On-site',
+    jobType: 'Contract',
+    description: 'Perform penetration testing, audit identity/access management protocols, and coordinate SOC incident responses.',
+    requirements: 'Knowledge of OWASP top 10, network protocols, ISO 27001 compliance, and SIEM monitoring tools.',
+    salaryRange: '$60 - $85 / hour',
+    applicationUrl: 'https://cybershield.example.com/careers/soc-analyst',
+    contactEmail: 'security-hiring@cybershield.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'Data Platform & Streaming Engineer',
+    company: 'Global Telecom Network',
+    location: 'Remote',
+    jobType: 'Full-Time',
+    description: 'Build real-time ETL streaming pipelines, maintain analytics data lakes, and design automated reporting frameworks.',
+    requirements: 'Hands-on background with Python, SQL, Apache Kafka, Spark, and PostgreSQL.',
+    salaryRange: '$80,000 - $110,000',
+    applicationUrl: 'https://telecom.example.com/careers/data-engineer',
+    contactEmail: 'careers@telecom.example.com',
+    status: 'Active'
+  },
+  {
+    title: 'AI Robotics Software Engineer',
+    company: 'Apex Robotics AI',
+    location: 'New York, NY / Remote',
+    jobType: 'Full-Time',
+    description: 'Develop autonomous perception algorithms, real-time sensor fusion systems, and robotic fleet management controllers.',
+    requirements: 'C++, Python, ROS2, computer vision, and robotics simulation experience.',
+    salaryRange: '$110,000 - $145,000',
+    applicationUrl: 'https://apexrobotics.example.com/apply/robotics-eng',
+    contactEmail: 'talent@apexrobotics.example.com',
+    status: 'Active'
   }
 ];
 
 /**
- * Seed the database with users, announcements, and job postings
+ * Seed the database with users, announcements, job postings, and applications
  * 
  * @param {Object} [options={}]
  * @param {number} [options.factoryUsersCount=5] - Number of factory users to generate
  * @param {number} [options.factoryAnnouncementsCount=2] - Number of factory announcements to generate
- * @param {number} [options.factoryJobPostingsCount=3] - Number of factory job postings to generate
- * @returns {Promise<{usersCount: number, announcementsCount: number, jobPostingsCount: number}>}
+ * @param {number} [options.factoryJobPostingsCount=4] - Number of factory job postings to generate
+ * @returns {Promise<{usersCount: number, announcementsCount: number, jobPostingsCount: number, applicationsCount: number}>}
  */
 async function seedDatabase(options = {}) {
   const factoryUsersCount = options.factoryUsersCount !== undefined ? options.factoryUsersCount : 5;
   const factoryAnnouncementsCount = options.factoryAnnouncementsCount !== undefined ? options.factoryAnnouncementsCount : 2;
-  const factoryJobPostingsCount = options.factoryJobPostingsCount !== undefined ? options.factoryJobPostingsCount : 3;
+  const factoryJobPostingsCount = options.factoryJobPostingsCount !== undefined ? options.factoryJobPostingsCount : 4;
 
   console.log('🌱 Starting database seeding process...');
 
