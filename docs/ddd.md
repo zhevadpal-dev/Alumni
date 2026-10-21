@@ -1,8 +1,8 @@
 # 🏛️ Data Design & Architecture Documentation (DDD)
 
 > **Platform:** Alumni Tracking System  
-> **Status:** Active (In-Memory Prototype) ➔ Target (PostgreSQL 15 Relational Persistence)  
-> **Version:** 1.1.0  
+> **Status:** Active (PostgreSQL 15 Relational Persistence & In-Memory Fallback)  
+> **Version:** 1.2.0  
 > **Author:** Alumni Engineering Team  
 
 ---
@@ -13,9 +13,13 @@
 3. [Entity Specifications & Attributes](#3-entity-specifications--attributes)
    - [3.1 User Entity](#31-user-entity)
    - [3.2 Announcement Entity](#32-announcement-entity)
+   - [3.3 Job Posting Entity](#33-job-posting-entity)
 4. [Entity Relationship Diagram (ERD)](#4-entity-relationship-diagram-erd)
 5. [In-Memory Store vs. Target Relational Schema](#5-in-memory-store-vs-target-relational-schema)
 6. [Validation & Business Rules](#6-validation--business-rules)
+   - [6.1 User Domain Constraints](#61-user-domain-constraints)
+   - [6.2 Announcement Domain Constraints](#62-announcement-domain-constraints)
+   - [6.3 Job Posting Domain Constraints](#63-job-posting-domain-constraints)
 7. [Data Lifecycle & State Transitions](#7-data-lifecycle--state-transitions)
 8. [Target PostgreSQL DDL Specification](#8-target-postgresql-ddl-specification)
 9. [Migration Strategy & Zero-Downtime Roadmap](#9-migration-strategy--zero-downtime-roadmap)
@@ -108,6 +112,28 @@ The `Announcement` entity represents institutional broadcasts, career opportunit
 | `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Creation timestamp |
 | `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last update timestamp |
 
+### 3.3 Job Posting Entity
+
+The `JobPosting` entity represents career opportunities, internships, and professional openings shared by alumni, corporate partners, or university career coordinators.
+
+| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique job posting ID |
+| `title` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Job title or position designation |
+| `company` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Organization or enterprise offering the position |
+| `location` | `String` | `VARCHAR(255)` | **No** | `'Remote'` | Non-empty string | Physical location or remote designation |
+| `jobType` | `String` | `VARCHAR(50)` | **No** | `'Full-Time'` | Whitelist: `'Full-Time'`, `'Part-Time'`, `'Contract'`, `'Internship'`, `'Remote'` | Employment type classification |
+| `description` | `String` | `TEXT` | **No** | — | Required, non-empty text | Detailed role responsibilities & scope |
+| `requirements` | `String` \| `null` | `TEXT` | Yes | `null` | Free text / bullet points | Qualifications, skills, prerequisites |
+| `salaryRange` | `String` \| `null` | `VARCHAR(100)` | Yes | `null` | Free text (e.g. `"$90k - $120k"`) | Compensation package or estimated range |
+| `applicationUrl`| `String` \| `null` | `VARCHAR(500)` | Yes | `null` | Valid `http://` or `https://` URL | External application or career portal link |
+| `contactEmail` | `String` \| `null` | `VARCHAR(255)` | Yes | `null` | RFC 5322 regex format, lowercased | Inquiries or resume submission email |
+| `posterId` | `Number` \| `null` | `INTEGER` | Yes | `null` | `FK` referencing `users(id)` ON DELETE SET NULL | Alumni or employer user who posted the listing |
+| `status` | `String` | `VARCHAR(50)` | **No** | `'Active'` | Whitelist: `'Active'`, `'Closed'`, `'Draft'`, `'Expired'` | Current lifecycle listing status |
+| `deadline` | `String` (ISO 8601) \| `null`| `TIMESTAMPTZ` | Yes | `null` | Valid ISO 8601 timestamp | Application deadline cutoff timestamp |
+| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Initial posting timestamp |
+| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last record modification timestamp |
+
 ---
 
 ## 4. Entity Relationship Diagram (ERD)
@@ -145,11 +171,20 @@ erDiagram
 
     JOB_POSTING {
         int id PK "Serial primary key"
-        string title "Job title"
-        string company "Hiring company"
+        string title "Position title (Required)"
+        string company "Hiring company name (Required)"
         string location "Job location / Remote"
+        string jobType "Full-Time | Part-Time | Contract | Internship | Remote"
+        string description "Role responsibilities (Required)"
+        string requirements "Qualifications and skills"
+        string salaryRange "Compensation bracket"
+        string applicationUrl "External application portal URL"
+        string contactEmail "Contact / recruiter email"
         int posterId FK "References USER(id)"
-        timestamptz createdAt "Listing timestamp"
+        string status "Active | Closed | Draft | Expired"
+        timestamptz deadline "Application closing timestamp"
+        timestamptz createdAt "Listing creation timestamp"
+        timestamptz updatedAt "Last update timestamp"
     }
 
     EVENT_RSVP {
@@ -204,6 +239,23 @@ erDiagram
    - Normalized to canonical PascalCase capitalization upon insertion.
 3. **Default Author Attribution:**
    - If not provided, author defaults to `'Alumni Relations Office'`.
+
+### 6.3 Job Posting Domain Constraints
+1. **Mandatory Core Fields:**
+   - `title`, `company`, and `description` are strictly required non-empty strings.
+2. **Employment Type Whitelist:**
+   - Must match case-insensitively one of: `['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote']`.
+   - Defaults to `'Full-Time'` when omitted.
+3. **Publication Status Lifecycle:**
+   - Must match one of: `['Active', 'Closed', 'Draft', 'Expired']`.
+   - Defaults to `'Active'`.
+   - Postings with an expired `deadline` timestamp automatically transition or filter to `'Expired'`.
+4. **Application Link & Contact Validation:**
+   - `applicationUrl` (when supplied) must match valid web URL protocols (`http://` or `https://`).
+   - `contactEmail` (when supplied) must satisfy RFC 5322 email regex and normalize to lowercase.
+   - For an active posting, at least one point of contact (`applicationUrl` or `contactEmail`) is recommended.
+5. **Referential Integrity & User Linking:**
+   - `posterId` references `users(id)`. If the posting author's account is removed, the foreign key cascades via `ON DELETE SET NULL` to preserve historical job archives.
 
 ---
 
@@ -284,6 +336,34 @@ CREATE TABLE IF NOT EXISTS announcements (
 CREATE INDEX IF NOT EXISTS idx_announcements_category ON announcements(category);
 CREATE INDEX IF NOT EXISTS idx_announcements_created_at ON announcements(created_at DESC);
 
+-- 3. Job Postings Table
+CREATE TABLE IF NOT EXISTS job_postings (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    company VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL DEFAULT 'Remote',
+    job_type VARCHAR(50) NOT NULL DEFAULT 'Full-Time'
+        CHECK (job_type IN ('Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote')),
+    description TEXT NOT NULL,
+    requirements TEXT,
+    salary_range VARCHAR(100),
+    application_url VARCHAR(500),
+    contact_email VARCHAR(255),
+    poster_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'Active'
+        CHECK (status IN ('Active', 'Closed', 'Draft', 'Expired')),
+    deadline TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for job postings
+CREATE INDEX IF NOT EXISTS idx_job_postings_poster_id ON job_postings(poster_id);
+CREATE INDEX IF NOT EXISTS idx_job_postings_status ON job_postings(status);
+CREATE INDEX IF NOT EXISTS idx_job_postings_job_type ON job_postings(job_type);
+CREATE INDEX IF NOT EXISTS idx_job_postings_company ON job_postings(company);
+CREATE INDEX IF NOT EXISTS idx_job_postings_created_at ON job_postings(created_at DESC);
+
 -- Automatic timestamp trigger function
 CREATE OR REPLACE FUNCTION update_timestamp_column()
 RETURNS TRIGGER AS $$
@@ -300,6 +380,11 @@ EXECUTE FUNCTION update_timestamp_column();
 
 CREATE TRIGGER set_timestamp_announcements
 BEFORE UPDATE ON announcements
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp_column();
+
+CREATE TRIGGER set_timestamp_job_postings
+BEFORE UPDATE ON job_postings
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp_column();
 ```

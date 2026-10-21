@@ -364,6 +364,7 @@ The Alumni Tracking System employs a structured relational data model strictly e
 - **Relational Schema:**
   - `users`: `id` (SERIAL PK), `name` (VARCHAR), `email` (VARCHAR UNIQUE NOT NULL), `role` (VARCHAR), `department` (VARCHAR), `graduation_year` (INTEGER), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
   - `announcements`: `id` (SERIAL PK), `title` (VARCHAR NOT NULL), `content` (TEXT NOT NULL), `author` (VARCHAR), `category` (VARCHAR), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
+  - `job_postings`: `id` (SERIAL PK), `title` (VARCHAR NOT NULL), `company` (VARCHAR NOT NULL), `location` (VARCHAR), `job_type` (VARCHAR), `description` (TEXT NOT NULL), `requirements` (TEXT), `salary_range` (VARCHAR), `application_url` (VARCHAR), `contact_email` (VARCHAR), `poster_id` (INTEGER FK), `status` (VARCHAR), `deadline` (TIMESTAMPTZ), `created_at` (TIMESTAMP), `updated_at` (TIMESTAMP).
 
 📖 For comprehensive entity specifications, schema definitions, validation rules, Mermaid ER diagrams, and PostgreSQL migration DDL, see the full document:  
 👉 **[Data Design Documentation](docs/ddd.md)**
