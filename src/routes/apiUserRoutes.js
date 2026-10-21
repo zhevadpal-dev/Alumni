@@ -17,4 +17,9 @@ router.put('/api/users/:id', ApiUserController.updateUserPut);
 router.patch('/api/users/:id', ApiUserController.updateUserPatch);
 router.delete('/api/users/:id', ApiUserController.deleteUser);
 
+// REST API relational sub-routes
+router.get('/api/users/:id/announcements', ApiUserController.getUserAnnouncements);
+router.get('/api/users/:id/jobs', ApiUserController.getUserJobs);
+router.get('/api/users/:id/relations', ApiUserController.getUserRelations);
+
 module.exports = router;

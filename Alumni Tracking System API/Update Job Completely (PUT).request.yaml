@@ -1,0 +1,19 @@
+$kind: http-request
+description: Replaces all attributes of an existing job posting.
+url: "{{baseUrl}}/api/jobs/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Lead Cloud Systems Architect",
+      "company": "ScaleCloud Inc.",
+      "location": "Remote",
+      "jobType": "Full-Time",
+      "description": "Principal engineer designing global distributed edge caching and microservices.",
+      "salaryRange": "$110,000 - $140,000",
+      "status": "Active"
+    }
+order: 8400

@@ -1,0 +1,23 @@
+$kind: http-request
+description: Creates and persists a new job posting in PostgreSQL with validation.
+url: "{{baseUrl}}/api/jobs"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Cloud Infrastructure Engineer",
+      "company": "ScaleCloud Inc.",
+      "location": "Istanbul / Remote",
+      "jobType": "Full-Time",
+      "description": "Lead container infrastructure, CI/CD automation, and PostgreSQL database performance tuning.",
+      "requirements": "Node.js, Docker, Kubernetes, SQL",
+      "salaryRange": "$80,000 - $110,000",
+      "applicationUrl": "https://careers.scalecloud.example.com/apply/infra",
+      "contactEmail": "talent@scalecloud.example.com",
+      "posterId": 1,
+      "status": "Active"
+    }
+order: 8200

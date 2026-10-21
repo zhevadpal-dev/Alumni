@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning user #1 with eager-loaded announcements and jobPostings collections.
+url: "{{baseUrl}}/api/users/1/relations"
+method: GET
+headers:
+  Accept: application/json
+order: 8900

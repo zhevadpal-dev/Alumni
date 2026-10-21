@@ -1,0 +1,7 @@
+$kind: http-request
+description: Direct relational sub-route returning the User entity who posted the job.
+url: "{{baseUrl}}/api/jobs/1/poster"
+method: GET
+headers:
+  Accept: application/json
+order: 8350

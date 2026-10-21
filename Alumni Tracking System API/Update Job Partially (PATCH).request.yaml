@@ -1,0 +1,13 @@
+$kind: http-request
+description: Partially updates attributes (e.g. status) of an existing job posting.
+url: "{{baseUrl}}/api/jobs/1"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "Closed"
+    }
+order: 8500

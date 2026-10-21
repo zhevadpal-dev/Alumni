@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning all job postings created by user #1.
+url: "{{baseUrl}}/api/users/1/jobs"
+method: GET
+headers:
+  Accept: application/json
+order: 8800

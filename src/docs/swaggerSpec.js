@@ -42,6 +42,14 @@ const swaggerSpec = {
     {
       name: 'Core Lab Routes',
       description: 'Basic laboratory and greeting endpoints'
+    },
+    {
+      name: 'API Job Postings (ApiJobController)',
+      description: 'RESTful API job posting endpoints returning standard JSON payloads (/api/jobs)'
+    },
+    {
+      name: 'Domain Relations & Sub-Resources',
+      description: 'Relational query endpoints navigating associations between Users, Announcements, and Job Postings'
     }
   ],
   paths: {
@@ -1303,6 +1311,441 @@ const swaggerSpec = {
           }
         }
       }
+    },
+    '/api/jobs': {
+      get: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'List all job postings',
+        description: 'Retrieves all job postings with optional filtering by status, job type, company, location, poster user, substring search, and pagination.',
+        parameters: [
+          {
+            name: 'status',
+            in: 'query',
+            required: false,
+            description: 'Filter by job lifecycle status',
+            schema: { type: 'string', enum: ['Active', 'Closed', 'Draft', 'Expired'] }
+          },
+          {
+            name: 'jobType',
+            in: 'query',
+            required: false,
+            description: 'Filter by employment type',
+            schema: { type: 'string', enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote'] }
+          },
+          {
+            name: 'company',
+            in: 'query',
+            required: false,
+            description: 'Filter by company name substring',
+            schema: { type: 'string', example: 'TechCorp' }
+          },
+          {
+            name: 'location',
+            in: 'query',
+            required: false,
+            description: 'Filter by location substring',
+            schema: { type: 'string', example: 'Remote' }
+          },
+          {
+            name: 'posterId',
+            in: 'query',
+            required: false,
+            description: 'Filter by author poster user ID',
+            schema: { type: 'integer', example: 1 }
+          },
+          {
+            name: 'search',
+            in: 'query',
+            required: false,
+            description: 'Substring search across title, company, description, and requirements',
+            schema: { type: 'string', example: 'Backend' }
+          },
+          {
+            name: 'withPoster',
+            in: 'query',
+            required: false,
+            description: 'Whether to eager-load and join poster User profile details',
+            schema: { type: 'boolean', example: true }
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            description: 'Maximum number of items to return',
+            schema: { type: 'integer', example: 10 }
+          },
+          {
+            name: 'page',
+            in: 'query',
+            required: false,
+            description: 'Page number for pagination',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of job postings matching filter criteria',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    count: { type: 'integer', example: 3 },
+                    data: {
+                      type: 'array',
+                      items: { $ref: '#/components/schemas/JobPosting' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '500': {
+            description: 'Internal server error',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+          }
+        }
+      },
+      post: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'Create a new job posting',
+        description: 'Creates and persists a new job posting record in PostgreSQL.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/JobPostingInput' }
+            }
+          }
+        },
+        responses: {
+          '201': {
+            description: 'Job posting created successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Job posting created successfully.' },
+                    data: { $ref: '#/components/schemas/JobPosting' }
+                  }
+                }
+              }
+            }
+          },
+          '400': {
+            description: 'Validation failure or invalid payload',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+          }
+        }
+      }
+    },
+    '/api/jobs/{id}': {
+      get: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'Get single job posting by ID',
+        description: 'Retrieves a single job posting by ID joined with its poster User details.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Job posting found and returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/JobPosting' }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: 'Job posting not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+          }
+        }
+      },
+      put: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'Update job posting completely (PUT)',
+        description: 'Replaces all attributes of the specified job posting record.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/JobPostingInput' }
+            }
+          }
+        },
+        responses: {
+          '200': {
+            description: 'Job posting updated successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Job posting updated successfully.' },
+                    data: { $ref: '#/components/schemas/JobPosting' }
+                  }
+                }
+              }
+            }
+          },
+          '400': { description: 'Validation error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          '404': { description: 'Job posting not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+        }
+      },
+      patch: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'Update job posting partially (PATCH)',
+        description: 'Updates only provided attributes of the specified job posting.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { type: 'object', properties: { status: { type: 'string', enum: ['Active', 'Closed', 'Draft', 'Expired'] } } }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'Job posting partially updated successfully' },
+          '404': { description: 'Job posting not found' }
+        }
+      },
+      delete: {
+        tags: ['API Job Postings (ApiJobController)'],
+        summary: 'Delete job posting by ID',
+        description: 'Permanently deletes a job posting from the PostgreSQL database.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting to delete',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Job posting deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    message: { type: 'string', example: 'Job posting with ID 1 was deleted successfully.' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Job posting not found' }
+        }
+      }
+    },
+    '/api/jobs/{id}/poster': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get poster user for a job posting',
+        description: 'Direct relational sub-route returning the User entity who posted the job.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the job posting',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Poster user record returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    jobId: { type: 'integer', example: 1 },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Job posting or poster user not found' }
+        }
+      }
+    },
+    '/api/users/{id}/announcements': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get announcements authored by user',
+        description: 'Direct relational sub-route returning all announcements created by the specified user (1-to-Many).',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the user',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of announcements authored by the user',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    userId: { type: 'integer', example: 1 },
+                    count: { type: 'integer', example: 2 },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/Announcement' } }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/api/users/{id}/jobs': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get job postings created by user',
+        description: 'Direct relational sub-route returning all job postings posted by the specified user (1-to-Many).',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the user',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'List of job postings created by the user',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    userId: { type: 'integer', example: 1 },
+                    count: { type: 'integer', example: 2 },
+                    data: { type: 'array', items: { $ref: '#/components/schemas/JobPosting' } }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/api/users/{id}/relations': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get user profile with full relations',
+        description: 'Direct relational sub-route returning user record eager-loaded with both announcements and jobPostings collections.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the user',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'User record with eager-loaded relations returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    data: { $ref: '#/components/schemas/UserWithRelations' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'User not found' }
+        }
+      }
+    },
+    '/api/announcements/{id}/author': {
+      get: {
+        tags: ['Domain Relations & Sub-Resources'],
+        summary: 'Get author user for an announcement',
+        description: 'Direct relational sub-route returning the User entity who authored the announcement.',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Numeric ID of the announcement',
+            schema: { type: 'integer', example: 1 }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'Author user entity returned',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'success' },
+                    announcementId: { type: 'integer', example: 1 },
+                    data: { $ref: '#/components/schemas/User' }
+                  }
+                }
+              }
+            }
+          },
+          '404': { description: 'Announcement or author user not found' }
+        }
+      }
     }
   },
   components: {
@@ -1351,6 +1794,76 @@ const swaggerSpec = {
           content: { type: 'string', example: 'Connect with current undergraduate students to provide career mentorship...' },
           author: { type: 'string', example: 'Career Development Center' },
           category: { type: 'string', enum: ['General', 'Event', 'Career', 'Academic', 'News', 'Urgent'], example: 'Career' }
+        }
+      },
+      JobPosting: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          title: { type: 'string', example: 'Senior Backend Engineer' },
+          company: { type: 'string', example: 'TechCorp Solutions' },
+          location: { type: 'string', example: 'Remote' },
+          jobType: { type: 'string', enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote'], example: 'Full-Time' },
+          description: { type: 'string', example: 'Architect high-throughput microservices and maintain distributed systems...' },
+          requirements: { type: 'string', example: '3+ years Node.js, PostgreSQL, Docker' },
+          salaryRange: { type: 'string', example: '$85,000 - $115,000' },
+          applicationUrl: { type: 'string', example: 'https://careers.example.com/apply' },
+          contactEmail: { type: 'string', format: 'email', example: 'recruiting@example.com' },
+          posterId: { type: 'integer', example: 1 },
+          status: { type: 'string', enum: ['Active', 'Closed', 'Draft', 'Expired'], example: 'Active' },
+          deadline: { type: 'string', format: 'date-time', example: '2026-12-31T23:59:59.000Z' },
+          createdAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          updatedAt: { type: 'string', format: 'date-time', example: '2026-10-21T10:00:00.000Z' },
+          poster: {
+            type: 'object',
+            nullable: true,
+            properties: {
+              id: { type: 'integer', example: 1 },
+              name: { type: 'string', example: 'Said Hasan' },
+              email: { type: 'string', example: 'said@example.com' },
+              role: { type: 'string', example: 'admin' },
+              department: { type: 'string', example: 'Computer Science' }
+            }
+          }
+        }
+      },
+      JobPostingInput: {
+        type: 'object',
+        required: ['title', 'company', 'description'],
+        properties: {
+          title: { type: 'string', example: 'Senior Backend Engineer' },
+          company: { type: 'string', example: 'TechCorp Solutions' },
+          location: { type: 'string', example: 'Remote' },
+          jobType: { type: 'string', enum: ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote'], example: 'Full-Time' },
+          description: { type: 'string', example: 'Architect high-throughput microservices and maintain distributed systems...' },
+          requirements: { type: 'string', example: '3+ years Node.js, PostgreSQL, Docker' },
+          salaryRange: { type: 'string', example: '$85,000 - $115,000' },
+          applicationUrl: { type: 'string', example: 'https://careers.example.com/apply' },
+          contactEmail: { type: 'string', format: 'email', example: 'recruiting@example.com' },
+          posterId: { type: 'integer', example: 1 },
+          status: { type: 'string', enum: ['Active', 'Closed', 'Draft', 'Expired'], example: 'Active' },
+          deadline: { type: 'string', format: 'date-time', example: '2026-12-31T23:59:59.000Z' }
+        }
+      },
+      UserWithRelations: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 1 },
+          name: { type: 'string', example: 'Said Hasan' },
+          email: { type: 'string', format: 'email', example: 'said@example.com' },
+          role: { type: 'string', example: 'admin' },
+          department: { type: 'string', example: 'Computer Science' },
+          graduationYear: { type: 'integer', example: 2022 },
+          createdAt: { type: 'string', format: 'date-time', example: '2026-09-30T07:30:00.000Z' },
+          updatedAt: { type: 'string', format: 'date-time', example: '2026-09-30T07:44:00.000Z' },
+          announcements: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/Announcement' }
+          },
+          jobPostings: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/JobPosting' }
+          }
         }
       },
       HealthResponse: {

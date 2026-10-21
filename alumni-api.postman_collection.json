@@ -673,6 +673,292 @@
         "description": "Returns placeholder about page text."
       },
       "response": []
+    },
+    {
+      "name": "Get All Jobs (API)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs?withPoster=true",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs"
+          ],
+          "query": [
+            {
+              "key": "withPoster",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "Retrieves all career opportunities and job postings with optional filters (status, jobType, search) and joined poster user."
+      },
+      "response": []
+    },
+    {
+      "name": "Create Job Posting (API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Cloud Infrastructure Engineer\",\n  \"company\": \"ScaleCloud Inc.\",\n  \"location\": \"Istanbul / Remote\",\n  \"jobType\": \"Full-Time\",\n  \"description\": \"Lead container infrastructure, CI/CD automation, and PostgreSQL database performance tuning.\",\n  \"requirements\": \"Node.js, Docker, Kubernetes, SQL\",\n  \"salaryRange\": \"$80,000 - $110,000\",\n  \"applicationUrl\": \"https://careers.scalecloud.example.com/apply/infra\",\n  \"contactEmail\": \"talent@scalecloud.example.com\",\n  \"posterId\": 1,\n  \"status\": \"Active\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs"
+          ]
+        },
+        "description": "Creates and persists a new job posting in PostgreSQL with validation."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Job by ID (API)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1"
+          ]
+        },
+        "description": "Retrieves a single job posting by ID joined with poster User entity."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Job Poster (API)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1/poster",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1",
+            "poster"
+          ]
+        },
+        "description": "Direct relational sub-route returning the User entity who posted the job."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Job Completely (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Lead Cloud Systems Architect\",\n  \"company\": \"ScaleCloud Inc.\",\n  \"location\": \"Remote\",\n  \"jobType\": \"Full-Time\",\n  \"description\": \"Principal engineer designing global distributed edge caching and microservices.\",\n  \"salaryRange\": \"$110,000 - $140,000\",\n  \"status\": \"Active\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1"
+          ]
+        },
+        "description": "Replaces all attributes of an existing job posting."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Job Partially (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Closed\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1"
+          ]
+        },
+        "description": "Partially updates attributes (e.g. status) of an existing job posting."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Job by ID (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs",
+            "1"
+          ]
+        },
+        "description": "Permanently deletes a job posting from the database."
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Announcements (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1/announcements",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1",
+            "announcements"
+          ]
+        },
+        "description": "Relational sub-route returning all announcements authored by user #1."
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Jobs (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1",
+            "jobs"
+          ]
+        },
+        "description": "Relational sub-route returning all job postings created by user #1."
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Profile with Relations (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1/relations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1",
+            "relations"
+          ]
+        },
+        "description": "Relational sub-route returning user #1 with eager-loaded announcements and jobPostings collections."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Announcement Author (API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/1/author",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "1",
+            "author"
+          ]
+        },
+        "description": "Relational sub-route returning the author User entity for announcement #1."
+      },
+      "response": []
     }
   ]
 }

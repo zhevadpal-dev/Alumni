@@ -258,6 +258,118 @@ class ApiUserController {
       });
     }
   }
+
+  // ==========================================
+  // RELATIONAL SUB-ROUTES
+  // ==========================================
+
+  /**
+   * GET /api/users/:id/announcements
+   * Retrieve all announcements authored by a specific user.
+   */
+  static async getUserAnnouncements(req, res) {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await UserModel.exists(userId);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      const announcements = await UserModel.getAnnouncements(userId, req.query);
+      return res.status(200).json({
+        status: 'success',
+        userId,
+        count: announcements.length,
+        data: announcements
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching user announcements.'
+      });
+    }
+  }
+
+  /**
+   * GET /api/users/:id/jobs
+   * Retrieve all job postings created by a specific user.
+   */
+  static async getUserJobs(req, res) {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const exists = await UserModel.exists(userId);
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      const jobs = await UserModel.getJobPostings(userId, req.query);
+      return res.status(200).json({
+        status: 'success',
+        userId,
+        count: jobs.length,
+        data: jobs
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching user job postings.'
+      });
+    }
+  }
+
+  /**
+   * GET /api/users/:id/relations
+   * Retrieve full user profile with eager-loaded announcements and jobPostings.
+   */
+  static async getUserRelations(req, res) {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const user = await UserModel.findByIdWithRelations(userId);
+      if (!user) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User with ID ${userId} not found.`
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: user
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching user relations.'
+      });
+    }
+  }
 }
 
 // REST Resource Aliases for standard MVC frameworks

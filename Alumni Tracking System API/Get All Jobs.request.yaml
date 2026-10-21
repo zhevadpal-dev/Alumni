@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieves all career opportunities and job postings with optional filters (status, jobType, search) and joined poster user.
+url: "{{baseUrl}}/api/jobs?withPoster=true"
+method: GET
+headers:
+  Accept: application/json
+order: 8100

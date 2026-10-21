@@ -1,0 +1,5 @@
+$kind: http-request
+description: Permanently deletes a job posting from the database.
+url: "{{baseUrl}}/api/jobs/1"
+method: DELETE
+order: 8600

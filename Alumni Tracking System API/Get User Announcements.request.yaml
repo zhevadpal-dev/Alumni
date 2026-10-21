@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning all announcements authored by user #1.
+url: "{{baseUrl}}/api/users/1/announcements"
+method: GET
+headers:
+  Accept: application/json
+order: 8700

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Relational sub-route returning the author User entity for announcement #1.
+url: "{{baseUrl}}/api/announcements/1/author"
+method: GET
+headers:
+  Accept: application/json
+order: 8950

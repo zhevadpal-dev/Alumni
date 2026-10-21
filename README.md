@@ -598,17 +598,35 @@ npm run dev
 | `POST` / `PUT` | `/announcements/:id` & `/announcements/:id/edit` | **Update (Action)** | `renderUpdateSuccess(announcement)` | Updates announcement and renders HTML updated view |
 | `POST` / `DELETE` | `/announcements/:id` & `/announcements/:id/delete` | **Delete (Action)** | `renderDeleteSuccess(announcement)` | Deletes announcement and renders HTML deletion confirmation |
 
-### Planned Alumni Management Endpoints
+### 💼 REST API Job Posting Endpoints (`ApiJobController` ➡️ `/api/jobs`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/jobs` | List job postings (supports `status`, `jobType`, `company`, `location`, `posterId`, `search`, `withPoster`, `limit`, `page`) | Returns JSON array of job postings |
+| `POST` | `/api/jobs` | Create new job posting (validates whitelist `jobType`, `status`, URLs) | Body: `title`, `company`, `description`, `jobType`, `salaryRange`, etc. |
+| `GET` | `/api/jobs/:id` | Retrieve single job posting by ID with poster details | Returns JSON job posting joined with poster user |
+| `PUT` | `/api/jobs/:id` | Full replacement of job posting record | Body: `title`, `company`, `description`, etc. |
+| `PATCH` | `/api/jobs/:id` | Partial update of job posting fields | Body: fields to update (e.g. `status: 'Closed'`) |
+| `DELETE` | `/api/jobs/:id` | Delete job posting by ID | Returns deleted job posting JSON |
+
+### 🔗 Domain Relational Endpoints (Direct Sub-Resources)
+
+| Method | Endpoint | Association Type | Description | Output |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/users/:id/announcements` | **1-to-Many** | Retrieve all announcements authored by user `:id` | JSON array of announcements |
+| `GET` | `/api/users/:id/jobs` | **1-to-Many** | Retrieve all job postings created by user `:id` | JSON array of job postings |
+| `GET` | `/api/users/:id/relations` | **Full Composite** | Retrieve user with eager-loaded `announcements` and `jobPostings` | JSON user object with nested arrays |
+| `GET` | `/api/announcements/:id/author` | **Belongs-To** | Retrieve author User profile for announcement `:id` | JSON author user object |
+| `GET` | `/api/jobs/:id/poster` | **Belongs-To** | Retrieve poster User profile for job posting `:id` | JSON poster user object |
+
+### Planned Future Endpoints
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Register a new user profile |
+| `POST` | `/api/auth/register` | Register a new user profile with password hashing |
 | `POST` | `/api/auth/login` | Authenticate user and issue JWT bearer token |
-| `GET` | `/api/alumni` | Search and filter graduate records |
-| `GET` | `/api/alumni/:id` | Retrieve comprehensive alumni profile |
-| `PUT` | `/api/alumni/:id` | Update profile information |
-| `GET` | `/api/jobs` | Retrieve active career opportunities |
-| `POST` | `/api/jobs` | Submit a new career or internship listing |
+| `GET` | `/api/alumni` | Search and filter verified graduate records |
+| `GET` | `/api/alumni/:id` | Retrieve comprehensive verified alumni dossier |
 
 ---
 

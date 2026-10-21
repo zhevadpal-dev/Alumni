@@ -176,6 +176,60 @@ class ApiAnnouncementController {
       });
     }
   }
+
+  // ==========================================
+  // RELATIONAL SUB-ROUTES
+  // ==========================================
+
+  /**
+   * GET /api/announcements/:id/author
+   * Retrieve the User entity who authored this announcement.
+   */
+  static async getAuthor(req, res) {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Announcement ID must be a valid integer.'
+      });
+    }
+
+    try {
+      const item = await AnnouncementModel.getById(id);
+      if (!item) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Announcement with ID ${id} not found.`
+        });
+      }
+
+      if (!item.authorId) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Announcement with ID ${id} does not have an associated author user.`
+        });
+      }
+
+      const author = await AnnouncementModel.getAuthor(id);
+      if (!author) {
+        return res.status(404).json({
+          status: 'error',
+          message: `Author user with ID ${item.authorId} was not found.`
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        announcementId: id,
+        data: author
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error while fetching announcement author.'
+      });
+    }
+  }
 }
 
 // REST Resource Aliases

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieves a single job posting by ID joined with poster User entity.
+url: "{{baseUrl}}/api/jobs/1"
+method: GET
+headers:
+  Accept: application/json
+order: 8300

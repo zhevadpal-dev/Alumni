@@ -17,4 +17,7 @@ router.put('/api/announcements/:id', ApiAnnouncementController.update);
 router.patch('/api/announcements/:id', ApiAnnouncementController.update);
 router.delete('/api/announcements/:id', ApiAnnouncementController.remove);
 
+// REST API relational sub-route
+router.get('/api/announcements/:id/author', ApiAnnouncementController.getAuthor);
+
 module.exports = router;
