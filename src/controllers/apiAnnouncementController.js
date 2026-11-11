@@ -17,7 +17,7 @@ class ApiAnnouncementController {
    * GET /api/announcements
    * Retrieve all announcements with optional filtering by category, search, author, and pagination.
    */
-  static async getAll(req, res) {
+  static async getAll(req, res, next) {
     try {
       const items = await AnnouncementModel.getAll(req.query);
       return res.status(200).json({
@@ -26,10 +26,7 @@ class ApiAnnouncementController {
         data: items
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching announcements.'
-      });
+      next(err);
     }
   }
 
@@ -37,7 +34,7 @@ class ApiAnnouncementController {
    * GET /api/announcements/:id
    * Retrieve a single announcement by its numeric ID.
    */
-  static async getById(req, res) {
+  static async getById(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -60,10 +57,7 @@ class ApiAnnouncementController {
         data: item
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching announcement.'
-      });
+      next(err);
     }
   }
 
@@ -71,7 +65,7 @@ class ApiAnnouncementController {
    * POST /api/announcements
    * Create a new announcement in PostgreSQL.
    */
-  static async create(req, res) {
+  static async create(req, res, next) {
     const { title, content, author, category } = req.body || {};
 
     if (!title || !content) {
@@ -95,10 +89,13 @@ class ApiAnnouncementController {
         data: created
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -106,7 +103,7 @@ class ApiAnnouncementController {
    * PUT /api/announcements/:id & PATCH /api/announcements/:id
    * Update an existing announcement in PostgreSQL.
    */
-  static async update(req, res) {
+  static async update(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -130,10 +127,13 @@ class ApiAnnouncementController {
         data: updated
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -141,7 +141,7 @@ class ApiAnnouncementController {
    * DELETE /api/announcements/:id
    * Delete an existing announcement from PostgreSQL by ID.
    */
-  static async remove(req, res) {
+  static async remove(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -170,10 +170,7 @@ class ApiAnnouncementController {
         data: deleted
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while deleting announcement.'
-      });
+      next(err);
     }
   }
 
@@ -185,7 +182,7 @@ class ApiAnnouncementController {
    * GET /api/announcements/:id/author
    * Retrieve the User entity who authored this announcement.
    */
-  static async getAuthor(req, res) {
+  static async getAuthor(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -224,10 +221,7 @@ class ApiAnnouncementController {
         data: author
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching announcement author.'
-      });
+      next(err);
     }
   }
 }

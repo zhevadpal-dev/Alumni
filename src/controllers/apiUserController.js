@@ -12,7 +12,7 @@ class ApiUserController {
    * GET /api/users
    * List all user records with optional filter, search, and pagination.
    */
-  static async getAllUsers(req, res) {
+  static async getAllUsers(req, res, next) {
     try {
       const users = await UserModel.findAll(req.query);
       return res.status(200).json({
@@ -21,10 +21,7 @@ class ApiUserController {
         data: users
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching users.'
-      });
+      next(err);
     }
   }
 
@@ -32,7 +29,7 @@ class ApiUserController {
    * GET /api/users/:id
    * Retrieve a single user record by numeric ID.
    */
-  static async getUserById(req, res) {
+  static async getUserById(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -55,10 +52,7 @@ class ApiUserController {
         data: user
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user.'
-      });
+      next(err);
     }
   }
 
@@ -66,7 +60,7 @@ class ApiUserController {
    * POST /api/users
    * Create a new user record in PostgreSQL.
    */
-  static async createUser(req, res) {
+  static async createUser(req, res, next) {
     const name = req.body?.name || req.query?.name;
     const email = req.body?.email || req.query?.email;
     const role = req.body?.role || req.query?.role;
@@ -102,10 +96,13 @@ class ApiUserController {
         data: newUser
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -113,7 +110,7 @@ class ApiUserController {
    * PUT /api/users/:id
    * Fully update/replace an existing user record.
    */
-  static async updateUserPut(req, res) {
+  static async updateUserPut(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -163,10 +160,13 @@ class ApiUserController {
         data: updatedUser
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -174,7 +174,7 @@ class ApiUserController {
    * PATCH /api/users/:id
    * Partially update specific fields of an existing user record.
    */
-  static async updateUserPatch(req, res) {
+  static async updateUserPatch(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -217,10 +217,13 @@ class ApiUserController {
         data: updatedUser
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -228,7 +231,7 @@ class ApiUserController {
    * DELETE /api/users/:id
    * Delete an existing user record by numeric ID.
    */
-  static async deleteUser(req, res) {
+  static async deleteUser(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -252,10 +255,7 @@ class ApiUserController {
         data: deletedUser
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while deleting user.'
-      });
+      next(err);
     }
   }
 
@@ -267,7 +267,7 @@ class ApiUserController {
    * GET /api/users/:id/announcements
    * Retrieve all announcements authored by a specific user.
    */
-  static async getUserAnnouncements(req, res) {
+  static async getUserAnnouncements(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -293,10 +293,7 @@ class ApiUserController {
         data: announcements
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user announcements.'
-      });
+      next(err);
     }
   }
 
@@ -304,7 +301,7 @@ class ApiUserController {
    * GET /api/users/:id/jobs
    * Retrieve all job postings created by a specific user.
    */
-  static async getUserJobs(req, res) {
+  static async getUserJobs(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -330,10 +327,7 @@ class ApiUserController {
         data: jobs
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user job postings.'
-      });
+      next(err);
     }
   }
 
@@ -341,7 +335,7 @@ class ApiUserController {
    * GET /api/users/:id/relations
    * Retrieve full user profile with eager-loaded announcements and jobPostings.
    */
-  static async getUserRelations(req, res) {
+  static async getUserRelations(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -364,10 +358,7 @@ class ApiUserController {
         data: user
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user relations.'
-      });
+      next(err);
     }
   }
 
@@ -375,7 +366,7 @@ class ApiUserController {
    * GET /api/users/:id/applications
    * Retrieve all job applications submitted by a specific user.
    */
-  static async getUserApplications(req, res) {
+  static async getUserApplications(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -401,10 +392,7 @@ class ApiUserController {
         data: applications
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user applications.'
-      });
+      next(err);
     }
   }
 
@@ -412,7 +400,7 @@ class ApiUserController {
    * GET /api/users/:id/applied-jobs
    * Retrieve all job postings that a specific user has applied to (Many-to-Many).
    */
-  static async getUserAppliedJobs(req, res) {
+  static async getUserAppliedJobs(req, res, next) {
     const userId = parseInt(req.params.id, 10);
     if (isNaN(userId)) {
       return res.status(400).json({
@@ -438,10 +426,7 @@ class ApiUserController {
         data: jobs
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching user applied jobs.'
-      });
+      next(err);
     }
   }
 }

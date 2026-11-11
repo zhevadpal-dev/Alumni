@@ -22,7 +22,7 @@ class ApiApplicationController {
    * Retrieve all job applications with optional filtering and pagination.
    * Query params: userId, jobId, status, withDetails ('true' for nested objects), limit, page.
    */
-  static async getAll(req, res) {
+  static async getAll(req, res, next) {
     try {
       const withDetails = req.query.withDetails === 'true' || req.query.includeDetails === 'true';
       const items = withDetails
@@ -35,10 +35,7 @@ class ApiApplicationController {
         data: items
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching applications.'
-      });
+      next(err);
     }
   }
 
@@ -46,7 +43,7 @@ class ApiApplicationController {
    * GET /api/applications/:id
    * Retrieve a single application by ID with nested applicant and job posting details.
    */
-  static async getById(req, res) {
+  static async getById(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -69,10 +66,7 @@ class ApiApplicationController {
         data: item
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching application.'
-      });
+      next(err);
     }
   }
 
@@ -81,7 +75,7 @@ class ApiApplicationController {
    * Submit a new job application.
    * Enforces Many-to-Many uniqueness (user cannot apply twice to the same job).
    */
-  static async create(req, res) {
+  static async create(req, res, next) {
     try {
       const newApp = await ApplicationModel.create(req.body);
       return res.status(201).json({
@@ -90,10 +84,13 @@ class ApiApplicationController {
         data: newApp
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -101,7 +98,7 @@ class ApiApplicationController {
    * PUT /api/applications/:id
    * Fully update an existing application record.
    */
-  static async update(req, res) {
+  static async update(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -125,10 +122,13 @@ class ApiApplicationController {
         data: updated
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -136,7 +136,7 @@ class ApiApplicationController {
    * PATCH /api/applications/:id
    * Partially update an existing application record (e.g., status progression).
    */
-  static async patch(req, res) {
+  static async patch(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -160,10 +160,13 @@ class ApiApplicationController {
         data: updated
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 
@@ -171,7 +174,7 @@ class ApiApplicationController {
    * DELETE /api/applications/:id
    * Delete or withdraw an existing job application.
    */
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -195,10 +198,7 @@ class ApiApplicationController {
         data: deleted
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while deleting application.'
-      });
+      next(err);
     }
   }
 }

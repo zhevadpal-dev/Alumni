@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const requestLogger = require('./middlewares/logger');
 const guardian404 = require('./middlewares/guardian404');
+const guardian5xx = require('./middlewares/guardian5xx');
 const routes = require('./routes');
 
 const app = express();
@@ -52,6 +53,9 @@ app.use('/', routes);
 
 // 404 Guardian Middleware: catches all unmatched routes and returns structured JSON
 app.use(guardian404);
+
+// 5xx Guardian Middleware: Global error handler catching unhandled exceptions
+app.use(guardian5xx);
 
 // Modularity: Start server if executed directly, export app for testing
 if (require.main === module) {

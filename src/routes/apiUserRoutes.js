@@ -6,22 +6,23 @@
 const express = require('express');
 const router = express.Router();
 const ApiUserController = require('../controllers/apiUserController');
+const asyncHandler = require('../middlewares/asyncHandler');
 
 // REST API collection routes
-router.get('/api/users', ApiUserController.getAllUsers);
-router.post('/api/users', ApiUserController.createUser);
+router.get('/api/users', asyncHandler(ApiUserController.getAllUsers));
+router.post('/api/users', asyncHandler(ApiUserController.createUser));
 
 // REST API single resource routes by ID
-router.get('/api/users/:id', ApiUserController.getUserById);
-router.put('/api/users/:id', ApiUserController.updateUserPut);
-router.patch('/api/users/:id', ApiUserController.updateUserPatch);
-router.delete('/api/users/:id', ApiUserController.deleteUser);
+router.get('/api/users/:id', asyncHandler(ApiUserController.getUserById));
+router.put('/api/users/:id', asyncHandler(ApiUserController.updateUserPut));
+router.patch('/api/users/:id', asyncHandler(ApiUserController.updateUserPatch));
+router.delete('/api/users/:id', asyncHandler(ApiUserController.deleteUser));
 
 // REST API relational sub-routes
-router.get('/api/users/:id/announcements', ApiUserController.getUserAnnouncements);
-router.get('/api/users/:id/jobs', ApiUserController.getUserJobs);
-router.get('/api/users/:id/applications', ApiUserController.getUserApplications);
-router.get('/api/users/:id/applied-jobs', ApiUserController.getUserAppliedJobs);
-router.get('/api/users/:id/relations', ApiUserController.getUserRelations);
+router.get('/api/users/:id/announcements', asyncHandler(ApiUserController.getUserAnnouncements));
+router.get('/api/users/:id/jobs', asyncHandler(ApiUserController.getUserJobs));
+router.get('/api/users/:id/applications', asyncHandler(ApiUserController.getUserApplications));
+router.get('/api/users/:id/applied-jobs', asyncHandler(ApiUserController.getUserAppliedJobs));
+router.get('/api/users/:id/relations', asyncHandler(ApiUserController.getUserRelations));
 
 module.exports = router;

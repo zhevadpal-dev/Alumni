@@ -22,7 +22,7 @@ class ApiJobController {
    * GET /api/jobs
    * Retrieve all job postings with optional filtering, search, and pagination.
    */
-  static async getAll(req, res) {
+  static async getAll(req, res, next) {
     try {
       const withPoster = req.query.withPoster === 'true' || req.query.includePoster === 'true';
       const items = withPoster
@@ -35,10 +35,7 @@ class ApiJobController {
         data: items
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching job postings.'
-      });
+      next(err);
     }
   }
 
@@ -46,7 +43,7 @@ class ApiJobController {
    * GET /api/jobs/:id
    * Retrieve a single job posting by ID (joined with poster details).
    */
-  static async getById(req, res) {
+  static async getById(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -69,10 +66,7 @@ class ApiJobController {
         data: item
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching job posting.'
-      });
+      next(err);
     }
   }
 
@@ -80,7 +74,7 @@ class ApiJobController {
    * GET /api/jobs/:id/poster
    * Retrieve the user entity who posted the specified job posting (Relational Sub-Route).
    */
-  static async getPoster(req, res) {
+  static async getPoster(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -119,10 +113,7 @@ class ApiJobController {
         data: poster
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching job poster.'
-      });
+      next(err);
     }
   }
 
@@ -130,7 +121,7 @@ class ApiJobController {
    * POST /api/jobs
    * Create a new job posting in PostgreSQL.
    */
-  static async create(req, res) {
+  static async create(req, res, next) {
     const payload = req.body || {};
     try {
       const created = await JobPostingModel.create(payload);
@@ -140,11 +131,13 @@ class ApiJobController {
         data: created
       });
     } catch (err) {
-      const statusCode = err.statusCode || 400;
-      return res.status(statusCode).json({
-        status: 'error',
-        message: err.message || 'Failed to create job posting.'
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message || 'Failed to create job posting.'
+        });
+      }
+      next(err);
     }
   }
 
@@ -152,7 +145,7 @@ class ApiJobController {
    * PUT /api/jobs/:id
    * Update an existing job posting (full update).
    */
-  static async update(req, res) {
+  static async update(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -176,11 +169,13 @@ class ApiJobController {
         data: updated
       });
     } catch (err) {
-      const statusCode = err.statusCode || 400;
-      return res.status(statusCode).json({
-        status: 'error',
-        message: err.message || 'Failed to update job posting.'
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message || 'Failed to update job posting.'
+        });
+      }
+      next(err);
     }
   }
 
@@ -188,15 +183,15 @@ class ApiJobController {
    * PATCH /api/jobs/:id
    * Partially modify an existing job posting.
    */
-  static async patch(req, res) {
-    return ApiJobController.update(req, res);
+  static async patch(req, res, next) {
+    return ApiJobController.update(req, res, next);
   }
 
   /**
    * DELETE /api/jobs/:id
    * Delete an existing job posting by ID.
    */
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -220,10 +215,7 @@ class ApiJobController {
         data: deleted
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while deleting job posting.'
-      });
+      next(err);
     }
   }
 
@@ -231,7 +223,7 @@ class ApiJobController {
    * GET /api/jobs/:id/applications
    * Retrieve all applications submitted for this job posting (1-to-Many).
    */
-  static async getApplications(req, res) {
+  static async getApplications(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -257,10 +249,7 @@ class ApiJobController {
         data: applications
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching job applications.'
-      });
+      next(err);
     }
   }
 
@@ -268,7 +257,7 @@ class ApiJobController {
    * GET /api/jobs/:id/applicants
    * Retrieve all applicant users for this job posting (Many-to-Many).
    */
-  static async getApplicants(req, res) {
+  static async getApplicants(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -294,10 +283,7 @@ class ApiJobController {
         data: applicants
       });
     } catch (err) {
-      return res.status(500).json({
-        status: 'error',
-        message: err.message || 'Internal server error while fetching job applicants.'
-      });
+      next(err);
     }
   }
 
@@ -305,7 +291,7 @@ class ApiJobController {
    * POST /api/jobs/:id/apply
    * Submit an application for this specific job posting.
    */
-  static async apply(req, res) {
+  static async apply(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({
@@ -335,10 +321,13 @@ class ApiJobController {
         data: application
       });
     } catch (err) {
-      return res.status(err.statusCode || 400).json({
-        status: 'error',
-        message: err.message
-      });
+      if (err.statusCode && err.statusCode < 500) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+      next(err);
     }
   }
 }

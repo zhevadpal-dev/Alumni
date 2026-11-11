@@ -10,15 +10,16 @@
 const express = require('express');
 const router = express.Router();
 const ApiApplicationController = require('../controllers/apiApplicationController');
+const asyncHandler = require('../middlewares/asyncHandler');
 
 // REST API collection routes
-router.get('/api/applications', ApiApplicationController.getAll);
-router.post('/api/applications', ApiApplicationController.create);
+router.get('/api/applications', asyncHandler(ApiApplicationController.getAll));
+router.post('/api/applications', asyncHandler(ApiApplicationController.create));
 
 // REST API single resource routes by ID
-router.get('/api/applications/:id', ApiApplicationController.getById);
-router.put('/api/applications/:id', ApiApplicationController.update);
-router.patch('/api/applications/:id', ApiApplicationController.patch);
-router.delete('/api/applications/:id', ApiApplicationController.delete);
+router.get('/api/applications/:id', asyncHandler(ApiApplicationController.getById));
+router.put('/api/applications/:id', asyncHandler(ApiApplicationController.update));
+router.patch('/api/applications/:id', asyncHandler(ApiApplicationController.patch));
+router.delete('/api/applications/:id', asyncHandler(ApiApplicationController.delete));
 
 module.exports = router;
