@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const requestLogger = require('./middlewares/logger');
+const guardian404 = require('./middlewares/guardian404');
 const routes = require('./routes');
 
 const app = express();
@@ -48,6 +49,9 @@ app.use((req, res, next) => {
 
 // Mount routes (includes /, /hello, /sum, /about, /api/health, /api/users)
 app.use('/', routes);
+
+// 404 Guardian Middleware: catches all unmatched routes and returns structured JSON
+app.use(guardian404);
 
 // Modularity: Start server if executed directly, export app for testing
 if (require.main === module) {

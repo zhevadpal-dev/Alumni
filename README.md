@@ -161,7 +161,8 @@ Alumni/
 │   │   └── swaggerUiHtml.js         # Swagger UI HTML shell generator with CDN bundles
 │   │
 │   ├── middlewares/                 # MIDDLEWARE LAYER (Request Lifecycle & Processing)
-│   │   └── logger.js                # Global HTTP request logger middleware ([time] [method] [route] [res.type] [duration])
+│   │   ├── logger.js                # Global HTTP request logger middleware ([time] [method] [route] [res.type] [duration])
+│   │   └── guardian404.js           # 404 Guardian middleware catching all unmatched routes with structured JSON
 │   │
 │   └── app.js                       # Express app configuration, CORS, parsers, route mounting
 │
@@ -736,6 +737,7 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 - **Input Validation:** Route parameters and body payloads are parsed and validated to prevent type errors.
 - **Environment Isolation:** Sensitive credentials, connection strings, and tokens remain isolated in `.env` files and excluded from source control.
 - **Request Lifecycle Logging:** Global middleware (`src/middlewares/logger.js`) intercepts all incoming HTTP requests to compute real-time execution duration and output clean standardized log entries (`[time] [method] [route] [res.type] [duration]`).
+- **404 Route Guardian:** Fallback middleware (`src/middlewares/guardian404.js`) catches all unmatched HTTP requests across any method and path, returning a consistent, structured JSON 404 response instead of default HTML error pages.
 - **Cross-Origin Resource Sharing (CORS):** Pre-configured middleware permits secure integration with external web clients and SPAs.
 
 ---
