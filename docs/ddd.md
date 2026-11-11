@@ -121,11 +121,11 @@ The `JobPosting` entity represents career opportunities, internships, and profes
 | Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique job posting ID |
-| `title` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Job title or position designation |
+| `title` | `String` | `VARCHAR(120)` | **No** | — | Required, non-empty, trimmed, maximum 120 characters | Job title or position designation |
 | `company` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Organization or enterprise offering the position |
-| `location` | `String` | `VARCHAR(255)` | **No** | `'Remote'` | Non-empty string | Physical location or remote designation |
+| `city` / `location` | `String` \| `null` | `VARCHAR(255)` | Yes | `'Remote'` | Optional trimmed string, defaults to `'Remote'` | City or physical location / remote designation |
 | `jobType` | `String` | `VARCHAR(50)` | **No** | `'Full-Time'` | Whitelist: `'Full-Time'`, `'Part-Time'`, `'Contract'`, `'Internship'`, `'Remote'` | Employment type classification |
-| `description` | `String` | `TEXT` | **No** | — | Required, non-empty text | Detailed role responsibilities & scope |
+| `description` | `String` \| `null` | `TEXT` | Yes | `null` | Optional text | Detailed role responsibilities & scope |
 | `requirements` | `String` \| `null` | `TEXT` | Yes | `null` | Free text / bullet points | Qualifications, skills, prerequisites |
 | `salaryRange` | `String` \| `null` | `VARCHAR(100)` | Yes | `null` | Free text (e.g. `"$90k - $120k"`) | Compensation package or estimated range |
 | `applicationUrl`| `String` \| `null` | `VARCHAR(500)` | Yes | `null` | Valid `http://` or `https://` URL | External application or career portal link |
@@ -195,11 +195,12 @@ erDiagram
 
     JOB_POSTING {
         int id PK "Serial primary key"
-        string title "Position title (Required)"
+        string title "Position title (Required, max 120 chars)"
         string company "Hiring company name (Required)"
-        string location "Job location / Remote"
+        string city "City / Work location (Optional, default 'Remote')"
+        string location "Location alias / Remote (Optional)"
         string jobType "Full-Time | Part-Time | Contract | Internship | Remote"
-        string description "Role responsibilities (Required)"
+        string description "Role responsibilities (Optional)"
         string requirements "Qualifications and skills"
         string salaryRange "Compensation bracket"
         string applicationUrl "External application portal URL"
@@ -278,20 +279,24 @@ erDiagram
    - If not provided, author defaults to `'Alumni Relations Office'`.
 
 ### 6.3 Job Posting Domain Constraints
-1. **Mandatory Core Fields:**
-   - `title`, `company`, and `description` are strictly required non-empty strings.
-2. **Employment Type Whitelist:**
+1. **Mandatory Core Fields & Length Constraints:**
+   - `title`: Strictly required, non-empty, trimmed string with a maximum length of 120 characters ($1 \le \text{length} \le 120$). Postings with missing titles or titles exceeding 120 characters are rejected with `HTTP 400 Bad Request`.
+   - `company`: Strictly required, non-empty, trimmed string identifying the hiring organization.
+2. **Optional Specification Fields:**
+   - `city` (location): Optional string denoting physical work city, campus, or remote arrangement (defaults to `'Remote'` when omitted).
+   - `description`: Optional text for role overview, duties, and responsibilities. Postings without an extensive description remain valid to allow rapid opportunity sharing.
+3. **Employment Type Whitelist:**
    - Must match case-insensitively one of: `['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote']`.
    - Defaults to `'Full-Time'` when omitted.
-3. **Publication Status Lifecycle:**
+4. **Publication Status Lifecycle:**
    - Must match one of: `['Active', 'Closed', 'Draft', 'Expired']`.
    - Defaults to `'Active'`.
    - Postings with an expired `deadline` timestamp automatically transition or filter to `'Expired'`.
-4. **Application Link & Contact Validation:**
+5. **Application Link & Contact Validation:**
    - `applicationUrl` (when supplied) must match valid web URL protocols (`http://` or `https://`).
    - `contactEmail` (when supplied) must satisfy RFC 5322 email regex and normalize to lowercase.
    - For an active posting, at least one point of contact (`applicationUrl` or `contactEmail`) is recommended.
-5. **Referential Integrity & User Linking:**
+6. **Referential Integrity & User Linking:**
    - `posterId` references `users(id)`. If the posting author's account is removed, the foreign key cascades via `ON DELETE SET NULL` to preserve historical job archives.
 
 ### 6.4 Application Domain Constraints
@@ -391,12 +396,13 @@ CREATE INDEX IF NOT EXISTS idx_announcements_created_at ON announcements(created
 -- 3. Job Postings Table
 CREATE TABLE IF NOT EXISTS job_postings (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(120) NOT NULL CHECK (char_length(title) <= 120),
     company VARCHAR(255) NOT NULL,
-    location VARCHAR(255) NOT NULL DEFAULT 'Remote',
+    city VARCHAR(255) DEFAULT 'Remote',
+    location VARCHAR(255) DEFAULT 'Remote',
     job_type VARCHAR(50) NOT NULL DEFAULT 'Full-Time'
         CHECK (job_type IN ('Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote')),
-    description TEXT NOT NULL,
+    description TEXT,
     requirements TEXT,
     salary_range VARCHAR(100),
     application_url VARCHAR(500),
