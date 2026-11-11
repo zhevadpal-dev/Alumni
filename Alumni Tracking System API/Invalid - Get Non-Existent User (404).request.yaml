@@ -1,0 +1,7 @@
+$kind: http-request
+description: Tests 404 Not Found error when requesting a user ID that does not exist in the database.
+url: "{{baseUrl}}/api/users/999999"
+method: GET
+headers:
+  Accept: application/json
+order: 13100

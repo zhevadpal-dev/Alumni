@@ -1,0 +1,15 @@
+$kind: http-request
+description: Tests 400 Bad Request error when providing an invalid role not in the allowed enum (alumni, student, faculty, teacher, admin).
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Invalid Role User",
+      "email": "invalid_role@example.com",
+      "role": "superadmin"
+    }
+order: 13400

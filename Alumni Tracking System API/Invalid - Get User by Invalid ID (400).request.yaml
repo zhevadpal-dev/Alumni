@@ -1,0 +1,7 @@
+$kind: http-request
+description: Tests 400 Bad Request error when passing a non-integer user ID in the path.
+url: "{{baseUrl}}/api/users/not-an-integer"
+method: GET
+headers:
+  Accept: application/json
+order: 13000

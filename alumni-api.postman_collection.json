@@ -1446,6 +1446,415 @@
         "description": "Advance candidate application review workflow status via web action."
       },
       "response": []
+    },
+    {
+      "name": "Invalid - Get User by Invalid ID (400)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/not-an-integer",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "not-an-integer"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when passing a non-integer user ID in the path."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Get Non-Existent User (404)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "999999"
+          ]
+        },
+        "description": "Tests 404 Not Found error when requesting a user ID that does not exist in the database."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create User Missing Required Fields (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when required fields (name, email) are omitted from user creation."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create User Duplicate Email (409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Duplicate Test User\",\n  \"email\": \"said@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        },
+        "description": "Tests 409 Conflict error when attempting to register a user with an already existing email."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create User Invalid Role (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Invalid Role User\",\n  \"email\": \"invalid_role@example.com\",\n  \"role\": \"superadmin\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when providing an invalid role not in the allowed enum (alumni, student, faculty, teacher, admin)."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Update User Missing Required Fields (400)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/users/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "1"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when PUT request body is missing mandatory name or email fields."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Get Announcement by Invalid ID (400)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/not-an-integer",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "not-an-integer"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when passing a non-integer announcement ID in the path."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Get Non-Existent Announcement (404)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements",
+            "999999"
+          ]
+        },
+        "description": "Tests 404 Not Found error when requesting an announcement ID that does not exist in the database."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create Announcement Missing Fields (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/announcements",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "announcements"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when title and content are missing from announcement creation."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create Job Missing Fields (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when title, company, or description are omitted from job creation."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create Job Invalid JobType (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Software Engineer\",\n  \"company\": \"Tech Corp\",\n  \"description\": \"Building cloud applications.\",\n  \"jobType\": \"InvalidJobType\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when jobType is not one of Full-Time, Part-Time, Contract, Internship, Remote."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Create Job Invalid Application URL (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Software Engineer\",\n  \"company\": \"Tech Corp\",\n  \"description\": \"Building cloud applications.\",\n  \"applicationUrl\": \"ftp://invalid-url.example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "jobs"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when applicationUrl does not start with http:// or https://."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Submit Application Missing Fields (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications"
+          ]
+        },
+        "description": "Tests 400 Bad Request error when userId and jobId are omitted from job application submission."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Submit Application Non-Existent References (404)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 999999,\n  \"jobId\": 999999\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications"
+          ]
+        },
+        "description": "Tests 404 Not Found error when referenced userId or jobId does not exist in the database."
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid - Submit Application Duplicate (409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 3,\n  \"jobId\": 14\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "applications"
+          ]
+        },
+        "description": "Tests 409 Conflict error when user has already applied for the specified job posting."
+      },
+      "response": []
     }
   ]
 }

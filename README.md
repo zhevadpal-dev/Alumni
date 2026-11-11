@@ -694,6 +694,28 @@ npm run dev
 | `GET` | `/api/jobs/:id/applicants` | **Many-to-Many** | Retrieve all candidate Users who applied for job posting `:id` | JSON array of applicant user profiles |
 | `POST` | `/api/jobs/:id/apply` | **Action Creation** | Submit application directly for job posting `:id` | Body: `userId`, `coverLetter`, `resumeUrl`, `notes` |
 
+### ⚠️ Invalid Request Test Suite (Negative Testing & Error Handling)
+
+Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking System API/` to test input validation, business constraints, and error handling:
+
+| Scenario / Test Name | Method | Endpoint | Payload / Condition | Expected Status | Error Response Message |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Get User by Invalid ID** | `GET` | `/api/users/not-an-integer` | Non-integer ID in path | `400 Bad Request` | `User ID must be a valid integer.` |
+| **Get Non-Existent User** | `GET` | `/api/users/999999` | Non-existent user ID | `404 Not Found` | `User with ID 999999 not found.` |
+| **Create User Missing Required Fields** | `POST` | `/api/users` | `{}` (missing `name`, `email`) | `400 Bad Request` | `Name and email are required fields.` |
+| **Create User Duplicate Email** | `POST` | `/api/users` | Existing email (`said@example.com`) | `409 Conflict` | `A user with this email already exists.` |
+| **Create User Invalid Role** | `POST` | `/api/users` | `role: "superadmin"` | `400 Bad Request` | `Field "role" must be one of: alumni, student, faculty, teacher, admin.` |
+| **Update User Missing Fields (PUT)** | `PUT` | `/api/users/1` | `{}` (missing required PUT fields) | `400 Bad Request` | `PUT request requires both name and email for full update.` |
+| **Get Announcement by Invalid ID** | `GET` | `/api/announcements/not-an-integer` | Non-integer ID in path | `400 Bad Request` | `Announcement ID must be a valid integer.` |
+| **Get Non-Existent Announcement** | `GET` | `/api/announcements/999999` | Non-existent announcement ID | `404 Not Found` | `Announcement with ID 999999 not found.` |
+| **Create Announcement Missing Fields** | `POST` | `/api/announcements` | `{}` (missing `title`, `content`) | `400 Bad Request` | `Fields "title" and "content" are required.` |
+| **Create Job Missing Fields** | `POST` | `/api/jobs` | `{}` (missing `title`, `company`, `description`) | `400 Bad Request` | `Field "title" is required...; Field "company" is required...` |
+| **Create Job Invalid JobType** | `POST` | `/api/jobs` | `jobType: "InvalidJobType"` | `400 Bad Request` | `Invalid jobType "InvalidJobType". Allowed values: Full-Time, Part-Time, Contract, Internship, Remote.` |
+| **Create Job Invalid URL** | `POST` | `/api/jobs` | `applicationUrl: "ftp://bad-url"` | `400 Bad Request` | `Field "applicationUrl" must start with http:// or https://.` |
+| **Submit Application Missing Fields** | `POST` | `/api/applications` | `{}` (missing `userId`, `jobId`) | `400 Bad Request` | `Field "userId" is required...; Field "jobId" is required...` |
+| **Submit Application Non-Existent Reference** | `POST` | `/api/applications` | Non-existent `userId: 999999, jobId: 999999` | `404 Not Found` | `Referenced user or job posting does not exist.` |
+| **Submit Duplicate Application** | `POST` | `/api/applications` | User already applied to job (`userId: 3, jobId: 14`) | `409 Conflict` | `User #3 has already submitted an application for Job #14.` |
+
 ### Planned Future Endpoints
 
 | Method | Endpoint | Description |

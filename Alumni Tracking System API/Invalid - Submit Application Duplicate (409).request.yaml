@@ -1,0 +1,14 @@
+$kind: http-request
+description: Tests 409 Conflict error when user has already applied for the specified job posting.
+url: "{{baseUrl}}/api/applications"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": 3,
+      "jobId": 14
+    }
+order: 14400

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Tests 400 Bad Request error when passing a non-integer announcement ID in the path.
+url: "{{baseUrl}}/api/announcements/not-an-integer"
+method: GET
+headers:
+  Accept: application/json
+order: 13600

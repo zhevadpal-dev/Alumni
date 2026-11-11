@@ -1,0 +1,11 @@
+$kind: http-request
+description: Tests 400 Bad Request error when PUT request body is missing mandatory name or email fields.
+url: "{{baseUrl}}/api/users/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {}
+order: 13500

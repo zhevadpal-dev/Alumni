@@ -1,0 +1,11 @@
+$kind: http-request
+description: Tests 400 Bad Request error when title and content are missing from announcement creation.
+url: "{{baseUrl}}/api/announcements"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {}
+order: 13800

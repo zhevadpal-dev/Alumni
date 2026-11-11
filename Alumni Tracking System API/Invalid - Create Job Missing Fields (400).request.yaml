@@ -1,0 +1,11 @@
+$kind: http-request
+description: Tests 400 Bad Request error when title, company, or description are omitted from job creation.
+url: "{{baseUrl}}/api/jobs"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {}
+order: 13900

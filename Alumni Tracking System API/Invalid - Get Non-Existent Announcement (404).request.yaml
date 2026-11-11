@@ -1,0 +1,7 @@
+$kind: http-request
+description: Tests 404 Not Found error when requesting an announcement ID that does not exist in the database.
+url: "{{baseUrl}}/api/announcements/999999"
+method: GET
+headers:
+  Accept: application/json
+order: 13700

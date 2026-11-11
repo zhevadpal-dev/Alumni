@@ -1,0 +1,11 @@
+$kind: http-request
+description: Tests 400 Bad Request error when userId and jobId are omitted from job application submission.
+url: "{{baseUrl}}/api/applications"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {}
+order: 14200

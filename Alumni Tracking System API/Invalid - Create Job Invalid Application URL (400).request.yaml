@@ -1,0 +1,16 @@
+$kind: http-request
+description: Tests 400 Bad Request error when applicationUrl does not start with http:// or https://.
+url: "{{baseUrl}}/api/jobs"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Software Engineer",
+      "company": "Tech Corp",
+      "description": "Building cloud applications.",
+      "applicationUrl": "ftp://invalid-url.example.com"
+    }
+order: 14100

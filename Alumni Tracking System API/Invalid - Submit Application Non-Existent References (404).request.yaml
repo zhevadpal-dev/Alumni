@@ -1,0 +1,14 @@
+$kind: http-request
+description: Tests 404 Not Found error when referenced userId or jobId does not exist in the database.
+url: "{{baseUrl}}/api/applications"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": 999999,
+      "jobId": 999999
+    }
+order: 14300
