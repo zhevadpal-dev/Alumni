@@ -25,6 +25,11 @@
 7. [Data Lifecycle & State Transitions](#7-data-lifecycle--state-transitions)
 8. [Target PostgreSQL DDL Specification](#8-target-postgresql-ddl-specification)
 9. [Migration Strategy & Zero-Downtime Roadmap](#9-migration-strategy--zero-downtime-roadmap)
+10. [Observability, Telemetry & Fault Tolerance Architecture](#10-observability-telemetry--fault-tolerance-architecture)
+    - [10.1 Global Request Duration Telemetry](#101-global-request-duration-telemetry)
+    - [10.2 Dual-Mode 404 Route Guardian](#102-dual-mode-404-route-guardian)
+    - [10.3 5xx Global Error Handler & Promise Interception](#103-5xx-global-error-handler--promise-interception)
+    - [10.4 Persistent File-Based Error Auditing](#104-persistent-file-based-error-auditing)
 
 ---
 
@@ -494,3 +499,60 @@ To migrate from the in-memory array implementation to PostgreSQL without breakin
    Allows fallback to in-memory during local lightweight unit testing and seamless activation of PostgreSQL in staging/production environments.
 3. **Zero Controller Changes:**
    Controllers (`apiUserController`, `apiAnnouncementController`, etc.) continue consuming `UserModel` and `AnnouncementModel` contracts without needing to know whether queries are satisfied via memory slices or PostgreSQL connection pools.
+
+---
+
+## 10. Observability, Telemetry & Fault Tolerance Architecture
+
+To guarantee high availability, strict security boundaries, and operational observability across both API and Web presentation layers, the Alumni Tracking System integrates dedicated architectural middleware:
+
+### 10.1 Global Request Duration Telemetry
+- **Implementation:** [`src/middlewares/logger.js`](../src/middlewares/logger.js)
+- **Mechanism:** Intercepts every incoming HTTP transaction upon arrival using high-resolution monotonic timestamps (`process.hrtime` / `Date.now()`).
+- **Hook Point:** Hooks into `res.on('finish')` to calculate exact end-to-end request-response cycle duration in milliseconds.
+- **Log Format:** Standard single-line terminal output:
+  ```text
+  [time] [method] [route] [res.type] [duration]
+  15:25:41 GET /api/users 200 10ms
+  15:25:41 POST /api/users 400 5ms
+  ```
+
+### 10.2 Dual-Mode 404 Route Guardian
+- **Implementation:** [`src/middlewares/guardian404.js`](../src/middlewares/guardian404.js) & [`src/views/404.html`](../src/views/404.html)
+- **Placement:** Positioned strictly after all registered application routes to intercept any unmatched request.
+- **Content Negotiation & Routing:**
+  - **API Endpoints (`/api/*` or `Accept: application/json`):** Returns structured JSON error payloads with `HTTP 404 Not Found`:
+    ```json
+    {
+      "status": "error",
+      "message": "Route not found",
+      "path": "/api/nonexistent",
+      "method": "GET"
+    }
+    ```
+  - **Web Browser Routes:** Delivers a responsive, accessible generic 404 HTML Error Page with a "Return to Homepage" link (`/`) and quick-navigation shortcuts to Alumni Directory, Job Board, Announcements, and Swagger documentation.
+
+### 10.3 5xx Global Error Handler & Promise Interception
+- **Implementation:** [`src/middlewares/guardian5xx.js`](../src/middlewares/guardian5xx.js) & [`src/middlewares/asyncHandler.js`](../src/middlewares/asyncHandler.js)
+- **Signature:** Standard Express 4-parameter error handler `(err, req, res, next)`.
+- **Fault Shielding:**
+  - Traps all unhandled exceptions, parser errors, and database connection faults.
+  - Prevents raw HTML stack traces from leaking to client environments.
+  - Emits uniform JSON response for internal server errors:
+    ```json
+    {
+      "status": "error",
+      "message": "Internal Server Error"
+    }
+    ```
+  - Asynchronous controller handlers are wrapped via `asyncHandler` higher-order function, ensuring rejected promises automatically forward to `next(err)`.
+
+### 10.4 Persistent File-Based Error Auditing
+- **Implementation:** [`src/middlewares/guardian5xx.js`](../src/middlewares/guardian5xx.js) -> `logs/error.logs`
+- **Mechanism:** On every captured error, asynchronously appends structured forensic data:
+  - ISO 8601 Timestamp
+  - HTTP Status Code, Method, and Request Path
+  - Error Message
+  - Complete Stack Trace
+- **Security & Version Control:** The `logs/` directory and `*.logs` files are strictly isolated via `.gitignore`, preventing sensitive server stack traces or environment details from leaking to version control repositories.
+

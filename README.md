@@ -169,6 +169,8 @@ Alumni/
 │   │
 │   └── app.js                       # Express app configuration, CORS, parsers, route mounting
 │
+├── logs/                            # APPLICATION LOGS (Excluded from version control via .gitignore)
+│   └── error.logs                   # Persistent forensic error log file ([timestamp] [status] [method] [path] stack)
 ├── index.js                         # Production server entrypoint binding HTTP listener (PORT 5001)
 ├── Dockerfile                       # Multi-stage production Node.js 20 Alpine container image
 ├── docker-compose.yml               # Multi-container orchestration (Node app & PostgreSQL db)
@@ -716,12 +718,17 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 | **Get Announcement by Invalid ID** | `GET` | `/api/announcements/not-an-integer` | Non-integer ID in path | `400 Bad Request` | `Announcement ID must be a valid integer.` |
 | **Get Non-Existent Announcement** | `GET` | `/api/announcements/999999` | Non-existent announcement ID | `404 Not Found` | `Announcement with ID 999999 not found.` |
 | **Create Announcement Missing Fields** | `POST` | `/api/announcements` | `{}` (missing `title`, `content`) | `400 Bad Request` | `Fields "title" and "content" are required.` |
-| **Create Job Missing Fields** | `POST` | `/api/jobs` | `{}` (missing `title`, `company`, `description`) | `400 Bad Request` | `Field "title" is required...; Field "company" is required...` |
+| **Create Job Missing Fields** | `POST` | `/api/jobs` | `{}` (missing `title` or `company`) | `400 Bad Request` | `Field "title" is required...; Field "company" is required...` |
+| **Create Job Title Exceeds 120 Chars** | `POST` | `/api/jobs` | `title` with 121+ characters | `400 Bad Request` | `Field "title" exceeds maximum length of 120 characters.` |
 | **Create Job Invalid JobType** | `POST` | `/api/jobs` | `jobType: "InvalidJobType"` | `400 Bad Request` | `Invalid jobType "InvalidJobType". Allowed values: Full-Time, Part-Time, Contract, Internship, Remote.` |
 | **Create Job Invalid URL** | `POST` | `/api/jobs` | `applicationUrl: "ftp://bad-url"` | `400 Bad Request` | `Field "applicationUrl" must start with http:// or https://.` |
 | **Submit Application Missing Fields** | `POST` | `/api/applications` | `{}` (missing `userId`, `jobId`) | `400 Bad Request` | `Field "userId" is required...; Field "jobId" is required...` |
 | **Submit Application Non-Existent Reference** | `POST` | `/api/applications` | Non-existent `userId: 999999, jobId: 999999` | `404 Not Found` | `Referenced user or job posting does not exist.` |
 | **Submit Duplicate Application** | `POST` | `/api/applications` | User already applied to job (`userId: 3, jobId: 14`) | `409 Conflict` | `User #3 has already submitted an application for Job #14.` |
+| **Unmatched API Route (404 Guardian)** | `GET` | `/api/nonexistent` | Non-existent endpoint under `/api/*` | `404 Not Found` | `{ "status": "error", "message": "Route not found", "path": "..." }` |
+| **Unmatched Web Route (404 Guardian)** | `GET` | `/nonexistent` | Non-existent web browser path | `404 Not Found` | Rendered `404.html` with Return to Homepage button |
+| **Malformed JSON Payload** | `POST` | `/api/users` | Malformed JSON syntax (`{ invalid`) | `400 Bad Request` | `{ "status": "error", "message": "Expected property name..." }` |
+| **Unhandled Server Error (5xx Guardian)** | `GET` | `/api/*` | Uncaught runtime exception or DB crash | `500 Internal Server Error` | `{ "status": "error", "message": "Internal Server Error" }` + logged to `logs/error.logs` |
 
 ### Planned Future Endpoints
 
@@ -743,7 +750,96 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 - **404 Route Guardian:** Dual-mode fallback middleware (`src/middlewares/guardian404.js`) catches all unmatched HTTP requests across any method and path: returning a structured JSON 404 response for API endpoints (`/api/*`), and serving a polished, responsive generic 404 HTML Error Page (`src/views/404.html`) for browser and web requests.
 - **5xx Guardian Middleware (Global Error Handler):** 4-parameter error handler (`src/middlewares/guardian5xx.js`) intercepts all unhandled errors, logs detailed stack traces to `console.error` for terminal debugging, persists error records to `logs/error.logs`, and returns a structured JSON 500 response (`{ "status": "error", "message": "Internal Server Error" }`), eliminating raw HTML stack trace leakage.
 - **Async Handler Wrapper:** Standard wrapper (`src/middlewares/asyncHandler.js`) wraps asynchronous controllers and routers to ensure unhandled promise rejections are automatically forwarded to `next(err)`.
+- **Persistent Error Logging:** Asynchronous file logging writes captured error details to `logs/error.logs`, while `.gitignore` prevents sensitive diagnostic traces from being pushed to GitHub.
 - **Cross-Origin Resource Sharing (CORS):** Pre-configured middleware permits secure integration with external web clients and SPAs.
+
+---
+
+## 🛡️ Observability, Middleware Pipeline & Error Handling
+
+The application features a defense-in-depth middleware pipeline governing request observation, routing boundaries, and runtime fault tolerance:
+
+```text
+Incoming HTTP Request
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Request Logger (src/middlewares/logger.js)               │
+│    - Captures high-res start timestamp                      │
+│    - On response finish: outputs [time] [method] [path] ... │
+└────────┬────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. Core Body Parsers & CORS Middleware                      │
+│    - express.json(), express.urlencoded(), multipart parser │
+└────────┬────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 3. Application Routers (src/routes/)                        │
+│    - All async handlers wrapped via asyncHandler.js         │
+│    - Successful requests return 200/201/204                 │
+└────────┬────────────────────────────────────────────────────┘
+         │
+         ├─────────────────────────────────────────┐
+         │ (Route Unmatched)                       │ (Unhandled Exception)
+         ▼                                         ▼
+┌──────────────────────────────────────┐  ┌──────────────────────────────────────┐
+│ 4. 404 Route Guardian                │  │ 5. 5xx Global Error Handler          │
+│    (src/middlewares/guardian404.js)  │  │    (src/middlewares/guardian5xx.js)  │
+│                                      │  │                                      │
+│  - If path is /api/*:                │  │  - Logs stack trace to console.error │
+│    Returns JSON 404 error object     │  │  - Appends to logs/error.logs        │
+│                                      │  │  - Returns JSON 500 error object:    │
+│  - If Web / Browser path:            │  │    {"status":"error",                │
+│    Renders src/views/404.html page   │  │     "message":"Internal Server Error"}│
+│    with "Return to Homepage" link    │  │  - Eliminates raw HTML stack leaks   │
+└──────────────────────────────────────┘  └──────────────────────────────────────┘
+```
+
+### 1. Global Request Duration Telemetry (`logger.js`)
+- **Hook:** Intercepts every incoming request before controller dispatch.
+- **Duration Calculation:** Measures elapsed milliseconds upon `res.on('finish')`.
+- **Output:** Standard single-line terminal log:
+  ```text
+  15:37:42 GET /users 200 11ms
+  15:37:42 GET /api/users 200 1ms
+  15:37:42 GET /api/does-not-exist 404 0ms
+  15:37:42 GET /does-not-exist 404 1ms
+  ```
+
+### 2. Dual-Mode 404 Route Guardian (`guardian404.js` & `404.html`)
+- **API Guard:** When requests targeting `/api/*` (or specifying `Accept: application/json`) miss all defined routes, returns structured JSON:
+  ```json
+  {
+    "status": "error",
+    "message": "Route not found",
+    "path": "/api/nonexistent",
+    "method": "GET"
+  }
+  ```
+- **Web Browser Guard:** For UI / browser requests, renders [`src/views/404.html`](src/views/404.html) with HTTP status `404`, featuring a clean card layout, responsive design, polite error message, and a primary **"Return to Homepage"** button.
+
+### 3. 5xx Guardian & Asynchronous Error Handling (`guardian5xx.js` & `asyncHandler.js`)
+- Standard Express 4-parameter signature: `(err, req, res, next)`.
+- Traps parser failures, unhandled exceptions, database timeouts, and async promise rejections.
+- Returns clean JSON `500 Internal Server Error`, ensuring sensitive internal stack traces are never exposed to clients.
+- Every async controller is protected via `asyncHandler(fn)`, safely piping any uncaught rejection into Express's error chain.
+
+### 4. File-Based Persistent Error Logging (`logs/error.logs`)
+- Automatically captures full error forensics on every captured fault:
+  ```text
+  [2026-11-11T15:30:45.617Z] [STATUS 500] GET /api/test-crash
+  Message: Database connection failed unexpectedly
+  Stack Trace:
+  Error: Database connection failed unexpectedly
+      at /usr/src/app/src/routes/healthRoutes.js:16:9
+  --------------------------------------------------------------------------------
+  ```
+- Self-initializing: automatically creates the `logs/` directory if absent.
+- Securely isolated: `.gitignore` explicitly prevents `logs/` and `*.logs` from ever being pushed to version control.
+
 
 ---
 
