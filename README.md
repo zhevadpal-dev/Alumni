@@ -127,7 +127,8 @@ Alumni/
 │   │   ├── announcementViews.js     # Server-rendered HTML templates for announcements (List, Detail, Form)
 │   │   ├── htmlViews.js             # Server-rendered HTML page templates (Home, About, Users)
 │   │   ├── jobViews.js              # Server-rendered HTML templates for Job Board UI (List, Detail, Form)
-│   │   └── applicationViews.js      # Server-rendered HTML templates for Application Tracking UI (Dashboard, Dossier)
+│   │   ├── applicationViews.js      # Server-rendered HTML templates for Application Tracking UI (Dashboard, Dossier)
+│   │   └── 404.html                 # Generic user-friendly 404 HTML Error Page (Page Not Found)
 │   │
 │   ├── controllers/                 # CONTROLLER LAYER (Application & Business Logic)
 │   │   ├── apiAnnouncementController.js # RESTful API controller for /api/announcements (JSON CRUD, status codes)
@@ -162,7 +163,7 @@ Alumni/
 │   │
 │   ├── middlewares/                 # MIDDLEWARE LAYER (Request Lifecycle & Processing)
 │   │   ├── logger.js                # Global HTTP request logger middleware ([time] [method] [route] [res.type] [duration])
-│   │   ├── guardian404.js           # 404 Guardian middleware catching all unmatched routes with structured JSON
+│   │   ├── guardian404.js           # 404 Guardian middleware (structured JSON for /api/*, HTML page for web)
 │   │   ├── guardian5xx.js           # 5xx Guardian middleware (Global Error Handler) catching unhandled exceptions
 │   │   └── asyncHandler.js          # Asynchronous handler wrapper routing promise rejections to next(err)
 │   │
@@ -739,7 +740,7 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 - **Input Validation:** Route parameters and body payloads are parsed and validated to prevent type errors.
 - **Environment Isolation:** Sensitive credentials, connection strings, and tokens remain isolated in `.env` files and excluded from source control.
 - **Request Lifecycle Logging:** Global middleware (`src/middlewares/logger.js`) intercepts all incoming HTTP requests to compute real-time execution duration and output clean standardized log entries (`[time] [method] [route] [res.type] [duration]`).
-- **404 Route Guardian:** Fallback middleware (`src/middlewares/guardian404.js`) catches all unmatched HTTP requests across any method and path, returning a consistent, structured JSON 404 response instead of default HTML error pages.
+- **404 Route Guardian:** Dual-mode fallback middleware (`src/middlewares/guardian404.js`) catches all unmatched HTTP requests across any method and path: returning a structured JSON 404 response for API endpoints (`/api/*`), and serving a polished, responsive generic 404 HTML Error Page (`src/views/404.html`) for browser and web requests.
 - **5xx Guardian Middleware (Global Error Handler):** 4-parameter error handler (`src/middlewares/guardian5xx.js`) intercepts all unhandled errors, logs detailed stack traces to `console.error` for terminal debugging, persists error records to `logs/error.logs`, and returns a structured JSON 500 response (`{ "status": "error", "message": "Internal Server Error" }`), eliminating raw HTML stack trace leakage.
 - **Async Handler Wrapper:** Standard wrapper (`src/middlewares/asyncHandler.js`) wraps asynchronous controllers and routers to ensure unhandled promise rejections are automatically forwarded to `next(err)`.
 - **Cross-Origin Resource Sharing (CORS):** Pre-configured middleware permits secure integration with external web clients and SPAs.

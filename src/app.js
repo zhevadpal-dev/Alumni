@@ -51,7 +51,7 @@ app.use((req, res, next) => {
 // Mount routes (includes /, /hello, /sum, /about, /api/health, /api/users)
 app.use('/', routes);
 
-// 404 Guardian Middleware: catches all unmatched routes and returns structured JSON
+// 404 Guardian Middleware: catches unmatched routes (JSON for /api/*, HTML page for web requests)
 app.use(guardian404);
 
 // 5xx Guardian Middleware: Global error handler catching unhandled exceptions
