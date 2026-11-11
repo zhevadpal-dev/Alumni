@@ -160,6 +160,9 @@ Alumni/
 │   │   ├── swaggerSpec.js           # OpenAPI 3.0 specification definition (paths, schemas)
 │   │   └── swaggerUiHtml.js         # Swagger UI HTML shell generator with CDN bundles
 │   │
+│   ├── middlewares/                 # MIDDLEWARE LAYER (Request Lifecycle & Processing)
+│   │   └── logger.js                # Global HTTP request logger middleware ([time] [method] [route] [res.type] [duration])
+│   │
 │   └── app.js                       # Express app configuration, CORS, parsers, route mounting
 │
 ├── index.js                         # Production server entrypoint binding HTTP listener (PORT 5001)
@@ -732,6 +735,7 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 - **Modular Separation of Concerns:** Application configuration (`src/app.js`), route handlers (`src/routes/`), and process listeners (`index.js`) are decoupled for testability and maintainability.
 - **Input Validation:** Route parameters and body payloads are parsed and validated to prevent type errors.
 - **Environment Isolation:** Sensitive credentials, connection strings, and tokens remain isolated in `.env` files and excluded from source control.
+- **Request Lifecycle Logging:** Global middleware (`src/middlewares/logger.js`) intercepts all incoming HTTP requests to compute real-time execution duration and output clean standardized log entries (`[time] [method] [route] [res.type] [duration]`).
 - **Cross-Origin Resource Sharing (CORS):** Pre-configured middleware permits secure integration with external web clients and SPAs.
 
 ---
