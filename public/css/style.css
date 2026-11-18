@@ -7,8 +7,10 @@
 
 :root {
   /* Surface & Brand Tokens */
-  --color-primary-teal: #1c5d5f;
-  --color-primary-teal-hover: #164a4c;
+  --color-primary-cta: #16191c;
+  --color-primary-cta-hover: #2c3137;
+  --color-primary-teal: #16191c;
+  --color-primary-teal-hover: #2c3137;
   --color-ink-black: #16191c;
   --color-slate-body: #7b8187;
   --color-slate-dark: #4d5358;
@@ -32,7 +34,7 @@
 
   /* Geometry & Layout */
   --radius-card: 12px;
-  --radius-pill: 48px;
+  --radius-pill: 100px;
   --radius-badge: 9999px;
   --container-max-width: 1200px;
   --nav-height: 68px;
@@ -187,7 +189,8 @@ a {
 }
 
 .nav-link:hover {
-  color: var(--color-primary-teal);
+  color: #000000;
+  opacity: 0.7;
 }
 
 .nav-actions {
@@ -198,7 +201,7 @@ a {
 }
 
 /* ==========================================================================
-   3. BUTTONS (DEEP TEAL PILL & SECONDARY PILL)
+   3. BUTTONS (EDITORIAL INK BLACK PILL & SECONDARY PILL)
    ========================================================================== */
 .btn {
   display: inline-flex;
@@ -218,15 +221,15 @@ a {
 }
 
 .btn-primary {
-  background-color: var(--color-primary-teal);
-  color: #ffffff;
-  border-color: var(--color-primary-teal);
+  background-color: var(--color-primary-cta);
+  color: #ffffff !important;
+  border-color: var(--color-primary-cta);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-teal-hover);
-  border-color: var(--color-primary-teal-hover);
-  color: #ffffff;
+  background-color: var(--color-primary-cta-hover);
+  border-color: var(--color-primary-cta-hover);
+  color: #ffffff !important;
 }
 
 .btn-secondary {

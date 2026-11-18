@@ -164,8 +164,8 @@ class ApplicationViews {
         border: 1px solid transparent;
         transition: background 0.15s ease;
       }
-      .btn-primary { background: #2563eb; color: #ffffff; }
-      .btn-primary:hover { background: #1d4ed8; }
+      .btn-primary { background: #16191c; color: #ffffff; border-radius: 100px; }
+      .btn-primary:hover { background: #2c3137; }
       .btn-secondary { background: #ffffff; color: #334155; border-color: #cbd5e1; }
       .btn-secondary:hover { background: #f1f5f9; }
       .btn-danger { background: #ffffff; color: #dc2626; border-color: #fca5a5; }

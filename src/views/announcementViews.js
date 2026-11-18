@@ -124,8 +124,8 @@ class AnnouncementViews {
         border: none;
         transition: all 0.15s ease;
       }
-      .btn-primary { background: #2563eb; color: #ffffff; }
-      .btn-primary:hover { background: #1d4ed8; }
+      .btn-primary { background: #16191c; color: #ffffff; border-radius: 100px; }
+      .btn-primary:hover { background: #2c3137; }
       .btn-success { background: #16a34a; color: #ffffff; }
       .btn-success:hover { background: #15803d; }
       .btn-warning { background: #f59e0b; color: #ffffff; }
