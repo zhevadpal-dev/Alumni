@@ -23,258 +23,470 @@ class HtmlViews {
     const jobCount = stats.jobs !== undefined ? stats.jobs : 26;
     const appCount = stats.applications !== undefined ? stats.applications : 14;
     const annCount = stats.announcements !== undefined ? stats.announcements : 8;
-    const uptimeSeconds = Math.floor(stats.uptime || process.uptime());
-    const uptimeFormatted = `${Math.floor(uptimeSeconds / 60)}d ${uptimeSeconds % 60}s`;
 
     return `<!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-  ${getHeadTags('Alumni Tracking System — Workbench & Kontrol Paneli')}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Tracking System — Higher Ed Career & Network Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div class="container">
-    <!-- Top Navigation Header -->
-    <header class="header">
-      <div class="brand">
-        <span class="brand-icon">🎓</span>
-        <div>
-          <h1 class="title">Alumni Tracking System</h1>
-          <div class="subtitle">Yükseköğretim Mezun Takip & Kariyer Platformu</div>
-        </div>
-      </div>
-      <nav class="nav-links">
-        <a href="/" class="active">🏠 Ana Sayfa</a>
-        <a href="/jobs">💼 İş İlanları</a>
-        <a href="/applications">📝 Başvurular</a>
-        <a href="/users">👥 Mezunlar</a>
-        <a href="/announcements">📢 Duyurular</a>
-        <a href="/api/swagger">📖 API Swagger</a>
+
+  <!-- 1. STICKY HOMEBAR (TOP NAVIGATION) -->
+  <header class="sticky-nav">
+    <div class="container nav-wrapper">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-badge">ATS</span>
+        <span>Alumni Tracking System</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#directory" class="nav-link">Alumni Directory</a></li>
+          <li><a href="#jobs" class="nav-link">Job Board</a></li>
+          <li><a href="#applications" class="nav-link">Applications (ATS)</a></li>
+          <li><a href="#platform" class="nav-link">Platform</a></li>
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+        </ul>
       </nav>
-    </header>
 
-    <!-- Hero / Workbench Command Bar -->
-    <section class="bench-hero">
-      <div class="bench-badge">
-        <span>● OPERATIONAL-WORKBENCH</span>
-        <span>•</span>
-        <span>DESIGN SYSTEM 2.0</span>
+      <div class="nav-actions">
+        <a href="/users" class="btn btn-ghost btn-sm">Sign In</a>
+        <a href="#jobs" class="btn btn-primary btn-sm">Explore Careers →</a>
       </div>
-      <h1>
-        <span class="highlight">Mezun & Kariyer</span> Operasyon Masası
+    </div>
+  </header>
+
+  <!-- 2. HERO SECTION (PHOENIX ORANGE ATMOSPHERIC WASH) -->
+  <section class="hero-section">
+    <div class="container hero-content">
+      <div class="hero-pill-badge">
+        <span class="dot"></span>
+        <span>ALUMNI PLATFORM 2.0 • POSTGRESQL 15 PERSISTED</span>
+      </div>
+
+      <h1 class="hero-headline">
+        The Modern Network for <strong>Higher Education Alumni</strong>
       </h1>
-      <p>
-        Mezun veri tabanı yönetimi, iş ve staj ilanları, aday başvuru takip süreci (ATS), kurumsal duyurular ve RESTful API servislerinin tek ekrandan yönetildiği editoryal çalışma masası.
+
+      <p class="hero-subtext">
+        Connect graduates with premier career opportunities, track application lifecycles, and empower academic institutions with an editorial, high-performance database.
       </p>
 
-      <div class="pill-group">
-        <div class="pill">
-          <span class="pill-dot"></span>
-          <span>Sistem: <strong>Aktif (Online)</strong></span>
-        </div>
-        <div class="pill">
-          <span>🐘 Veritabanı: <strong>PostgreSQL 15 (ACID)</strong></span>
-        </div>
-        <div class="pill">
-          <span>🚀 Port: <strong>5001</strong></span>
-        </div>
-        <div class="pill">
-          <span>⏱️ Çalışma Süresi: <strong>${uptimeFormatted}</strong></span>
-        </div>
-        <div class="pill">
-          <span>🛡️ 404/5xx Guardians: <strong>Devrede</strong></span>
-        </div>
-      </div>
+      <form action="/users" method="GET" class="hero-capture">
+        <input type="email" placeholder="Enter alumni or university email..." aria-label="University Email" required>
+        <button type="submit" class="btn btn-primary">Get Started</button>
+      </form>
 
-      <div class="hero-actions">
-        <a href="/jobs" class="btn btn-primary">
-          <span>💼 İş İlanları Panosu</span>
-          <span>➔</span>
-        </a>
-        <a href="/applications" class="btn btn-secondary">
-          <span>📝 Başvuru Takip Sistemi</span>
-        </a>
-        <a href="/users" class="btn btn-secondary">
-          <span>👥 Mezunlar Dizini</span>
-        </a>
-        <a href="/api/swagger" class="btn btn-secondary">
-          <span>📖 Swagger UI Test</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- Key Metrics Cards -->
-    <h2 class="section-title">📊 Platform Canlı İstatistikleri</h2>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div>
-          <div class="stat-header">
-            <span class="stat-title">Kayıtlı Mezunlar</span>
-            <span class="stat-icon">👥</span>
-          </div>
-          <div class="stat-value">${userCount}</div>
-          <div class="stat-desc">Alumni, Student, Faculty, Admin rolleri</div>
+      <div class="hero-meta-strip">
+        <div class="hero-meta-item">
+          <span>🐘</span>
+          <span>ACID Relational Storage</span>
         </div>
-        <a href="/users" class="stat-link">Mezun Dizini ➔</a>
-      </div>
-
-      <div class="stat-card">
-        <div>
-          <div class="stat-header">
-            <span class="stat-title">Aktif İş İlanları</span>
-            <span class="stat-icon">💼</span>
-          </div>
-          <div class="stat-value">${jobCount}</div>
-          <div class="stat-desc">Full-Time, Remote, Staj ve Sözleşmeli</div>
+        <span>•</span>
+        <div class="hero-meta-item">
+          <span>💼</span>
+          <span>Many-to-Many ATS Pipeline</span>
         </div>
-        <a href="/jobs" class="stat-link">İlan Panosu ➔</a>
-      </div>
-
-      <div class="stat-card">
-        <div>
-          <div class="stat-header">
-            <span class="stat-title">Aday Başvuruları</span>
-            <span class="stat-icon">📝</span>
-          </div>
-          <div class="stat-value">${appCount}</div>
-          <div class="stat-desc">İncelemede, Mülakat, Kabul ve Red aşamaları</div>
-        </div>
-        <a href="/applications" class="stat-link">Başvuru Takibi ➔</a>
-      </div>
-
-      <div class="stat-card">
-        <div>
-          <div class="stat-header">
-            <span class="stat-title">Duyurular</span>
-            <span class="stat-icon">📢</span>
-          </div>
-          <div class="stat-value">${annCount}</div>
-          <div class="stat-desc">Kariyer, Etkinlik, Bülten ve Acil duyurular</div>
-        </div>
-        <a href="/announcements" class="stat-link">Duyuru Paneli ➔</a>
-      </div>
-    </div>
-
-    <!-- Core Operations Matrix -->
-    <h2 class="section-title">⚡ Çalışma Masası Modülleri (Workbench Modules)</h2>
-    <div class="modules-grid">
-      <!-- Modül 1: İş & Staj İlanları (Mint Green Taxonomy) -->
-      <div class="module-card domain-mint">
-        <div>
-          <div class="module-card-header">
-            <div class="module-card-icon">💼</div>
-            <div>
-              <div class="module-card-title">İş & Staj İlanları (Job Board)</div>
-              <span class="badge" style="background:#ffffff; color:#064e3b; border: 1px solid rgba(6,78,59,0.2);">● CAREER-PORTAL</span>
-            </div>
-          </div>
-          <div class="module-card-desc">
-            Alumni ve partner şirketlerin açtığı açık pozisyonları listeleyin, filtreleyin, yeni ilan yayınlayın ve her ilana gelen aday başvurularını doğrudan yönetin.
-          </div>
-        </div>
-        <div class="module-card-footer">
-          <a href="/jobs" class="btn btn-primary btn-sm">İlanları İncele</a>
-          <a href="/jobs/new" class="btn btn-secondary btn-sm">+ Yeni İlan Ekle</a>
-          <a href="/jobs/1" class="btn btn-secondary btn-sm">Örnek İlan (#1)</a>
-        </div>
-      </div>
-
-      <!-- Modül 2: Aday Başvuru Takip Sistemi (Canary Yellow Taxonomy) -->
-      <div class="module-card domain-canary">
-        <div>
-          <div class="module-card-header">
-            <div class="module-card-icon">📝</div>
-            <div>
-              <div class="module-card-title">Aday Takip Sistemi (Applications ATS)</div>
-              <span class="badge" style="background:#ffffff; color:#713f12; border: 1px solid rgba(113,63,18,0.2);">● ATS-WORKBENCH</span>
-            </div>
-          </div>
-          <div class="module-card-desc">
-            Mezunların kariyer fırsatlarına yaptığı başvuruları izleyin. Aday özgeçmişlerini, ön yazılarını değerlendirin ve başvuru durumlarını (Submitted ➔ Under Review ➔ Accepted) ilerletin.
-          </div>
-        </div>
-        <div class="module-card-footer">
-          <a href="/applications" class="btn btn-primary btn-sm">Başvuru Dashboard'u</a>
-          <a href="/applications/1" class="btn btn-secondary btn-sm">Aday Dosyası (#1)</a>
-          <a href="/api/applications" class="btn btn-secondary btn-sm">JSON API</a>
-        </div>
-      </div>
-
-      <!-- Modül 3: Mezunlar Dizini (Soft Violet Taxonomy) -->
-      <div class="module-card domain-violet">
-        <div>
-          <div class="module-card-header">
-            <div class="module-card-icon">👥</div>
-            <div>
-              <div class="module-card-title">Mezunlar & Ağ Dizini (Alumni Directory)</div>
-              <span class="badge" style="background:#ffffff; color:#10054d; border: 1px solid rgba(16,5,77,0.2);">● ALUMNI-DIRECTORY</span>
-            </div>
-          </div>
-          <div class="module-card-desc">
-            Mezunları isim, e-posta, bölüm, mezuniyet yılı ve çalıştıkları şirketlere göre arayın. Yeni mezun kayıtları ekleyin ve kullanıcı profil detaylarını inceleyin.
-          </div>
-        </div>
-        <div class="module-card-footer">
-          <a href="/users" class="btn btn-primary btn-sm">Mezunlar Dizini</a>
-          <a href="/users/1" class="btn btn-secondary btn-sm">Profil Görüntüle (#1)</a>
-          <a href="/api/users" class="btn btn-secondary btn-sm">Users API</a>
-        </div>
-      </div>
-
-      <!-- Modül 4: Kurumsal Duyurular (Petal Pink Taxonomy) -->
-      <div class="module-card domain-pink">
-        <div>
-          <div class="module-card-header">
-            <div class="module-card-icon">📢</div>
-            <div>
-              <div class="module-card-title">Kurumsal & Akademik Duyurular</div>
-              <span class="badge" style="background:#ffffff; color:#881337; border: 1px solid rgba(136,19,55,0.2);">● CAMPUS-EVENTS</span>
-            </div>
-          </div>
-          <div class="module-card-desc">
-            Üniversite ve mezunlar derneği duyurularını, kariyer günlerini ve etkinlik bültenlerini yayınlayın. Kategori bazında filtreleme yapın.
-          </div>
-        </div>
-        <div class="module-card-footer">
-          <a href="/announcements" class="btn btn-primary btn-sm">Duyuruları Gör</a>
-          <a href="/announcements/new" class="btn btn-secondary btn-sm">+ Yeni Duyuru</a>
-          <a href="/api/announcements" class="btn btn-secondary btn-sm">Announcements API</a>
+        <span>•</span>
+        <div class="hero-meta-item">
+          <span>🛡️</span>
+          <span>404/5xx Guardians Active</span>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Developer & API Workbench Tools -->
-    <section class="dev-workbench">
-      <h2 class="section-title">🔧 Geliştirici & API Araçları (Developer Tools)</h2>
-      <div class="dev-tools-grid">
-        <a href="/api/swagger" class="tool-box">
-          <strong>📖 Swagger UI</strong>
-          <span>Etkileşimli OpenAPI dokümantasyonu ve test konsolu</span>
-        </a>
-        <a href="/api/swagger.json" class="tool-box">
-          <strong>📋 OpenAPI JSON</strong>
-          <span>Ham OpenAPI 3.0 şeması (Postman / CI entegrasyonu)</span>
-        </a>
-        <a href="/api/health" class="tool-box">
-          <strong>🩺 Health Telemetry</strong>
-          <span>Sistem çalışma süresi, bellek ve ortam durumu</span>
-        </a>
-        <a href="/sayfa-bulunamadi" class="tool-box">
-          <strong>🛡️ 404 Sayfa Testi</strong>
-          <span>Generic 404 HTML Error Page önizlemesi</span>
-        </a>
+  <!-- 3. PASTEL TAXONOMY TILES (AMPLEMARKET PILLARS) -->
+  <section class="section section-cream" id="platform">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="eyebrow">Category-Coded Pillars</span>
+        <h2 class="section-title">An Integrated Suite for Academic Communities</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Each core service operates in a color-coded domain designed for clarity, data integrity, and fast interactions.
+        </p>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="workbench-footer">
-      <p>
-        <strong>Alumni Tracking System</strong> &copy; 2026 • Node.js 20 • Express.js • PostgreSQL 15 • Docker Containerized
-      </p>
-      <p style="margin-top:4px;font-size:0.8rem;">
-        Master Design System 2.0 • <a href="/about" style="color:var(--color-primary-teal);text-decoration:none;">Hakkında</a> • <a href="/api/swagger" style="color:var(--color-primary-teal);text-decoration:none;">API Docs</a>
-      </p>
-    </footer>
-  </div>
+      <div class="pastel-grid">
+        <div class="pastel-card bg-violet">
+          <div>
+            <div class="pastel-card-tag">● Alumni Directory</div>
+            <h3 class="pastel-card-title">Global Alumni Network</h3>
+            <p class="pastel-card-desc">
+              Comprehensive graduate dossiers detailing faculties, graduation classes, current companies, and research credentials (${userCount} registered).
+            </p>
+          </div>
+          <div class="pastel-card-footer">
+            <a href="/users" class="btn btn-primary btn-sm">Browse Members →</a>
+          </div>
+        </div>
+
+        <div class="pastel-card bg-mint">
+          <div>
+            <div class="pastel-card-tag">● Career Opportunities</div>
+            <h3 class="pastel-card-title">Verified Job Board</h3>
+            <p class="pastel-card-desc">
+              Exclusive employment, internship, and research positions curated by corporate partners and distinguished alumni (${jobCount} active).
+            </p>
+          </div>
+          <div class="pastel-card-footer">
+            <a href="/jobs" class="btn btn-primary btn-sm">View Postings →</a>
+          </div>
+        </div>
+
+        <div class="pastel-card bg-canary">
+          <div>
+            <div class="pastel-card-tag">● Applicant Tracking</div>
+            <h3 class="pastel-card-title">ATS Pipeline & Review</h3>
+            <p class="pastel-card-desc">
+              Structured stages from Submission to Technical Interview and Acceptance with attached resumes and reviewer notes (${appCount} candidates).
+            </p>
+          </div>
+          <div class="pastel-card-footer">
+            <a href="/applications" class="btn btn-primary btn-sm">Open ATS Board →</a>
+          </div>
+        </div>
+
+        <div class="pastel-card bg-pink">
+          <div>
+            <div class="pastel-card-tag">● Campus & Events</div>
+            <h3 class="pastel-card-title">University Bulletins</h3>
+            <p class="pastel-card-desc">
+              Academic conferences, career fairs, mentorship reunions, and urgent notifications delivered across faculties (${annCount} published).
+            </p>
+          </div>
+          <div class="pastel-card-footer">
+            <a href="/announcements" class="btn btn-primary btn-sm">Read News →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. FEATURE SECTION: ALUMNI DIRECTORY -->
+  <section class="section" id="directory">
+    <div class="container">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <span class="eyebrow">Directory Showcase</span>
+          <h2 class="section-title">Distinguished Alumni & Members</h2>
+          <p class="section-desc">
+            Explore active alumni profiles, academic departments, and current professional affiliations.
+          </p>
+        </div>
+        <div>
+          <a href="/users" class="btn btn-pearl">All Members Directory ➔</a>
+        </div>
+      </div>
+
+      <div class="alumni-grid">
+        <div class="alumni-card">
+          <div>
+            <div class="alumni-card-header">
+              <div class="alumni-avatar">CD</div>
+              <span class="alumni-badge">Alumni</span>
+            </div>
+            <h3 class="alumni-name">Canan Dağdeviren</h3>
+            <p class="alumni-title">Associate Professor & Scientist</p>
+            <div class="alumni-details">
+              <div class="alumni-detail-row">
+                <span>Department:</span>
+                <strong>Physics & Materials Science</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Class of:</span>
+                <strong>2009</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Institution:</span>
+                <strong>MIT Media Lab</strong>
+              </div>
+            </div>
+          </div>
+          <a href="/users/1" class="btn btn-secondary btn-sm" style="width: 100%;">View Dossier</a>
+        </div>
+
+        <div class="alumni-card">
+          <div>
+            <div class="alumni-card-header">
+              <div class="alumni-avatar" style="background-color: var(--color-mint-green); color: #064e3b;">AS</div>
+              <span class="alumni-badge">Alumni</span>
+            </div>
+            <h3 class="alumni-name">Dr. Aziz Sancar</h3>
+            <p class="alumni-title">Biochemist & Nobel Laureate</p>
+            <div class="alumni-details">
+              <div class="alumni-detail-row">
+                <span>Department:</span>
+                <strong>Biochemistry & Biophysics</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Class of:</span>
+                <strong>1969</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Institution:</span>
+                <strong>UNC School of Medicine</strong>
+              </div>
+            </div>
+          </div>
+          <a href="/users/2" class="btn btn-secondary btn-sm" style="width: 100%;">View Dossier</a>
+        </div>
+
+        <div class="alumni-card">
+          <div>
+            <div class="alumni-card-header">
+              <div class="alumni-avatar" style="background-color: var(--color-canary-yellow); color: #713f12;">MY</div>
+              <span class="alumni-badge">Faculty</span>
+            </div>
+            <h3 class="alumni-name">Mehmet Yılmaz</h3>
+            <p class="alumni-title">Staff Infrastructure Engineer</p>
+            <div class="alumni-details">
+              <div class="alumni-detail-row">
+                <span>Department:</span>
+                <strong>Computer Engineering</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Class of:</span>
+                <strong>2016</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Company:</span>
+                <strong>CloudScale Systems</strong>
+              </div>
+            </div>
+          </div>
+          <a href="/users/3" class="btn btn-secondary btn-sm" style="width: 100%;">View Dossier</a>
+        </div>
+
+        <div class="alumni-card">
+          <div>
+            <div class="alumni-card-header">
+              <div class="alumni-avatar" style="background-color: var(--color-petal-pink); color: #881337;">EK</div>
+              <span class="alumni-badge">Student</span>
+            </div>
+            <h3 class="alumni-name">Elif Kaya</h3>
+            <p class="alumni-title">Senior Graduate Researcher</p>
+            <div class="alumni-details">
+              <div class="alumni-detail-row">
+                <span>Department:</span>
+                <strong>Artificial Intelligence</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Class of:</span>
+                <strong>2024</strong>
+              </div>
+              <div class="alumni-detail-row">
+                <span>Laboratory:</span>
+                <strong>Autonomous Robotics Lab</strong>
+              </div>
+            </div>
+          </div>
+          <a href="/users/4" class="btn btn-secondary btn-sm" style="width: 100%;">View Dossier</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. FEATURE SECTION: JOB POSTINGS -->
+  <section class="section section-cream" id="jobs">
+    <div class="container">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <span class="eyebrow">Career Opportunities</span>
+          <h2 class="section-title">Open Positions for Alumni & Graduates</h2>
+          <p class="section-desc">
+            Verified listings posted by alumni founders, faculty labs, and enterprise hiring teams.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="/jobs/new" class="btn btn-primary">+ Post Opportunity</a>
+          <a href="/jobs" class="btn btn-pearl">Browse All Jobs</a>
+        </div>
+      </div>
+
+      <div class="jobs-list">
+        <div class="job-card">
+          <div class="job-main">
+            <div class="job-tags">
+              <span class="job-tag tag-mint">Full-Time</span>
+              <span class="job-tag tag-canary">Remote</span>
+              <span class="job-tag tag-violet">Active</span>
+            </div>
+            <h3 class="job-title">Staff Cloud Infrastructure Engineer</h3>
+            <div class="job-company">
+              <span>🏢 CloudScale Systems</span>
+              <span>•</span>
+              <span>📍 Istanbul, TR / Remote</span>
+              <span>•</span>
+              <span>💰 $110,000 - $140,000</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <a href="/jobs/1" class="btn btn-primary btn-sm">View & Apply →</a>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-main">
+            <div class="job-tags">
+              <span class="job-tag tag-mint">Full-Time</span>
+              <span class="job-tag tag-pink">Hybrid</span>
+              <span class="job-tag tag-violet">Active</span>
+            </div>
+            <h3 class="job-title">Lead Machine Learning Scientist</h3>
+            <div class="job-company">
+              <span>🏢 NeuroTech BioLab</span>
+              <span>•</span>
+              <span>📍 Boston, MA / Hybrid</span>
+              <span>•</span>
+              <span>💰 $140,000 - $175,000</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <a href="/jobs/2" class="btn btn-primary btn-sm">View & Apply →</a>
+          </div>
+        </div>
+
+        <div class="job-card">
+          <div class="job-main">
+            <div class="job-tags">
+              <span class="job-tag tag-canary">Internship</span>
+              <span class="job-tag tag-mint">Summer 2026</span>
+              <span class="job-tag tag-violet">Active</span>
+            </div>
+            <h3 class="job-title">Distributed Systems Software Engineering Intern</h3>
+            <div class="job-company">
+              <span>🏢 DataVortex Corp</span>
+              <span>•</span>
+              <span>📍 Remote / EU</span>
+              <span>•</span>
+              <span>💰 $45 / hour + Housing Stipend</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <a href="/jobs/3" class="btn btn-primary btn-sm">View & Apply →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ATS PIPELINE & DATABASE METRICS (DARK CHARCOAL PANEL) -->
+  <section class="section" id="applications">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="eyebrow">Enterprise Telemetry</span>
+        <h2 class="section-title">High-Performance Relational Architecture</h2>
+        <p class="section-desc" style="margin: 0 auto;">
+          Built on PostgreSQL 15, containerized with Docker, and backed by RESTful OpenAPI 3.0 documentation.
+        </p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-val">100%</div>
+          <div class="stat-tile-lbl">ACID Compliant Database</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-val">4 Stages</div>
+          <div class="stat-tile-lbl">Application Review ATS Workflow</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-val">&lt; 15ms</div>
+          <div class="stat-tile-lbl">Average Response Duration</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-val">OpenAPI 3.0</div>
+          <div class="stat-tile-lbl">Self-Documented Swagger Endpoints</div>
+        </div>
+      </div>
+
+      <div class="dark-panel">
+        <div class="dark-panel-grid">
+          <div>
+            <span class="eyebrow" style="color: var(--color-aqua);">Candidate Tracking Workflow</span>
+            <h3>Many-to-Many Career Routing</h3>
+            <p>
+              Candidates connect directly to verified jobs. Each application record enforces unique applicant-to-job pairing with structured status transitions from Under Review to Interview and Final Acceptance.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="/applications" class="btn btn-pearl">Open ATS Kanban →</a>
+              <a href="/api/applications" target="_blank" class="btn btn-ghost-dark">View Raw JSON</a>
+            </div>
+          </div>
+
+          <div style="background-color: var(--color-indigo-deep); padding: 32px; border-radius: var(--radius-cards);">
+            <div style="font-family: var(--font-mono); font-size: 13px; color: var(--color-aqua); margin-bottom: 12px;">
+              // POSTGRESQL RELATION SCHEMA
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.7;">
+              users (id, name, email, role, department)<br>
+              &nbsp;&nbsp;↳ 1-to-many ➔ job_postings (id, title, company)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;↳ many-to-many ➔ applications (<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_id, job_id, status, applied_at<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. FOOTER (CHARCOAL DARK SURFACE) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h4>🎓 Alumni Tracking System</h4>
+          <p>
+            The editorial-grade career platform and relational directory for academic institutions and their global alumni.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Platform</h5>
+          <ul>
+            <li><a href="#directory">Alumni Directory</a></li>
+            <li><a href="#jobs">Job Board</a></li>
+            <li><a href="#applications">Applications ATS</a></li>
+            <li><a href="/announcements">Campus Bulletins</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Developer</h5>
+          <ul>
+            <li><a href="/api/swagger" target="_blank">Swagger Documentation</a></li>
+            <li><a href="/api/swagger.json" target="_blank">OpenAPI 3.0 JSON</a></li>
+            <li><a href="/api/health" target="_blank">Health & Telemetry</a></li>
+            <li><a href="/sayfa-bulunamadi">404 Guardian Test</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Architecture</h5>
+          <ul>
+            <li><a href="/about">System About</a></li>
+            <li><a href="https://nodejs.org" target="_blank">Node.js 20 LTS</a></li>
+            <li><a href="https://www.postgresql.org" target="_blank">PostgreSQL 15</a></li>
+            <li><a href="https://www.docker.com" target="_blank">Docker Container</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Alumni Tracking System. All rights reserved.</span>
+        <span>Amplemarket Design Language • Flat Hairline Architecture</span>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>`;
   }

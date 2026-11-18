@@ -16,25 +16,32 @@ function getGlobalStyles() {
     } catch (e) {
       cachedCss = `
         :root {
-          --color-canvas-paper: #f9fafb;
-          --color-surface-white: #ffffff;
-          --color-stone: #d1d4d9;
-          --color-ink: #16191c;
-          --color-primary-teal: #1c5d5f;
-          --color-primary-teal-hover: #164a4c;
-          --font-editorial: 'Source Serif 4', 'Lora', Georgia, serif;
-          --font-sans: 'Inter', system-ui, sans-serif;
+          --color-phoenix-orange: #e8400d;
+          --gradient-phoenix-orange: radial-gradient(386.06% 162.79% at 3.76985% -12.1005%, rgb(232, 64, 13) 0%, rgb(255, 238, 216) 31.14%, rgb(208, 178, 255) 81.98%);
+          --color-midnight-indigo: #10054d;
+          --color-charcoal: #272625;
+          --color-ink: #111111;
+          --color-canvas-white: #ffffff;
+          --color-cream-wash: #f6f5f3;
+          --color-ash: #6d6c6b;
+          --color-stone: #b1b1af;
+          --color-pearl: #ecebea;
+          --color-petal-pink: #ffd7f0;
+          --color-mint-green: #b7efb2;
+          --color-canary-yellow: #ffef99;
+          --color-soft-violet: #e2ddfd;
+          --color-aqua: #99fff9;
+          --color-indigo-deep: #2e2460;
+          --font-primary: 'Inter', ui-sans-serif, system-ui, sans-serif;
           --font-mono: 'JetBrains Mono', monospace;
-          --radius-card: 12px;
-          --radius-pill: 48px;
+          --radius-cards: 12px;
+          --radius-buttons: 8px;
+          --radius-inputs: 12px;
+          --radius-badges: 9999px;
           --page-max-width: 1200px;
         }
-        *, *::before, *::after { box-sizing: border-box; box-shadow: none !important; }
-        body { margin: 0; background-color: var(--color-canvas-paper); color: var(--color-ink); font-family: var(--font-sans); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
-        h1, .display-title { font-family: var(--font-editorial); font-weight: 400; color: var(--color-ink); }
-        .card, .stat-card, .module-card, .job-card { background: #ffffff; border: 1px solid var(--color-stone) !important; border-radius: 12px !important; box-shadow: none !important; padding: 32px !important; }
-        .btn-primary, .hero-btn-primary, input[type="submit"] { background-color: var(--color-primary-teal) !important; border-radius: 48px !important; color: #ffffff !important; border: 1px solid var(--color-primary-teal) !important; padding: 12px 28px !important; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background-color: var(--color-canvas-white); color: var(--color-ink); font-family: var(--font-primary); }
       `;
     }
   }
