@@ -1,8 +1,9 @@
-# 🎨 Alumni Tracking System — Brand Guidelines & Design System
+# 🎨 Alumni Tracking System — Brand Guidelines & Identity Framework
 
 > **Platform:** Alumni Tracking System (ATS)  
-> **Version:** 1.0.0  
-> **Status:** Official Design & Identity Specification  
+> **Version:** 2.0.0  
+> **Status:** Official Identity Specification  
+> **Master Design System & UI Specification:** [`design.md`](design.md)  
 > **Anchor in Master Documentation:** [`README.md#brand-identity`](README.md#brand-identity)
 
 ---
@@ -166,6 +167,7 @@ Our visual iconography relies on universally recognized, accessible emojis and S
 ---
 
 > 🔗 **Related Documentation:**
+> - [Master Design System (`design.md`)](design.md)
 > - [Master README](README.md)
 > - [Domain-Driven Data Architecture (docs/ddd.md)](docs/ddd.md)
 > - [Agent & Workflow Automation (AGENTS.md)](AGENTS.md)

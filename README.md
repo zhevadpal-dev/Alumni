@@ -7,6 +7,7 @@
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)](https://github.com/zhevadpal-dev/Alumni)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Brand Guide](https://img.shields.io/badge/Brand-Guide-2563EB?style=flat&logo=markdown&logoColor=white)](brand.md)
+[![Design System](https://img.shields.io/badge/Design-System-E8400D?style=flat&logo=figma&logoColor=white)](design.md)
 
 **Alumni Tracking System** is a scalable, containerized web platform designed for higher education institutions to maintain enduring relationships with graduates, track career pathways, foster professional networking, and streamline institutional communication.
 
@@ -184,7 +185,8 @@ Alumni/
 │   └── forgetting-test.sh           # Automated in-memory lifecycle verification script (Forgetting Test)
 ├── docs/                            # ARCHITECTURAL DOCUMENTATION
 │   └── ddd.md                       # Comprehensive Data Design & Architecture Documentation (DDD)
-├── brand.md                         # Brand Guidelines, Visual Identity & Design System Specification
+├── brand.md                         # Brand Guidelines, Visual Identity & Tone of Voice Specification
+├── design.md                        # Master Design System (Amplemarket, User Interviews, Hashnode, Alden Synthesis)
 ├── package.json                     # Node.js project manifest, dependencies, and npm scripts
 └── README.md                        # Master project documentation
 ```
@@ -860,15 +862,16 @@ Whenever a new route or endpoint is defined in this project, the following proto
 <a id="brand-identity"></a>
 ## 🎨 Brand Identity & Design System
 
-The visual design system, official typography standards, color tokens, and tone of voice guidelines for the Alumni Tracking System are formally specified in the project's brand guidelines:
+The visual design system, official typography standards, color tokens, and tone of voice guidelines for the Alumni Tracking System are formally specified across two dedicated specifications:
 
-👉 **Read the Full Specification:** [Brand Guidelines (`brand.md`)](brand.md)
+👉 **Brand Identity & Philosophy:** [Brand Guidelines (`brand.md`)](brand.md)  
+👉 **Master Design System & UI Specification:** [Design System (`design.md`)](design.md)
 
-### Highlights:
-- **Core Palette:** Corporate Blue (`#2563eb`), Dark Slate (`#0f172a`), Surface Canvas (`#f8fafc`), Card Surface (`#ffffff`), and Border Gray (`#e2e8f0`).
-- **Semantic Accents:** Success Green (`#16a34a`), Warning Amber (`#d97706`), Danger Red (`#dc2626`), and Info Sky (`#0284c7`).
-- **Typography:** Native responsive system font stacks with monospace accents for IDs, paths, and telemetry.
-- **Component Principles:** Card-based elevated surfaces, WCAG 2.1 AA accessible contrast ratios, and consistent button semantics.
+### Design System Architecture (The 4-Pillar Synthesis):
+- **🌸 Pastel Domain Taxonomy (Amplemarket):** Flat pastel surfaces for cognitive domain mapping — Soft Violet (`#e2ddfd`) for Alumni, Mint Green (`#b7efb2`) for Jobs, Canary Yellow (`#ffef99`) for ATS, Petal Pink (`#ffd7f0`) for Events, Aqua (`#99fff9`) for Telemetry.
+- **🎓 Editorial Serif & Monospace Eyebrows (User Interviews):** High-contrast editorial serif headers (`Source Serif 4`) delivering academic dignity, paired with monospace tags (`● ALUMNI-PORTAL`) and crisp UI sans (`Inter`).
+- **⚡ Hairline Border & Single CTA Discipline (Hashnode):** Flat layers with 1px stone borders (`#d1d4d9`), zero muddy drop shadows, and strict single dominant CTA discipline per viewport.
+- **📜 Two-Tone Canvas & Word Annotations (Alden):** High-contrast Paper White (`#ffffff`) components over a warm Parchment Cream (`#f7f6f2`) canvas, enhanced with Sky Highlight (`#97cde5`) inline annotations.
 
 ---
 
