@@ -262,7 +262,7 @@ class ApplicationViews {
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System">
+          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
             <span class="nav-logo-icon">🎓</span>
             <span class="nav-brand-text">ATS</span>
           </a>
@@ -270,7 +270,6 @@ class ApplicationViews {
           <!-- Floating iOS-Style Pill Navigation -->
           <nav class="nav-pill-menu">
             <ul class="nav-links">
-              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}" style="${activeTab === 'applications' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Applications (ATS)</a></li>
@@ -393,12 +392,11 @@ class ApplicationViews {
         ${getHeadTags('Applications Tracking Board | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('applications')}
+        ${this.renderNavbar('applications')}
 
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+        <div class="container">
+          <div style="margin-bottom: 20px;">
             <div class="db-badge">🐘 PostgreSQL Database: Connected (alumni_db)</div>
-            <a href="/jobs" class="btn btn-secondary">💼 Go to Job Board</a>
           </div>
 
           ${this.renderFlashBanner(filter)}
@@ -556,9 +554,9 @@ class ApplicationViews {
         ${getHeadTags(`Application #${app.id} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('applications')}
+        ${this.renderNavbar('applications')}
 
+        <div class="container">
           <div style="margin-bottom: 20px;">
             <a href="/applications" class="btn-glass-pill">← Back to Applications Board</a>
           </div>
@@ -672,8 +670,9 @@ class ApplicationViews {
         ${getHeadTags('Error | Applications Tracking Board')}
       </head>
       <body>
+        ${this.renderNavbar('applications')}
+
         <div class="container">
-          ${this.renderNavbar('applications')}
           <div class="glass-form-card" style="text-align: center; padding: 40px 24px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
             <h2 style="font-family: var(--font-serif); color: #b91c1c; margin-bottom: 12px;">Application Operation Failed</h2>
