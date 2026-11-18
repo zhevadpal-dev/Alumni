@@ -358,8 +358,8 @@ class HtmlViews {
     const msg = query.msg || (query.success ? `Operation successful: ${query.success}` : query.error);
 
     return `
-      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-        <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 16px 24px; border-radius: 12px; margin-bottom: 24px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">
+        <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 1.25rem;">${icon}</span>
           <span>${msg}</span>
         </div>

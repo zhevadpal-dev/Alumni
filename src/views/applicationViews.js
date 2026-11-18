@@ -469,7 +469,7 @@ class ApplicationViews {
           </div>
 
           <!-- Quick Candidate Application Submission Form -->
-          <div class="card" style="margin-top: 36px; border-top: 4px solid #16a34a;">
+          <div class="card" style="margin-top: 36px;">
             <div class="card-header">
               <div>
                 <h3 class="card-title">📝 Submit New Candidate Application</h3>
@@ -521,7 +521,7 @@ class ApplicationViews {
 
               <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
                 <button type="reset" class="btn btn-secondary">Reset</button>
-                <button type="submit" class="btn btn-success">✅ Register Application</button>
+                <button type="submit" class="btn btn-primary">✅ Register Application</button>
               </div>
             </form>
           </div>
@@ -553,7 +553,7 @@ class ApplicationViews {
           ${this.renderFlashBanner(query)}
 
           <!-- Application Header Card -->
-          <div class="card" style="border-top: 4px solid #2563eb;">
+          <div class="card">
             <div class="card-header">
               <div>
                 <span class="badge ${this.getStatusBadgeClass(app.status)}">${escapeHtml(app.status)}</span>
@@ -661,7 +661,7 @@ class ApplicationViews {
       <body>
         <div class="container">
           ${this.renderNavbar('applications')}
-          <div class="card" style="border-top: 4px solid #ef4444; text-align: center; padding: 40px 24px;">
+          <div class="card" style="text-align: center; padding: 40px 24px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
             <h2 style="color: #b91c1c; margin-bottom: 12px;">Application Operation Failed</h2>
             <p style="color: #475569; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>

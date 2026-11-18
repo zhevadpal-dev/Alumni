@@ -524,7 +524,7 @@ class JobViews {
           </div>
 
           <!-- Quick Post Opportunity Form -->
-          <div class="card" style="margin-top: 36px; border-top: 4px solid #2563eb;">
+          <div class="card" style="margin-top: 36px;">
             <div class="card-header">
               <div>
                 <h3 class="card-title">💼 Quick Post: Share a Career Opportunity</h3>
@@ -673,7 +673,7 @@ class JobViews {
           ${this.renderFlashBanner(query)}
 
           <!-- Job Overview Card -->
-          <div class="card" style="border-top: 4px solid #2563eb;">
+          <div class="card">
             <div class="card-header">
               <div>
                 <span class="badge ${this.getJobTypeBadgeClass(job.jobType)}">${escapeHtml(job.jobType || 'Full-Time')}</span>
@@ -740,7 +740,7 @@ class JobViews {
           </div>
 
           <!-- Apply For This Position Section -->
-          <div class="card" style="border-top: 4px solid #16a34a;" id="apply-form">
+          <div class="card" id="apply-form">
             <div class="card-header">
               <div>
                 <h2 class="card-title">📝 Apply for this Position</h2>
@@ -776,7 +776,7 @@ class JobViews {
               </div>
 
               <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-                <button type="submit" class="btn btn-success" style="padding: 10px 24px; font-size: 0.95rem;">
+                <button type="submit" class="btn btn-primary">
                   🚀 Submit Job Application
                 </button>
               </div>
@@ -828,7 +828,7 @@ class JobViews {
 
           ${this.renderFlashBanner(query)}
 
-          <div class="card" style="border-top: 4px solid #2563eb;">
+          <div class="card">
             <div class="card-header">
               <div>
                 <h2 class="card-title">💼 Post a New Job Opportunity</h2>
@@ -945,7 +945,7 @@ class JobViews {
 
           ${this.renderFlashBanner(query)}
 
-          <div class="card" style="border-top: 4px solid #f59e0b;">
+          <div class="card">
             <div class="card-header">
               <div>
                 <h2 class="card-title">✏️ Edit Job Posting #${job.id}</h2>
@@ -1046,7 +1046,7 @@ class JobViews {
       <body>
         <div class="container">
           ${this.renderNavbar('jobs')}
-          <div class="card" style="border-top: 4px solid #ef4444; text-align: center; padding: 40px 24px;">
+          <div class="card" style="text-align: center; padding: 40px 24px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
             <h2 style="color: #b91c1c; margin-bottom: 12px;">Operation Encountered An Error</h2>
             <p style="color: #475569; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>
