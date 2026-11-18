@@ -2,182 +2,60 @@
  * Announcement Views (Presentation Layer)
  * 
  * Generates server-rendered, responsive HTML view templates for the Announcement Management UI.
- * Canonical design.md Implementation:
- * - Dual Typography: Source Serif 4 (Headings) + Inter (UI) + JetBrains Mono (Eyebrows)
+ * Sleek iOS Glassmorphism Implementation:
+ * - Dual Typography: Source Serif 4 (Headings) + Inter (UI) + JetBrains Mono (Eyebrows/Badges)
  * - Zero Drop-Shadows (Flat Hairline Architecture)
- * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
- * - Cards: 1px Fog Border (#d1d4d9)
- * - Pastel Domain Taxonomy (Petal Pink for Announcements)
+ * - Primary Button: High-Contrast Ink Black (#16191c) with Pill Shape (100px radius)
+ * - Glass Cards: Frosted Glass (rgba(255, 255, 255, 0.35 - 0.45) with blur)
+ * - Soft Pastel Badges: Color-coded pills (Academic, Career, Event, Urgent)
  */
 
 const { getGlobalStyles, getHeadTags } = require('./styles');
 
 class AnnouncementViews {
   /**
-   * Common CSS styles matching the project's design system (design.md)
+   * Common CSS styles matching the project's design system
    */
   static getBaseStyles() {
     return getGlobalStyles();
   }
 
   static getLegacyAnnouncementStyles() {
+    return getGlobalStyles();
+  }
+
+  /**
+   * Universal header navigation bar
+   */
+  static renderNavbar(activeTab = 'announcements') {
     return `
-      * { box-sizing: border-box; }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        background-color: #f8fafc;
-        color: #0f172a;
-        margin: 0;
-        padding: 24px;
-        line-height: 1.5;
-      }
-      .container { max-width: 960px; margin: 0 auto; }
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 16px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-      .title { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin: 0; }
-      .subtitle { color: #64748b; font-size: 0.95rem; margin-top: 4px; }
-      .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
-      .nav-links a {
-        display: inline-block;
-        background: #2563eb;
-        color: #ffffff;
-        padding: 8px 16px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.85rem;
-        transition: background 0.15s ease;
-      }
-      .nav-links a:hover { background: #1d4ed8; }
-      .nav-links a.secondary {
-        background: #ffffff;
-        color: #334155;
-        border: 1px solid #cbd5e1;
-      }
-      .nav-links a.secondary:hover { background: #f1f5f9; }
-      .card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      }
-      .badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-      .badge-Event { background: #e0f2fe; color: #0369a1; }
-      .badge-Career { background: #fef3c7; color: #92400e; }
-      .badge-Academic { background: #f3e8ff; color: #6b21a8; }
-      .badge-News { background: #dcfce7; color: #166534; }
-      .badge-Urgent { background: #fee2e2; color: #991b1b; }
-      .badge-General { background: #f1f5f9; color: #475569; }
-      .table-wrapper {
-        overflow-x: auto;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        background: #ffffff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        margin-bottom: 24px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-        font-size: 0.9rem;
-      }
-      th {
-        background-color: #f8fafc;
-        color: #475569;
-        font-weight: 600;
-        padding: 12px 16px;
-        border-bottom: 1px solid #e2e8f0;
-      }
-      td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-      }
-      tr:last-child td { border-bottom: none; }
-      tr:hover td { background-color: #fbfcfe; }
-      .btn {
-        display: inline-block;
-        padding: 7px 14px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        border: none;
-        transition: all 0.15s ease;
-      }
-      .btn-primary { background: #16191c; color: #ffffff; border-radius: 100px; }
-      .btn-primary:hover { background: #2c3137; }
-      .btn-success { background: #16a34a; color: #ffffff; }
-      .btn-success:hover { background: #15803d; }
-      .btn-warning { background: #f59e0b; color: #ffffff; }
-      .btn-warning:hover { background: #d97706; }
-      .btn-danger { background: #dc2626; color: #ffffff; }
-      .btn-danger:hover { background: #b91c1c; }
-      .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-      .btn-secondary:hover { background: #e2e8f0; }
-      .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
-      .action-cell { display: flex; gap: 6px; align-items: center; }
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-bottom: 16px;
-      }
-      .form-group { display: flex; flex-direction: column; }
-      .form-group.full-width { grid-column: 1 / -1; }
-      .form-group label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: #334155;
-        margin-bottom: 6px;
-      }
-      .form-control {
-        padding: 10px 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        outline: none;
-        transition: border-color 0.15s ease;
-        font-family: inherit;
-      }
-      .form-control:focus { border-color: #2563eb; ring: 2px solid #93c5fd; }
-      textarea.form-control { resize: vertical; min-height: 100px; }
-      .stats-bar {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-      }
-      .stat-card {
-        flex: 1;
-        min-width: 160px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      }
-      .stat-val { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
-      .stat-lbl { color: #64748b; font-size: 0.8rem; font-weight: 500; text-transform: uppercase; margin-top: 2px; }
+      <!-- FLOATING PILL TOP NAVIGATION BAR -->
+      <header class="top-nav">
+        <div class="nav-wrapper">
+          <a href="/" class="nav-logo" title="Alumni Tracking System">
+            <span class="nav-logo-icon">🎓</span>
+            <span class="nav-brand-text">ATS</span>
+          </a>
+
+          <!-- Floating iOS-Style Pill Navigation -->
+          <nav class="nav-pill-menu">
+            <ul class="nav-links">
+              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
+              <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
+              <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
+              <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}" style="${activeTab === 'announcements' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Announcements</a></li>
+              <li><a href="/api/swagger" target="_blank" class="nav-link">Swagger API</a></li>
+              <li><a href="/api/announcements" target="_blank" class="nav-link">REST API JSON</a></li>
+            </ul>
+          </nav>
+
+          <!-- Right-Aligned Action CTA Button -->
+          <div class="nav-actions">
+            <a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>
+          </div>
+        </div>
+      </header>
     `;
   }
 
@@ -189,17 +67,17 @@ class AnnouncementViews {
   static renderFlashBanner(query = {}) {
     if (!query || (!query.msg && !query.success && !query.error)) return '';
     const isError = Boolean(query.error) || query.type === 'error';
-    const bgColor = isError ? '#fef2f2' : '#f0fdf4';
-    const borderColor = isError ? '#fecaca' : '#bbf7d0';
-    const textColor = isError ? '#991b1b' : '#166534';
+    const bgColor = isError ? 'rgba(255, 222, 235, 0.85)' : 'rgba(212, 241, 244, 0.85)';
+    const borderColor = isError ? 'rgba(159, 18, 57, 0.25)' : 'rgba(6, 78, 59, 0.25)';
+    const textColor = isError ? '#9f1239' : '#064e3b';
     const icon = isError ? '⚠️' : '✅';
     const msg = query.msg || (query.success ? `Operation successful: ${query.success}` : query.error);
 
     return `
-      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+      <div style="background: ${bgColor}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid ${borderColor}; color: ${textColor}; padding: 14px 20px; border-radius: 16px; margin-bottom: 24px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: none;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.25rem;">${icon}</span>
-          <span>${msg}</span>
+          <span>${escapeHtml(msg)}</span>
         </div>
         <button type="button" onclick="this.parentElement.remove();" style="background: transparent; border: none; color: ${textColor}; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 4px;" title="Dismiss">&times;</button>
       </div>
@@ -225,26 +103,26 @@ class AnnouncementViews {
         month: 'short',
         day: 'numeric'
       });
-      const badgeClass = `badge-${a.category || 'General'}`;
+      const badgeClass = `badge-${(a.category || 'General').toLowerCase()}`;
 
       return `
         <tr>
-          <td style="font-weight: 600; color: #64748b;">#${a.id}</td>
+          <td><strong>#${a.id}</strong></td>
           <td>
-            <a href="/announcements/${a.id}" style="font-weight: 600; color: #0f172a; text-decoration: none;">${a.title}</a>
-            <div style="color: #64748b; font-size: 0.8rem; margin-top: 2px;">
-              ${a.content.length > 75 ? a.content.substring(0, 75) + '...' : a.content}
+            <a href="/announcements/${a.id}" class="candidate-link">${escapeHtml(a.title)}</a>
+            <div style="color: #4a4a4c; font-size: 0.85rem; margin-top: 4px; line-height: 1.4;">
+              ${escapeHtml(a.content.length > 75 ? a.content.substring(0, 75) + '...' : a.content)}
             </div>
           </td>
-          <td><span class="badge ${badgeClass}">${a.category || 'General'}</span></td>
-          <td style="color: #475569;">${a.author || 'Alumni Office'}</td>
-          <td style="color: #64748b; white-space: nowrap;">${formattedDate}</td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(a.category || 'General')}</span></td>
+          <td style="color: #4a4a4c; font-size: 0.9rem;">${escapeHtml(a.author || 'Alumni Office')}</td>
+          <td style="color: #4a4a4c; white-space: nowrap; font-size: 0.88rem;">${formattedDate}</td>
           <td>
             <div class="action-cell">
-              <a href="/announcements/${a.id}" class="btn btn-secondary btn-sm" title="View details">🔍 View</a>
-              <a href="/announcements/${a.id}/edit" class="btn btn-warning btn-sm" title="Edit announcement">✏️ Edit</a>
-              <form action="/announcements/${a.id}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Delete announcement #${a.id}: &quot;${a.title.replace(/"/g, '&quot;')}&quot;?');">
-                <button type="submit" class="btn btn-danger btn-sm" title="Delete">🗑️ Delete</button>
+              <a href="/announcements/${a.id}" class="btn-action-pill" title="View details">🔍 View</a>
+              <a href="/announcements/${a.id}/edit" class="btn-action-pill" title="Edit announcement">✏️ Edit</a>
+              <form action="/announcements/${a.id}/delete" method="POST" style="margin: 0; display: inline-flex;" onsubmit="return confirm('Delete announcement #${a.id}: &quot;${escapeHtml(a.title).replace(/"/g, '&quot;')}&quot;?');">
+                <button type="submit" class="btn-action-pill btn-delete" title="Delete">🗑️ Delete</button>
               </form>
             </div>
           </td>
@@ -256,71 +134,56 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Announcements | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Announcement Management | Alumni Tracking System')}
       </head>
       <body>
         <div class="container">
-          <!-- Header -->
-          <div class="header">
-            <div>
-              <h1 class="title">📢 Announcement Management</h1>
-              <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-                <span style="background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 9999px; font-size: 0.78rem; font-weight: 600;">🐘 PostgreSQL Database: Connected</span>
-                <span style="color: #64748b; font-size: 0.85rem;">${announcements.length} records persisted</span>
-              </div>
-            </div>
-            <div class="nav-links">
-              <a href="#new-announcement" class="btn btn-success" style="color: #fff;">➕ New Announcement</a>
-              <a href="/users" class="secondary">🎓 Alumni Directory</a>
-              <a href="/jobs" class="secondary">💼 Jobs</a>
-              <a href="/applications" class="secondary">📝 Applications</a>
-              <a href="/api/swagger" target="_blank">Swagger API</a>
-              <a href="/api/announcements" class="secondary" target="_blank">REST API JSON</a>
-            </div>
+          ${this.renderNavbar('announcements')}
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+            <div class="db-badge">🐘 PostgreSQL Database: Connected (${announcements.length} records persisted)</div>
+            <a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>
           </div>
 
           ${flashBanner}
 
-          <!-- Stats Bar -->
-          <div class="stats-bar">
+          <!-- Horizontal Glass Stats Grid -->
+          <div class="announcement-stats-grid">
             <div class="stat-card">
               <div class="stat-val">${announcements.length}</div>
               <div class="stat-lbl">Total Announcements</div>
             </div>
             <div class="stat-card">
-              <div class="stat-val">${announcements.filter(a => a.category === 'Event').length}</div>
+              <div class="stat-val">${announcements.filter(a => (a.category || '').toLowerCase() === 'event').length}</div>
               <div class="stat-lbl">Events</div>
             </div>
             <div class="stat-card">
-              <div class="stat-val">${announcements.filter(a => a.category === 'Career').length}</div>
+              <div class="stat-val">${announcements.filter(a => (a.category || '').toLowerCase() === 'career').length}</div>
               <div class="stat-lbl">Career Postings</div>
             </div>
             <div class="stat-card">
-              <div class="stat-val">${announcements.filter(a => a.category === 'Academic').length}</div>
+              <div class="stat-val">${announcements.filter(a => (a.category || '').toLowerCase() === 'academic').length}</div>
               <div class="stat-lbl">Academic</div>
             </div>
           </div>
 
           <!-- Table of Announcements -->
-          <div class="table-wrapper">
+          <div class="glass-table-container">
             <table>
               <thead>
                 <tr>
-                  <th style="width: 50px;">ID</th>
+                  <th style="width: 60px;">ID</th>
                   <th>Title & Summary</th>
-                  <th style="width: 110px;">Category</th>
-                  <th style="width: 160px;">Author</th>
-                  <th style="width: 110px;">Date</th>
-                  <th style="width: 190px;">Actions</th>
+                  <th style="width: 120px;">Category</th>
+                  <th style="width: 170px;">Author</th>
+                  <th style="width: 120px;">Date</th>
+                  <th style="width: 210px;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 ${announcements.length > 0 ? tableRows : `
                   <tr>
-                    <td colspan="6" style="text-align: center; color: #64748b; padding: 32px;">
+                    <td colspan="6" style="text-align: center; color: #4a4a4c; padding: 32px;">
                       No announcements published yet. Fill out the form below to create one.
                     </td>
                   </tr>
@@ -330,13 +193,18 @@ class AnnouncementViews {
           </div>
 
           <!-- CREATE FORM: POST /announcements -->
-          <div class="card" id="new-announcement">
-            <h2 style="margin: 0 0 16px 0; font-size: 1.25rem; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <span>➕ Publish New Announcement (POST /announcements)</span>
-            </h2>
+          <div class="glass-form-card" id="new-announcement" style="margin-top: 36px;">
+            <div class="card-header" style="margin-bottom: 20px;">
+              <h2 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <span>📢 Publish New Announcement</span>
+              </h2>
+              <p style="color: #4a4a4c; font-size: 0.85rem; margin: 4px 0 0 0;">
+                Broadcast updates, conferences, or job bulletins to all alumni network members.
+              </p>
+            </div>
             <form action="/announcements" method="POST">
-              <div class="form-grid">
-                <div class="form-group" style="grid-column: span 2;">
+              <div class="form-grid form-grid-2col">
+                <div class="form-group" style="grid-column: 1 / -1;">
                   <label for="title">Title *</label>
                   <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Annual Alumni Reunion Gala 2026" required />
                 </div>
@@ -355,14 +223,14 @@ class AnnouncementViews {
                   <label for="author">Author / Office</label>
                   <input type="text" id="author" name="author" class="form-control" placeholder="e.g. Alumni Relations Office" />
                 </div>
-                <div class="form-group full-width">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="content">Announcement Content *</label>
                   <textarea id="content" name="content" class="form-control" placeholder="Write full announcement details, schedules, links, or instructions..." required></textarea>
                 </div>
               </div>
-              <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                <button type="reset" class="btn btn-secondary">Clear</button>
-                <button type="submit" class="btn btn-success">📢 Publish Announcement</button>
+              <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+                <button type="reset" class="btn btn-secondary" style="border-radius: 100px;">Reset</button>
+                <button type="submit" class="btn btn-primary">📢 Publish Announcement</button>
               </div>
             </form>
           </div>
@@ -385,7 +253,7 @@ class AnnouncementViews {
    */
   static renderDetail(announcement, query = {}) {
     const flashBanner = this.renderFlashBanner(query);
-    const badgeClass = `badge-${announcement.category || 'General'}`;
+    const badgeClass = `badge-${(announcement.category || 'General').toLowerCase()}`;
     const createdStr = new Date(announcement.createdAt).toLocaleString(undefined, {
       year: 'numeric',
       month: 'long',
@@ -407,47 +275,49 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${announcement.title} | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags(`${escapeHtml(announcement.title)} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container" style="max-width: 720px; margin-top: 24px;">
+        <div class="container">
+          ${this.renderNavbar('announcements')}
+
+          <div style="margin-bottom: 20px;">
+            <a href="/announcements" class="btn-action-pill">← Back to Announcements</a>
+          </div>
+
           ${flashBanner}
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <a href="/announcements" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Announcements</a>
+
+          <div class="glass-form-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="badge ${badgeClass}">${escapeHtml(announcement.category || 'General')}</span>
+                <span style="color: #4a4a4c; font-size: 0.85rem; font-family: var(--font-mono);">Announcement #${announcement.id}</span>
+              </div>
               <div class="action-cell">
-                <a href="/announcements/${announcement.id}/edit" class="btn btn-warning btn-sm">✏️ Edit</a>
-                <form action="/announcements/${announcement.id}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
-                  <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                <a href="/announcements/${announcement.id}/edit" class="btn-action-pill">✏️ Edit</a>
+                <form action="/announcements/${announcement.id}/delete" method="POST" style="margin: 0; display: inline-flex;" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                  <button type="submit" class="btn-action-pill btn-delete">🗑️ Delete</button>
                 </form>
               </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-              <span class="badge ${badgeClass}">${announcement.category || 'General'}</span>
-              <span style="color: #64748b; font-size: 0.85rem;">Announcement #${announcement.id}</span>
-            </div>
-
-            <h1 style="margin: 0 0 12px 0; font-size: 1.8rem; color: #0f172a; line-height: 1.3;">
-              ${announcement.title}
+            <h1 style="font-family: var(--font-serif); margin: 0 0 16px 0; font-size: 2rem; color: #16191c; line-height: 1.25;">
+              ${escapeHtml(announcement.title)}
             </h1>
 
-            <div style="display: flex; gap: 16px; color: #64748b; font-size: 0.85rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px; flex-wrap: wrap;">
-              <span><strong>Author:</strong> ${announcement.author || 'Alumni Office'}</span>
+            <div style="display: flex; gap: 16px; color: #4a4a4c; font-size: 0.88rem; border-bottom: 1px solid rgba(22, 25, 28, 0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+              <span><strong>Author:</strong> ${escapeHtml(announcement.author || 'Alumni Office')}</span>
               <span><strong>Published:</strong> ${createdStr}</span>
               ${updatedStr ? `<span><strong>Updated:</strong> ${updatedStr}</span>` : ''}
             </div>
 
-            <div style="font-size: 1.05rem; line-height: 1.7; color: #1e293b; white-space: pre-line; margin-bottom: 28px;">
-              ${announcement.content}
+            <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 24px; font-size: 1.05rem; line-height: 1.7; color: #16191c; white-space: pre-line; margin-bottom: 28px;">
+              ${escapeHtml(announcement.content)}
             </div>
 
-            <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; justify-content: space-between; align-items: center;">
-              <a href="/announcements" class="btn btn-secondary">&larr; Return to Announcements</a>
-              <a href="/announcements/${announcement.id}/edit" class="btn btn-warning">✏️ Edit Announcement</a>
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <a href="/announcements" class="btn-action-pill">← Return to Announcements</a>
+              <a href="/announcements/${announcement.id}/edit" class="btn btn-primary btn-sm">✏️ Edit Announcement</a>
             </div>
           </div>
         </div>
@@ -464,6 +334,7 @@ class AnnouncementViews {
    * Render HTML view for GET /announcements/:id/edit
    * 
    * @param {Object} announcement
+   * @param {Object} [query={}]
    * @returns {string} HTML markup
    */
   static renderEditForm(announcement, query = {}) {
@@ -478,27 +349,27 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edit: ${announcement.title} | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags(`Edit: ${escapeHtml(announcement.title)} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container" style="max-width: 720px; margin-top: 24px;">
-          ${flashBanner}
-          <div class="card">
-            <div style="margin-bottom: 16px;">
-              <a href="/announcements/${announcement.id}" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Announcement #${announcement.id}</a>
-            </div>
+        <div class="container" style="max-width: 760px;">
+          ${this.renderNavbar('announcements')}
 
-            <h1 style="margin: 0 0 6px 0; font-size: 1.5rem; color: #0f172a;">✏️ Edit Announcement #${announcement.id}</h1>
-            <p style="color: #64748b; margin: 0 0 24px 0; font-size: 0.95rem;">Update the announcement title, body, author, or category.</p>
+          <div style="margin-bottom: 20px;">
+            <a href="/announcements/${announcement.id}" class="btn-action-pill">← Back to Announcement #${announcement.id}</a>
+          </div>
+
+          ${flashBanner}
+
+          <div class="glass-form-card">
+            <h1 style="font-family: var(--font-serif); margin: 0 0 6px 0; font-size: 1.65rem; color: #16191c;">✏️ Edit Announcement #${announcement.id}</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.92rem;">Update the announcement title, body, author, or category.</p>
 
             <form action="/announcements/${announcement.id}/edit" method="POST">
-              <div class="form-grid">
-                <div class="form-group" style="grid-column: span 2;">
+              <div class="form-grid form-grid-2col">
+                <div class="form-group" style="grid-column: 1 / -1;">
                   <label for="title">Title *</label>
-                  <input type="text" id="title" name="title" class="form-control" value="${announcement.title.replace(/"/g, '&quot;')}" required />
+                  <input type="text" id="title" name="title" class="form-control" value="${escapeHtml(announcement.title)}" required />
                 </div>
                 <div class="form-group">
                   <label for="category">Category</label>
@@ -508,16 +379,16 @@ class AnnouncementViews {
                 </div>
                 <div class="form-group">
                   <label for="author">Author / Office</label>
-                  <input type="text" id="author" name="author" class="form-control" value="${(announcement.author || '').replace(/"/g, '&quot;')}" />
+                  <input type="text" id="author" name="author" class="form-control" value="${escapeHtml(announcement.author || '')}" />
                 </div>
-                <div class="form-group full-width">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="content">Announcement Content *</label>
-                  <textarea id="content" name="content" class="form-control" style="min-height: 140px;" required>${announcement.content}</textarea>
+                  <textarea id="content" name="content" class="form-control" style="min-height: 140px;" required>${escapeHtml(announcement.content)}</textarea>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                <a href="/announcements/${announcement.id}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-warning">💾 Save Changes (Update)</button>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
+                <a href="/announcements/${announcement.id}" class="btn btn-secondary" style="border-radius: 100px;">Cancel</a>
+                <button type="submit" class="btn btn-primary">💾 Save Changes (Update)</button>
               </div>
             </form>
           </div>
@@ -541,24 +412,23 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Announcement | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('New Announcement | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 720px; margin-top: 24px;">
-          <div class="card">
-            <div style="margin-bottom: 16px;">
-              <a href="/announcements" style="color: #2563eb; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to Announcements</a>
-            </div>
+        <div class="container" style="max-width: 760px;">
+          ${this.renderNavbar('announcements')}
 
-            <h1 style="margin: 0 0 6px 0; font-size: 1.5rem; color: #0f172a;">➕ Create New Announcement</h1>
-            <p style="color: #64748b; margin: 0 0 24px 0; font-size: 0.95rem;">Publish an announcement visible across the alumni network.</p>
+          <div style="margin-bottom: 20px;">
+            <a href="/announcements" class="btn-action-pill">← Back to Announcements</a>
+          </div>
+
+          <div class="glass-form-card">
+            <h1 style="font-family: var(--font-serif); margin: 0 0 6px 0; font-size: 1.65rem; color: #16191c;">➕ Create New Announcement</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.92rem;">Publish an announcement visible across the alumni network.</p>
 
             <form action="/announcements" method="POST">
-              <div class="form-grid">
-                <div class="form-group" style="grid-column: span 2;">
+              <div class="form-grid form-grid-2col">
+                <div class="form-group" style="grid-column: 1 / -1;">
                   <label for="title">Title *</label>
                   <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Annual Alumni Reunion Gala 2026" required />
                 </div>
@@ -577,14 +447,14 @@ class AnnouncementViews {
                   <label for="author">Author / Office</label>
                   <input type="text" id="author" name="author" class="form-control" placeholder="e.g. Alumni Relations Office" />
                 </div>
-                <div class="form-group full-width">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="content">Announcement Content *</label>
                   <textarea id="content" name="content" class="form-control" style="min-height: 140px;" placeholder="Write full details..." required></textarea>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
-                <a href="/announcements" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-success">📢 Publish Announcement</button>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
+                <a href="/announcements" class="btn btn-secondary" style="border-radius: 100px;">Cancel</a>
+                <button type="submit" class="btn btn-primary">📢 Publish Announcement</button>
               </div>
             </form>
           </div>
@@ -605,36 +475,35 @@ class AnnouncementViews {
    * @returns {string} HTML markup
    */
   static renderCreateSuccess(announcement) {
+    const badgeClass = `badge-${(announcement.category || 'General').toLowerCase()}`;
     return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Announcement Published | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Announcement Published | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 650px; margin-top: 40px;">
-          <div class="card" style="border-top: 5px solid #16a34a; text-align: center; padding: 36px;">
+        <div class="container" style="max-width: 650px;">
+          ${this.renderNavbar('announcements')}
+          <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
-            <h1 style="color: #15803d; margin: 0 0 8px 0; font-size: 1.6rem;">Announcement Published Successfully!</h1>
-            <p style="color: #475569; margin: 0 0 24px 0;">The announcement has been registered and is now active.</p>
+            <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Published Successfully!</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0;">The announcement has been registered and is now active across the platform.</p>
             
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <strong style="color: #0f172a; font-size: 1.15rem;">${announcement.title}</strong>
-                <span class="badge badge-${announcement.category || 'General'}">${announcement.category || 'General'}</span>
+            <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <strong style="color: #16191c; font-size: 1.15rem;">${escapeHtml(announcement.title)}</strong>
+                <span class="badge ${badgeClass}">${escapeHtml(announcement.category || 'General')}</span>
               </div>
-              <p style="margin: 4px 0; color: #475569; font-size: 0.9rem;"><strong>Author:</strong> ${announcement.author}</p>
-              <p style="margin: 4px 0; color: #475569; font-size: 0.9rem;"><strong>Announcement ID:</strong> #${announcement.id}</p>
-              <p style="margin: 8px 0 0 0; color: #1e293b; font-size: 0.95rem; white-space: pre-line;">${announcement.content}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Author:</strong> ${escapeHtml(announcement.author || 'Alumni Office')}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Announcement ID:</strong> #${announcement.id}</p>
+              <p style="margin: 8px 0 0 0; color: #16191c; font-size: 0.95rem; white-space: pre-line;">${escapeHtml(announcement.content)}</p>
             </div>
 
             <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
               <a href="/announcements" class="btn btn-primary">&larr; Back to Announcements</a>
-              <a href="/announcements/${announcement.id}" class="btn btn-secondary">🔍 View Announcement</a>
-              <a href="/announcements#new-announcement" class="btn btn-success">➕ Publish Another</a>
+              <a href="/announcements/${announcement.id}" class="btn-action-pill">🔍 View Announcement</a>
+              <a href="/announcements#new-announcement" class="btn btn-secondary" style="border-radius: 100px;">➕ Publish Another</a>
             </div>
           </div>
         </div>
@@ -650,35 +519,34 @@ class AnnouncementViews {
    * @returns {string} HTML markup
    */
   static renderUpdateSuccess(announcement) {
+    const badgeClass = `badge-${(announcement.category || 'General').toLowerCase()}`;
     return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Announcement Updated | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Announcement Updated | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 650px; margin-top: 40px;">
-          <div class="card" style="border-top: 5px solid #f59e0b; text-align: center; padding: 36px;">
+        <div class="container" style="max-width: 650px;">
+          ${this.renderNavbar('announcements')}
+          <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
-            <h1 style="color: #d97706; margin: 0 0 8px 0; font-size: 1.6rem;">Announcement Updated!</h1>
-            <p style="color: #475569; margin: 0 0 24px 0;">Announcement #${announcement.id} has been modified successfully.</p>
+            <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Updated!</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0;">Announcement #${announcement.id} has been modified successfully.</p>
             
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 24px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <strong style="color: #0f172a; font-size: 1.15rem;">${announcement.title}</strong>
-                <span class="badge badge-${announcement.category || 'General'}">${announcement.category || 'General'}</span>
+            <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <strong style="color: #16191c; font-size: 1.15rem;">${escapeHtml(announcement.title)}</strong>
+                <span class="badge ${badgeClass}">${escapeHtml(announcement.category || 'General')}</span>
               </div>
-              <p style="margin: 4px 0; color: #475569; font-size: 0.9rem;"><strong>Author:</strong> ${announcement.author}</p>
-              <p style="margin: 8px 0 0 0; color: #1e293b; font-size: 0.95rem; white-space: pre-line;">${announcement.content}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Author:</strong> ${escapeHtml(announcement.author || 'Alumni Office')}</p>
+              <p style="margin: 8px 0 0 0; color: #16191c; font-size: 0.95rem; white-space: pre-line;">${escapeHtml(announcement.content)}</p>
             </div>
 
             <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
               <a href="/announcements" class="btn btn-primary">&larr; Back to Announcements</a>
-              <a href="/announcements/${announcement.id}" class="btn btn-secondary">🔍 View Announcement</a>
-              <a href="/announcements/${announcement.id}/edit" class="btn btn-warning">✏️ Edit Again</a>
+              <a href="/announcements/${announcement.id}" class="btn-action-pill">🔍 View Announcement</a>
+              <a href="/announcements/${announcement.id}/edit" class="btn btn-secondary" style="border-radius: 100px;">✏️ Edit Again</a>
             </div>
           </div>
         </div>
@@ -698,21 +566,19 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Announcement Deleted | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Announcement Deleted | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 600px; margin-top: 40px;">
-          <div class="card" style="border-top: 5px solid #dc2626; text-align: center; padding: 36px;">
+        <div class="container" style="max-width: 600px;">
+          ${this.renderNavbar('announcements')}
+          <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🗑️</div>
-            <h1 style="color: #b91c1c; margin: 0 0 8px 0; font-size: 1.6rem;">Announcement Deleted</h1>
-            <p style="color: #475569; margin: 0 0 20px 0;">The announcement has been permanently removed.</p>
+            <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Deleted</h1>
+            <p style="color: #4a4a4c; margin: 0 0 20px 0;">The announcement has been permanently removed from the system.</p>
             
-            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; text-align: left; margin-bottom: 24px;">
-              <p style="margin: 4px 0; color: #991b1b; font-size: 0.95rem;"><strong>Deleted Announcement:</strong> ${deleted.title} (#${deleted.id})</p>
-              <p style="margin: 4px 0; color: #991b1b; font-size: 0.85rem;"><strong>Category:</strong> ${deleted.category}</p>
+            <div style="background: rgba(255, 222, 235, 0.45); border: 1px solid rgba(255, 143, 179, 0.5); border-radius: 16px; padding: 18px; text-align: left; margin-bottom: 24px;">
+              <p style="margin: 4px 0; color: #9f1239; font-size: 0.95rem;"><strong>Deleted Announcement:</strong> ${escapeHtml(deleted.title)} (#${deleted.id})</p>
+              <p style="margin: 4px 0; color: #9f1239; font-size: 0.85rem;"><strong>Category:</strong> ${escapeHtml(deleted.category)}</p>
             </div>
 
             <div>
@@ -737,19 +603,17 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Error | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Error | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 600px; margin-top: 40px;">
-          <div class="card" style="border-top: 5px solid #dc2626; text-align: center; padding: 36px;">
+        <div class="container" style="max-width: 600px;">
+          ${this.renderNavbar('announcements')}
+          <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
-            <h1 style="color: #b91c1c; margin: 0 0 8px 0; font-size: 1.5rem;">Operation Error</h1>
-            <p style="color: #475569; margin: 0 0 20px 0;">Could not complete the requested action:</p>
-            <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 14px; border-radius: 6px; margin-bottom: 24px; font-weight: 500;">
-              ${errorMessage}
+            <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.5rem;">Operation Error</h1>
+            <p style="color: #4a4a4c; margin: 0 0 20px 0;">Could not complete the requested action:</p>
+            <div style="background: rgba(255, 222, 235, 0.45); border: 1px solid rgba(255, 143, 179, 0.5); color: #9f1239; padding: 16px; border-radius: 16px; margin-bottom: 24px; font-weight: 500;">
+              ${escapeHtml(errorMessage)}
             </div>
             <div>
               <a href="${backUrl}" class="btn btn-primary">&larr; Go Back</a>
@@ -760,6 +624,19 @@ class AnnouncementViews {
       </html>
     `;
   }
+}
+
+/**
+ * Sanitize untrusted input strings to avoid XSS
+ */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 module.exports = AnnouncementViews;

@@ -1455,6 +1455,190 @@ select.form-control {
 }
 
 /* ==========================================================================
+   12. iOS GLASSMORPHISM ANNOUNCEMENT MANAGEMENT (STATS GRID, ACTIONS & BADGES)
+   ========================================================================== */
+.announcement-stats-grid,
+.stats-bar {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 28px !important;
+}
+
+@media (max-width: 960px) {
+  .announcement-stats-grid,
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .announcement-stats-grid,
+  .stats-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.announcement-stats-grid .stat-card,
+.stats-bar .stat-card {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+}
+
+.announcement-stats-grid .stat-card:hover,
+.stats-bar .stat-card:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.stat-val {
+  font-family: var(--font-sans) !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #16191c !important;
+  line-height: 1.1 !important;
+}
+
+.stat-lbl {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #4a4a4c !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-top: 6px !important;
+}
+
+/* Announcement Table Action Buttons */
+.action-cell {
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+.action-cell .btn,
+.action-cell .btn-action-pill,
+.btn-action-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  border-radius: 100px !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  padding: 6px 12px !important;
+  color: #16191c !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+.action-cell .btn:hover,
+.action-cell .btn-action-pill:hover,
+.btn-action-pill:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #16191c !important;
+  color: #16191c !important;
+}
+
+.action-cell .btn-danger,
+.action-cell button[type="submit"],
+.btn-action-pill.btn-delete {
+  color: #9f1239 !important;
+  border-color: rgba(255, 143, 179, 0.7) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.action-cell .btn-danger:hover,
+.action-cell button[type="submit"]:hover,
+.btn-action-pill.btn-delete:hover {
+  background: rgba(255, 222, 235, 0.9) !important;
+  border-color: #9f1239 !important;
+  color: #9f1239 !important;
+}
+
+/* Soft Color-Coded Pastel Category Badges */
+.badge-academic,
+.badge-Academic,
+.badge-career,
+.badge-Career,
+.badge-event,
+.badge-Event,
+.badge-urgent,
+.badge-Urgent,
+.badge-news,
+.badge-News,
+.badge-general,
+.badge-General {
+  border-radius: 100px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 5px 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  box-shadow: none !important;
+}
+
+.badge-academic,
+.badge-Academic {
+  background: rgba(232, 227, 253, 0.85) !important; /* Soft Pastel Violet */
+  color: #2e2460 !important;
+  border: 1px solid rgba(46, 36, 96, 0.2) !important;
+}
+
+.badge-career,
+.badge-Career {
+  background: rgba(255, 228, 214, 0.85) !important; /* Soft Pastel Peach */
+  color: #8c3e1e !important;
+  border: 1px solid rgba(140, 62, 30, 0.2) !important;
+}
+
+.badge-event,
+.badge-Event {
+  background: rgba(224, 247, 250, 0.85) !important; /* Soft Pastel Aqua */
+  color: #0e4a4c !important;
+  border: 1px solid rgba(14, 74, 76, 0.2) !important;
+}
+
+.badge-urgent,
+.badge-Urgent {
+  background: rgba(255, 222, 235, 0.85) !important; /* Soft Pastel Rose */
+  color: #9f1239 !important;
+  border: 1px solid rgba(159, 18, 57, 0.2) !important;
+}
+
+.badge-news,
+.badge-News,
+.badge-general,
+.badge-General {
+  background: rgba(212, 241, 244, 0.85) !important; /* Soft Pastel Mint */
+  color: #064e3b !important;
+  border: 1px solid rgba(6, 78, 59, 0.2) !important;
+}
+
+/* ==========================================================================
    RESPONSIVE QUERIES
    ========================================================================== */
 @media (max-width: 992px) {
