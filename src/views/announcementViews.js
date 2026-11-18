@@ -32,7 +32,7 @@ class AnnouncementViews {
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System">
+          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
             <span class="nav-logo-icon">🎓</span>
             <span class="nav-brand-text">ATS</span>
           </a>
@@ -40,13 +40,11 @@ class AnnouncementViews {
           <!-- Floating iOS-Style Pill Navigation -->
           <nav class="nav-pill-menu">
             <ul class="nav-links">
-              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}" style="${activeTab === 'announcements' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Announcements</a></li>
-              <li><a href="/api/swagger" target="_blank" class="nav-link">Swagger API</a></li>
-              <li><a href="/api/announcements" target="_blank" class="nav-link">REST API JSON</a></li>
+              <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
           </nav>
 
@@ -137,12 +135,11 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Management | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements')}
 
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div class="container">
+          <div style="margin-bottom: 20px;">
             <div class="db-badge">🐘 PostgreSQL Database: Connected (${announcements.length} records persisted)</div>
-            <a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>
           </div>
 
           ${flashBanner}
@@ -278,9 +275,9 @@ class AnnouncementViews {
         ${getHeadTags(`${escapeHtml(announcement.title)} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements')}
 
+        <div class="container">
           <div style="margin-bottom: 20px;">
             <a href="/announcements" class="btn-action-pill">← Back to Announcements</a>
           </div>
@@ -352,9 +349,9 @@ class AnnouncementViews {
         ${getHeadTags(`Edit: ${escapeHtml(announcement.title)} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container" style="max-width: 760px;">
-          ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements')}
 
+        <div class="container" style="max-width: 760px;">
           <div style="margin-bottom: 20px;">
             <a href="/announcements/${announcement.id}" class="btn-action-pill">← Back to Announcement #${announcement.id}</a>
           </div>
@@ -415,9 +412,9 @@ class AnnouncementViews {
         ${getHeadTags('New Announcement | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container" style="max-width: 760px;">
-          ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements')}
 
+        <div class="container" style="max-width: 760px;">
           <div style="margin-bottom: 20px;">
             <a href="/announcements" class="btn-action-pill">← Back to Announcements</a>
           </div>
@@ -483,8 +480,9 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Published | Alumni Tracking System')}
       </head>
       <body>
+        ${this.renderNavbar('announcements')}
+
         <div class="container" style="max-width: 650px;">
-          ${this.renderNavbar('announcements')}
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
             <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Published Successfully!</h1>
@@ -527,8 +525,9 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Updated | Alumni Tracking System')}
       </head>
       <body>
+        ${this.renderNavbar('announcements')}
+
         <div class="container" style="max-width: 650px;">
-          ${this.renderNavbar('announcements')}
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
             <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Updated!</h1>
@@ -569,8 +568,9 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Deleted | Alumni Tracking System')}
       </head>
       <body>
+        ${this.renderNavbar('announcements')}
+
         <div class="container" style="max-width: 600px;">
-          ${this.renderNavbar('announcements')}
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🗑️</div>
             <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.7rem;">Announcement Deleted</h1>
@@ -606,8 +606,9 @@ class AnnouncementViews {
         ${getHeadTags('Error | Alumni Tracking System')}
       </head>
       <body>
+        ${this.renderNavbar('announcements')}
+
         <div class="container" style="max-width: 600px;">
-          ${this.renderNavbar('announcements')}
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
             <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.5rem;">Operation Error</h1>
