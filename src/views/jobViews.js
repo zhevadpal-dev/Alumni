@@ -331,12 +331,12 @@ class JobViews {
   /**
    * Universal header navigation bar
    */
-  static renderNavbar(activeTab = 'jobs') {
+  static renderNavbar(activeTab = 'jobs', hideActionBtn = false) {
     return `
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System">
+          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
             <span class="nav-logo-icon">🎓</span>
             <span class="nav-brand-text">ATS</span>
           </a>
@@ -344,7 +344,6 @@ class JobViews {
           <!-- Floating iOS-Style Pill Navigation -->
           <nav class="nav-pill-menu">
             <ul class="nav-links">
-              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}" style="${activeTab === 'jobs' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
@@ -355,7 +354,7 @@ class JobViews {
 
           <!-- Right-Aligned Action CTA Button -->
           <div class="nav-actions">
-            <a href="/jobs/new" class="btn btn-primary btn-sm">+ Post Job</a>
+            ${hideActionBtn ? '' : '<a href="/jobs/new" class="btn btn-primary btn-sm">+ Post Job</a>'}
           </div>
         </div>
       </header>
@@ -690,11 +689,11 @@ class JobViews {
         ${getHeadTags(`${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumni Job Board`)}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('jobs')}
+        ${this.renderNavbar('jobs')}
 
-          <div style="margin-bottom: 16px;">
-            <a href="/jobs" class="btn btn-secondary btn-sm">← Back to All Job Postings</a>
+        <div class="container">
+          <div style="margin-bottom: 20px;">
+            <a href="/jobs" class="btn-action-pill">← Back to All Job Postings</a>
           </div>
 
           ${this.renderFlashBanner(query)}
@@ -846,42 +845,42 @@ class JobViews {
         ${getHeadTags('Create Job Posting | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('jobs')}
+        ${this.renderNavbar('jobs', true)}
 
-          <div style="margin-bottom: 16px;">
-            <a href="/jobs" class="btn btn-secondary btn-sm">← Back to Job Postings</a>
+        <div class="container">
+          <div style="margin-bottom: 20px;">
+            <a href="/jobs" class="btn-action-pill">← Back to Job Postings</a>
           </div>
 
           ${this.renderFlashBanner(query)}
 
-          <div class="card">
-            <div class="card-header">
+          <div class="glass-form-card">
+            <div class="card-header" style="margin-bottom: 24px;">
               <div>
                 <h2 class="card-title">💼 Post a New Job Opportunity</h2>
-                <p style="color: #64748b; font-size: 0.9rem; margin: 4px 0 0 0;">
+                <p style="color: #4a4a4c; font-size: 0.9rem; margin: 4px 0 0 0;">
                   Publish a new career opportunity for alumni and students in PostgreSQL.
                 </p>
               </div>
             </div>
 
             <form action="/jobs" method="POST">
-              <div class="form-grid">
+              <div class="form-grid form-grid-2col" style="gap: 18px;">
                 <div class="form-group">
                   <label for="title">Position Title *</label>
-                  <input type="text" id="title" name="title" required placeholder="e.g. Lead Cloud Architect">
+                  <input type="text" id="title" name="title" class="form-control" required placeholder="e.g. Lead Cloud Architect">
                 </div>
                 <div class="form-group">
                   <label for="company">Company / Organization *</label>
-                  <input type="text" id="company" name="company" required placeholder="e.g. CloudScale Systems">
+                  <input type="text" id="company" name="company" class="form-control" required placeholder="e.g. CloudScale Systems">
                 </div>
                 <div class="form-group">
                   <label for="location">Location</label>
-                  <input type="text" id="location" name="location" value="Remote" placeholder="e.g. Istanbul / Hybrid">
+                  <input type="text" id="location" name="location" class="form-control" value="Remote" placeholder="e.g. Istanbul / Hybrid">
                 </div>
                 <div class="form-group">
                   <label for="jobType">Job Type</label>
-                  <select id="jobType" name="jobType">
+                  <select id="jobType" name="jobType" class="form-control">
                     <option value="Full-Time" selected>Full-Time</option>
                     <option value="Part-Time">Part-Time</option>
                     <option value="Contract">Contract</option>
@@ -891,11 +890,11 @@ class JobViews {
                 </div>
                 <div class="form-group">
                   <label for="salaryRange">Salary Range</label>
-                  <input type="text" id="salaryRange" name="salaryRange" placeholder="e.g. $90,000 - $120,000">
+                  <input type="text" id="salaryRange" name="salaryRange" class="form-control" placeholder="e.g. $90,000 - $120,000">
                 </div>
                 <div class="form-group">
                   <label for="status">Publication Status</label>
-                  <select id="status" name="status">
+                  <select id="status" name="status" class="form-control">
                     <option value="Active" selected>Active (Open for applications)</option>
                     <option value="Draft">Draft (Internal review)</option>
                     <option value="Closed">Closed</option>
@@ -903,36 +902,36 @@ class JobViews {
                 </div>
                 <div class="form-group">
                   <label for="posterId">Posted By (Alumni User)</label>
-                  <select id="posterId" name="posterId">
+                  <select id="posterId" name="posterId" class="form-control">
                     <option value="">-- Select Poster --</option>
                     ${userOptions}
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="deadline">Application Deadline</label>
-                  <input type="date" id="deadline" name="deadline">
+                  <input type="date" id="deadline" name="deadline" class="form-control">
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="description">Job Description *</label>
-                  <textarea id="description" name="description" required placeholder="Comprehensive description of responsibilities, duties, and culture..."></textarea>
+                  <textarea id="description" name="description" class="form-control" required placeholder="Comprehensive description of responsibilities, duties, and culture..."></textarea>
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="requirements">Requirements & Qualifications</label>
-                  <textarea id="requirements" name="requirements" placeholder="Key skills, educational background, and technical experience..."></textarea>
+                  <textarea id="requirements" name="requirements" class="form-control" placeholder="Key skills, educational background, and technical experience..."></textarea>
                 </div>
                 <div class="form-group">
                   <label for="applicationUrl">External Application Portal</label>
-                  <input type="url" id="applicationUrl" name="applicationUrl" placeholder="https://careers.example.com/apply">
+                  <input type="url" id="applicationUrl" name="applicationUrl" class="form-control" placeholder="https://careers.example.com/apply">
                 </div>
                 <div class="form-group">
                   <label for="contactEmail">Recruiter Contact Email</label>
-                  <input type="email" id="contactEmail" name="contactEmail" placeholder="careers@example.com">
+                  <input type="email" id="contactEmail" name="contactEmail" class="form-control" placeholder="careers@example.com">
                 </div>
               </div>
 
-              <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px;">
-                <a href="/jobs" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">🚀 Publish Opportunity</button>
+              <div style="margin-top: 28px; display: flex; justify-content: flex-end; gap: 12px;">
+                <a href="/jobs" class="btn-action-pill">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">🚀 Publish Opportunity</button>
               </div>
             </form>
           </div>
@@ -963,42 +962,42 @@ class JobViews {
         ${getHeadTags(`Edit ${escapeHtml(job.title)} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('jobs')}
+        ${this.renderNavbar('jobs', true)}
 
-          <div style="margin-bottom: 16px;">
-            <a href="/jobs/${job.id}" class="btn btn-secondary btn-sm">← Back to Job Detail</a>
+        <div class="container">
+          <div style="margin-bottom: 20px;">
+            <a href="/jobs/${job.id}" class="btn-action-pill">← Back to Job Detail</a>
           </div>
 
           ${this.renderFlashBanner(query)}
 
-          <div class="card">
-            <div class="card-header">
+          <div class="glass-form-card">
+            <div class="card-header" style="margin-bottom: 24px;">
               <div>
                 <h2 class="card-title">✏️ Edit Job Posting #${job.id}</h2>
-                <p style="color: #64748b; font-size: 0.9rem; margin: 4px 0 0 0;">
+                <p style="color: #4a4a4c; font-size: 0.9rem; margin: 4px 0 0 0;">
                   Update job requirements, compensation, and publication lifecycle status in PostgreSQL.
                 </p>
               </div>
             </div>
 
             <form action="/jobs/${job.id}/edit" method="POST">
-              <div class="form-grid">
+              <div class="form-grid form-grid-2col" style="gap: 18px;">
                 <div class="form-group">
                   <label for="title">Position Title *</label>
-                  <input type="text" id="title" name="title" required value="${escapeHtml(job.title)}">
+                  <input type="text" id="title" name="title" class="form-control" required value="${escapeHtml(job.title)}">
                 </div>
                 <div class="form-group">
                   <label for="company">Company / Organization *</label>
-                  <input type="text" id="company" name="company" required value="${escapeHtml(job.company)}">
+                  <input type="text" id="company" name="company" class="form-control" required value="${escapeHtml(job.company)}">
                 </div>
                 <div class="form-group">
                   <label for="location">Location</label>
-                  <input type="text" id="location" name="location" value="${escapeHtml(job.location || '')}">
+                  <input type="text" id="location" name="location" class="form-control" value="${escapeHtml(job.location || '')}">
                 </div>
                 <div class="form-group">
                   <label for="jobType">Job Type</label>
-                  <select id="jobType" name="jobType">
+                  <select id="jobType" name="jobType" class="form-control">
                     <option value="Full-Time" ${job.jobType === 'Full-Time' ? 'selected' : ''}>Full-Time</option>
                     <option value="Part-Time" ${job.jobType === 'Part-Time' ? 'selected' : ''}>Part-Time</option>
                     <option value="Contract" ${job.jobType === 'Contract' ? 'selected' : ''}>Contract</option>
@@ -1008,11 +1007,11 @@ class JobViews {
                 </div>
                 <div class="form-group">
                   <label for="salaryRange">Salary Range</label>
-                  <input type="text" id="salaryRange" name="salaryRange" value="${escapeHtml(job.salaryRange || '')}">
+                  <input type="text" id="salaryRange" name="salaryRange" class="form-control" value="${escapeHtml(job.salaryRange || '')}">
                 </div>
                 <div class="form-group">
                   <label for="status">Publication Status</label>
-                  <select id="status" name="status">
+                  <select id="status" name="status" class="form-control">
                     <option value="Active" ${job.status === 'Active' ? 'selected' : ''}>Active</option>
                     <option value="Closed" ${job.status === 'Closed' ? 'selected' : ''}>Closed</option>
                     <option value="Draft" ${job.status === 'Draft' ? 'selected' : ''}>Draft</option>
@@ -1021,36 +1020,36 @@ class JobViews {
                 </div>
                 <div class="form-group">
                   <label for="posterId">Posted By (Alumni User)</label>
-                  <select id="posterId" name="posterId">
+                  <select id="posterId" name="posterId" class="form-control">
                     <option value="">-- Select Poster --</option>
                     ${userOptions}
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="deadline">Application Deadline</label>
-                  <input type="date" id="deadline" name="deadline" value="${formattedDeadline}">
+                  <input type="date" id="deadline" name="deadline" class="form-control" value="${formattedDeadline}">
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="description">Job Description *</label>
-                  <textarea id="description" name="description" required>${escapeHtml(job.description)}</textarea>
+                  <textarea id="description" name="description" class="form-control" required>${escapeHtml(job.description)}</textarea>
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="requirements">Requirements & Qualifications</label>
-                  <textarea id="requirements" name="requirements">${escapeHtml(job.requirements || '')}</textarea>
+                  <textarea id="requirements" name="requirements" class="form-control">${escapeHtml(job.requirements || '')}</textarea>
                 </div>
                 <div class="form-group">
                   <label for="applicationUrl">External Application Portal</label>
-                  <input type="url" id="applicationUrl" name="applicationUrl" value="${escapeHtml(job.applicationUrl || '')}">
+                  <input type="url" id="applicationUrl" name="applicationUrl" class="form-control" value="${escapeHtml(job.applicationUrl || '')}">
                 </div>
                 <div class="form-group">
                   <label for="contactEmail">Recruiter Contact Email</label>
-                  <input type="email" id="contactEmail" name="contactEmail" value="${escapeHtml(job.contactEmail || '')}">
+                  <input type="email" id="contactEmail" name="contactEmail" class="form-control" value="${escapeHtml(job.contactEmail || '')}">
                 </div>
               </div>
 
-              <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px;">
-                <a href="/jobs/${job.id}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">💾 Save Modifications</button>
+              <div style="margin-top: 28px; display: flex; justify-content: flex-end; gap: 12px;">
+                <a href="/jobs/${job.id}" class="btn-action-pill">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">💾 Save Modifications</button>
               </div>
             </form>
           </div>
