@@ -34,6 +34,7 @@ function getGlobalStyles() {
           --pastel-violet: #E8E3FD;
           --pastel-mint: #D4F1F4;
           --pastel-canary: #FFE4D6;
+          --pastel-peach: #FFE4D6;
           --pastel-pink: #FFDEEB;
           --pastel-aqua: #E0F7FA;
           --color-indigo-deep: #2e2460;

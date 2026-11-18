@@ -21,6 +21,7 @@
   --pastel-violet: #E8E3FD;
   --pastel-mint: #D4F1F4;
   --pastel-canary: #FFE4D6;
+  --pastel-peach: #FFE4D6;
   --pastel-pink: #FFDEEB;
   --pastel-aqua: #E0F7FA;
 
@@ -388,12 +389,14 @@ a {
 }
 
 .pillar-card {
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   border: 1px solid var(--color-fog-border);
   padding: 28px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: var(--color-ink-black);
+  box-shadow: none !important;
   transition: border-color 0.15s ease;
 }
 
@@ -402,23 +405,26 @@ a {
 }
 
 .pillar-card.bg-violet {
-  background-color: var(--pastel-violet);
+  background-color: var(--pastel-violet); /* #E8E3FD */
 }
 
-.pillar-card.bg-mint {
-  background-color: var(--pastel-mint);
+.pillar-card.bg-mint,
+.pillar-card.bg-teal {
+  background-color: var(--pastel-mint); /* #D4F1F4 */
 }
 
-.pillar-card.bg-canary {
-  background-color: var(--pastel-canary);
+.pillar-card.bg-canary,
+.pillar-card.bg-peach,
+.pillar-card.bg-sand {
+  background-color: var(--pastel-canary); /* #FFE4D6 */
 }
 
 .pillar-card.bg-pink {
-  background-color: var(--pastel-pink);
+  background-color: var(--pastel-pink); /* #FFDEEB */
 }
 
 .pillar-card.bg-aqua {
-  background-color: var(--pastel-aqua);
+  background-color: var(--pastel-aqua); /* #E0F7FA */
 }
 
 .pillar-tag {
@@ -443,8 +449,7 @@ a {
 .pillar-desc {
   font-size: 0.92rem;
   color: var(--color-ink-black);
-  opacity: 0.85;
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 24px;
 }
 
