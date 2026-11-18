@@ -94,7 +94,7 @@ class HtmlViews {
     <div class="container hero-content">
       <div class="hero-pill-badge">
         <span class="dot"></span>
-        <span>ALUMNI PLATFORM 2.0 • POSTGRESQL 15 PERSISTED</span>
+        <span>ALUMNI PLATFORM 2.0 • CAREER NETWORK</span>
       </div>
 
       <h1 class="hero-headline">
@@ -102,7 +102,7 @@ class HtmlViews {
       </h1>
 
       <p class="hero-subtext">
-        Connect graduates with premier career opportunities, track application lifecycles, and empower academic institutions with an editorial, high-performance database.
+        Connect graduates with premier career opportunities, track application lifecycles, and empower academic institutions with an editorial, high-performance career network.
       </p>
 
       <div class="hero-actions">
@@ -383,16 +383,16 @@ class HtmlViews {
   <section class="section" id="applications">
     <div class="container">
       <div class="section-header text-center">
-        <span class="eyebrow">Enterprise Telemetry</span>
-        <h2 class="section-title">High-Performance Relational Architecture</h2>
+        <span class="eyebrow">Career Pipeline</span>
+        <h2 class="section-title">Streamlined Candidate & Opportunity Routing</h2>
         <p class="section-desc" style="margin: 0 auto;">
-          Built on PostgreSQL 15, containerized with Docker, and backed by RESTful OpenAPI 3.0 documentation.
+          Designed for academic communities, connecting alumni with verified careers and structured communication.
         </p>
       </div>
 
       <div style="background: rgba(255, 255, 255, 0.85); border: 1px solid var(--color-fog-border); border-radius: var(--radius-card); padding: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
         <div style="max-width: 600px;">
-          <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-ink-black); margin-bottom: 8px;">Many-to-Many Candidate Routing</h3>
+          <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-ink-black); margin-bottom: 8px;">Direct Candidate & Opportunity Routing</h3>
           <p style="color: var(--color-slate-body); font-size: 0.95rem; line-height: 1.6;">
             Candidates connect directly to verified opportunities. Each application record enforces unique candidate-to-job pairing with structured review stages from Under Review to Interview and Final Acceptance.
           </p>
@@ -547,17 +547,17 @@ class HtmlViews {
         Mezunların kariyer basamaklarını izleme, iş ve staj ilanları yayınlama, aday başvurularını yönetme ve kurumsal iletişim duyurularını tek bir çatı altında toplar.
       </p>
 
-      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:8px;color:var(--color-ink);">Teknoloji Yığını (Tech Stack)</h3>
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:8px;color:var(--color-ink);">Teknoloji Altyapısı</h3>
       <ul style="color:var(--color-ash);margin-bottom:24px;padding-left:20px;">
-        <li><strong>Backend:</strong> Node.js 20 LTS & Express.js (MVC Mimarisi)</li>
-        <li><strong>Veritabanı:</strong> PostgreSQL 15 Relational Database (Docker Compose)</li>
+        <li><strong>Backend:</strong> Node.js 20 LTS & Express.js</li>
+        <li><strong>Veritabanı:</strong> PostgreSQL 15 İlişkisel Veritabanı</li>
         <li><strong>Dokümantasyon:</strong> OpenAPI 3.0 & Swagger UI</li>
-        <li><strong>Güvenlik & Hata Yönetimi:</strong> 404 Route Guardian, 5xx Global Error Handler, File Logging (logs/error.logs)</li>
-        <li><strong>Tasarım Sistemi:</strong> design.md (Dual Typography, 1px Fog Kenarlık, Deep Teal Pill Butonlar)</li>
+        <li><strong>Güvenlik & Hata Yönetimi:</strong> 404 Route Guardian & 5xx Global Error Handler</li>
+        <li><strong>Tasarım Sistemi:</strong> Modern Arayüz Mimarisi & Cam Efektleri</li>
       </ul>
 
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="/" class="btn btn-primary">Çalışma Masasına Dön (Workbench)</a>
+        <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
         <a href="/api/swagger" class="btn btn-secondary">API Swagger Dokümantasyonu</a>
       </div>
     </div>
@@ -694,9 +694,9 @@ class HtmlViews {
         <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
           <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
             <div>
-              <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● ALUMNI DATABASE</span>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● ALUMNI DIRECTORY</span>
               <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Alumni Directory & User Management</h1>
-              <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">PostgreSQL ACID Persisted &bull; ${users.length} Active Records</p>
+              <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">Verified Profiles &bull; ${users.length} Registered Alumni</p>
             </div>
             <a href="#create-user-form" class="btn btn-primary btn-sm">+ Register User</a>
           </div>
@@ -707,7 +707,7 @@ class HtmlViews {
           <div class="glass-form-card" id="create-user-form">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
               <h2 style="margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 600; color: #16191c;">
-                ➕ Create New User (POST /users)
+                ➕ Create New User
               </h2>
               <span class="badge" style="background: rgba(255, 255, 255, 0.7); color: #16191c; border: 1px solid rgba(255, 255, 255, 0.9);">● ALUMNI-REGISTER</span>
             </div>
@@ -1025,7 +1025,7 @@ class HtmlViews {
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
                 <a href="/users/${user.id}" class="btn-glass-pill btn-view">Cancel</a>
-                <button type="submit" class="btn btn-primary">💾 Save Changes (Update User)</button>
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
               </div>
             </form>
           </div>
@@ -1057,7 +1057,7 @@ class HtmlViews {
           <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
             <h1 style="color: var(--color-ink); margin: 0 0 8px 0; font-size: 1.8rem;">User Created Successfully!</h1>
-            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user record has been created via the View Layer (POST /users).</p>
+            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user profile has been successfully registered in the directory.</p>
             
             <div style="background: var(--color-parchment-cream); border: 1px solid var(--color-stone); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 24px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--color-stone); padding-bottom: 8px;">
@@ -1102,7 +1102,7 @@ class HtmlViews {
           <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
             <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
             <h1 style="color: var(--color-ink); margin: 0 0 8px 0; font-size: 1.8rem;">User Record Updated!</h1>
-            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user record #${user.id} has been modified via the View Layer.</p>
+            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user profile #${user.id} has been successfully updated.</p>
             
             <div style="background: var(--color-parchment-cream); border: 1px solid var(--color-stone); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 24px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--color-stone); padding-bottom: 8px;">

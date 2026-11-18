@@ -324,7 +324,7 @@ class ApplicationViews {
    */
   static renderFlashBanner(query = {}) {
     if (query.status === 'created') {
-      return `<div class="alert alert-success">✅ Application submitted successfully and persisted to PostgreSQL!</div>`;
+      return `<div class="alert alert-success">✅ Application submitted successfully!</div>`;
     }
     if (query.status === 'updated') {
       return `<div class="alert alert-success">✅ Application review status was updated successfully!</div>`;
@@ -420,7 +420,7 @@ class ApplicationViews {
 
         <div class="container">
           <div style="margin-bottom: 20px;">
-            <div class="db-badge">🐘 PostgreSQL Database: Connected (alumni_db)</div>
+            <div class="db-badge">🟢 System Online</div>
           </div>
 
           ${this.renderFlashBanner(filter)}
@@ -430,7 +430,7 @@ class ApplicationViews {
             <div class="metric-card">
               <div class="metric-label">Total Submissions</div>
               <div class="metric-value">${totalApps}</div>
-              <div class="metric-sub">Many-to-Many actions in DB</div>
+              <div class="metric-sub">Total candidate applications</div>
             </div>
             <div class="metric-card">
               <div class="metric-label">Under Review</div>
@@ -509,7 +509,7 @@ class ApplicationViews {
               <div>
                 <h3 class="card-title">📝 Submit New Candidate Application</h3>
                 <p style="color: #4a4a4c; font-size: 0.85rem; margin: 4px 0 0 0;">
-                  Links a User profile to an active Job Posting in PostgreSQL. Enforces unique (user_id, job_id).
+                  Submit an application on behalf of an alumni candidate for an active opportunity.
                 </p>
               </div>
             </div>

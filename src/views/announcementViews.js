@@ -163,7 +163,7 @@ class AnnouncementViews {
 
         <div class="container">
           <div style="margin-bottom: 20px;">
-            <div class="db-badge">🐘 PostgreSQL Database: Connected (${announcements.length} records persisted)</div>
+            <div class="db-badge">🟢 System Online</div>
           </div>
 
           ${flashBanner}
@@ -409,7 +409,7 @@ class AnnouncementViews {
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
                 <a href="/announcements/${announcement.id}" class="btn btn-secondary" style="border-radius: 100px;">Cancel</a>
-                <button type="submit" class="btn btn-primary">💾 Save Changes (Update)</button>
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
               </div>
             </form>
           </div>
