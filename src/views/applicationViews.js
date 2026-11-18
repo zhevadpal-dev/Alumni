@@ -209,7 +209,7 @@ class ApplicationViews {
         box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
       }
       textarea { resize: vertical; min-height: 90px; }
-      .form-hint { font-size: 0.78rem; color: #64748b; margin-top: 4px; }
+      .form-hint { font-size: 0.75rem; font-weight: 400; line-height: 1.4; color: rgba(22, 25, 28, 0.6); margin-top: 6px; padding-left: 4px; display: block; }
 
       /* Filter Toolbar */
       .filter-toolbar {

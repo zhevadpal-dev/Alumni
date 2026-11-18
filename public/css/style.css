@@ -776,6 +776,22 @@ a {
   letter-spacing: -0.01em;
 }
 
+.form-hint,
+.form-helper,
+.form-text,
+.field-hint,
+.form-group small {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(22, 25, 28, 0.6);
+  margin-top: 6px;
+  padding-left: 4px;
+  letter-spacing: -0.01em;
+}
+
 .form-control,
 input[type="text"].form-control,
 input[type="email"].form-control,
@@ -1809,6 +1825,24 @@ textarea.form-control {
   border-color: #16191c !important;
   box-shadow: none !important;
   outline: none !important;
+}
+
+/* Refined iOS-Style Form Helper / Hint Texts */
+.form-hint,
+.form-helper,
+.form-text,
+.field-hint,
+#apply-form .form-hint,
+.form-group .form-hint {
+  display: block !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  color: rgba(22, 25, 28, 0.6) !important;
+  margin-top: 6px !important;
+  padding-left: 4px !important;
+  letter-spacing: -0.01em !important;
 }
 
 /* ==========================================================================
