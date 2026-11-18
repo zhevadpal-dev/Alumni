@@ -553,21 +553,22 @@ class HtmlViews {
   static renderUsersList(users = [], query = {}) {
     const flashBanner = this.renderFlashBanner(query);
     const userCards = users.map(u => `
-      <div style="background: #ffffff; border: 1px solid var(--color-stone); border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: none !important; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div class="user-glass-card">
         <div style="flex: 1; min-width: 250px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <h3 style="margin: 0; color: var(--color-ink); font-size: 1.2rem; font-family: var(--font-editorial); font-weight: 600;">${u.name}</h3>
-            <span class="badge ${u.role || 'alumni'}">${u.role || 'alumni'}</span>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
+            <h3 class="user-title">${u.name}</h3>
+            <span class="badge ${u.role || 'alumni'}" style="background: rgba(255, 255, 255, 0.7); color: #16191c; border: 1px solid rgba(255, 255, 255, 0.9); font-size: 0.75rem;">${u.role || 'alumni'}</span>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #6d6c6b;">#${u.id}</span>
           </div>
-          <p style="margin: 3px 0; color: #475569; font-size: 0.9rem;"><strong>Email:</strong> ${u.email}</p>
-          ${u.department ? `<p style="margin: 2px 0; color: #64748b; font-size: 0.85rem;"><strong>Department:</strong> ${u.department} ${u.graduationYear ? `(Class of ${u.graduationYear})` : ''}</p>` : ''}
-          ${u.company ? `<p style="margin: 2px 0; color: #64748b; font-size: 0.85rem;"><strong>Company:</strong> ${u.company} ${u.jobTitle ? `&bull; ${u.jobTitle}` : ''}</p>` : ''}
+          <p class="user-meta"><strong>Email:</strong> ${u.email}</p>
+          ${u.department ? `<p class="user-subtext"><strong>Department:</strong> ${u.department} ${u.graduationYear ? `(Class of ${u.graduationYear})` : ''}</p>` : ''}
+          ${u.company ? `<p class="user-subtext"><strong>Company:</strong> ${u.company} ${u.jobTitle ? `&bull; ${u.jobTitle}` : ''}</p>` : ''}
         </div>
-        <div class="action-group">
-          <a href="/users/${u.id}" class="btn btn-secondary btn-sm">🔍 View</a>
-          <a href="/users/${u.id}/edit" class="btn btn-warning btn-sm">✏️ Edit</a>
+        <div class="action-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <a href="/users/${u.id}" class="btn-glass-pill btn-view">🔍 View</a>
+          <a href="/users/${u.id}/edit" class="btn-glass-pill btn-edit">✏️ Edit</a>
           <form action="/users/${u.id}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete user ${u.name}?');">
-            <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+            <button type="submit" class="btn-glass-pill btn-delete">🗑️ Delete</button>
           </form>
         </div>
       </div>
@@ -580,39 +581,55 @@ class HtmlViews {
         ${getHeadTags('Alumni Directory | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container">
-          <div class="header">
-            <div class="brand">
-              <span class="brand-icon">🎓</span>
-              <div>
-                <h1 class="title">Alumni Directory & User Management</h1>
-                <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-                  <span class="badge" style="background: var(--color-mint-green); color: #064e3b; border: 1px solid rgba(6,78,59,0.2);">🐘 PostgreSQL: Connected</span>
-                  <span style="color: var(--color-ash); font-size: 0.85rem; font-family: var(--font-mono);">${users.length} members persisted</span>
-                </div>
-              </div>
+        <!-- 1. FLOATING PILL TOP NAVIGATION BAR -->
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumni Tracking System">
+              <span class="nav-logo-icon">🎓</span>
+              <span class="nav-brand-text">ATS</span>
+            </a>
+
+            <!-- Floating iOS-Style Pill Navigation -->
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active" style="color: var(--color-ink-black); font-weight: 700;">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+              </ul>
+            </nav>
+
+            <!-- Right-Aligned Action CTA Buttons -->
+            <div class="nav-actions">
+              <a href="#create-user-form" class="btn btn-primary btn-sm">+ New Member</a>
             </div>
-            <div class="nav-links">
-              <a href="/">🏠 Home</a>
-              <a href="/jobs">💼 Jobs</a>
-              <a href="/applications">📝 Applications</a>
-              <a href="/announcements">📢 Announcements</a>
-              <a href="/api/swagger" target="_blank">Swagger Docs</a>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● ALUMNI DATABASE</span>
+              <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Alumni Directory & User Management</h1>
+              <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">PostgreSQL ACID Persisted &bull; ${users.length} Active Records</p>
             </div>
+            <a href="#create-user-form" class="btn btn-primary btn-sm">+ Register User</a>
           </div>
 
           ${flashBanner}
 
-          <!-- CREATE SECTION: POST /users Form -->
-          <div class="card domain-violet" id="create-user-form" style="background-color: var(--color-soft-violet) !important; border: 1px solid var(--color-stone);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-              <h2 style="margin: 0; font-size: 1.35rem; color: var(--color-ink);">
+          <!-- CREATE SECTION: POST /users Form (Frosted Glass Container) -->
+          <div class="glass-form-card" id="create-user-form">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+              <h2 style="margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 600; color: #16191c;">
                 ➕ Create New User (POST /users)
               </h2>
-              <span class="badge" style="background:#ffffff; color:#10054d;">● ALUMNI-REGISTER</span>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.7); color: #16191c; border: 1px solid rgba(255, 255, 255, 0.9);">● ALUMNI-REGISTER</span>
             </div>
             <form action="/users" method="POST">
-              <div class="form-grid">
+              <div class="form-grid-2col">
                 <div class="form-group">
                   <label for="name">Full Name *</label>
                   <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Canan Dağdeviren" required />
@@ -658,12 +675,15 @@ class HtmlViews {
             </form>
           </div>
 
-          <!-- READ SECTION: Current Users Directory -->
-          <div>
-            <h2 style="margin: 0 0 16px 0; font-size: 1.35rem; color: var(--color-ink);">
-              📋 Registered Alumni & Members (${users.length})
-            </h2>
-            ${users.length > 0 ? userCards : '<div class="card"><p style="color: #64748b; margin: 0;">No alumni records found. Use the form above to register the first member.</p></div>'}
+          <!-- READ SECTION: Current Users Directory (Frosted Glass Profile Cards) -->
+          <div style="margin-top: 36px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 style="margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 600; color: #16191c;">
+                📋 Registered Alumni & Members (${users.length})
+              </h2>
+              <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #4a4a4c;">${users.length} Active Records</span>
+            </div>
+            ${users.length > 0 ? userCards : '<div class="user-glass-card"><p style="color: #4a4a4c; margin: 0;">No alumni records found. Use the form above to register the first member.</p></div>'}
           </div>
         </div>
       </body>
@@ -691,66 +711,86 @@ class HtmlViews {
         ${getHeadTags(`${user.name} - Profile | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container" style="max-width: 680px; margin-top: 24px;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumni Tracking System">
+              <span class="nav-logo-icon">🎓</span>
+              <span class="nav-brand-text">ATS</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions">
+              <a href="/users" class="btn btn-secondary btn-sm">&larr; Directory</a>
+            </div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 720px; padding-top: 32px; padding-bottom: 64px;">
           ${flashBanner}
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <a href="/users" class="btn btn-secondary btn-sm">&larr; Back to Directory</a>
-              <div class="action-group">
-                <a href="/users/${user.id}/edit" class="btn btn-primary btn-sm">✏️ Edit Profile</a>
+          <div class="glass-form-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+              <a href="/users" class="btn-glass-pill btn-view">&larr; Back to Directory</a>
+              <div class="action-group" style="display: flex; gap: 8px;">
+                <a href="/users/${user.id}/edit" class="btn-glass-pill btn-edit">✏️ Edit Profile</a>
                 <form action="/users/${user.id}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete ${user.name}?');">
-                  <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                  <button type="submit" class="btn-glass-pill btn-delete">🗑️ Delete</button>
                 </form>
               </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h1 style="margin: 0; font-size: 1.85rem; color: var(--color-ink);">${user.name}</h1>
-              <span class="badge ${user.role || 'alumni'}">${user.role || 'alumni'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h1 style="margin: 0; font-family: var(--font-serif); font-size: 2rem; color: #16191c;">${user.name}</h1>
+                <p style="margin: 4px 0 0 0; color: #4a4a4c; font-size: 0.9rem;">Member ID: <span style="font-family: var(--font-mono); color: #16191c; font-weight: 600;">#${user.id}</span></p>
+              </div>
+              <span class="badge ${user.role || 'alumni'}" style="background: rgba(255, 255, 255, 0.7); color: #16191c; border: 1px solid rgba(255, 255, 255, 0.9);">${user.role || 'alumni'}</span>
             </div>
             
-            <div style="border-top: 1px solid var(--color-stone); margin-top: 20px; padding-top: 16px;">
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">User ID:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem; font-family: var(--font-mono);">#${user.id}</span>
-              </div>
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Email:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${user.email}</span>
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.6); margin-top: 20px; padding-top: 16px;">
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Email:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${user.email}</span>
               </div>
               ${user.department ? `
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Department:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${user.department}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Department:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${user.department}</span>
               </div>` : ''}
               ${user.graduationYear ? `
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Graduation Year:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem; font-family: var(--font-mono);">${user.graduationYear}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Graduation Year:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem; font-family: var(--font-mono);">${user.graduationYear}</span>
               </div>` : ''}
               ${user.phone ? `
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Phone:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${user.phone}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Phone:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${user.phone}</span>
               </div>` : ''}
               ${user.company ? `
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Company:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${user.company}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Company:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${user.company}</span>
               </div>` : ''}
               ${user.jobTitle ? `
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Job Title:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${user.jobTitle}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Job Title:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${user.jobTitle}</span>
               </div>` : ''}
-              <div style="display: flex; padding: 10px 0; border-bottom: 1px solid var(--color-stone-light);">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Joined:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${new Date(user.createdAt).toLocaleDateString()}</span>
+              <div style="display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.4);">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Joined:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${new Date(user.createdAt).toLocaleDateString()}</span>
               </div>
               ${user.updatedAt ? `
-              <div style="display: flex; padding: 10px 0;">
-                <span style="width: 140px; color: var(--color-ash); font-weight: 600; font-size: 0.9rem;">Last Updated:</span>
-                <span style="flex: 1; color: var(--color-ink); font-weight: 500; font-size: 0.9rem;">${new Date(user.updatedAt).toLocaleString()}</span>
+              <div style="display: flex; padding: 12px 0;">
+                <span style="width: 140px; color: #6d6c6b; font-weight: 600; font-size: 0.9rem;">Last Updated:</span>
+                <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${new Date(user.updatedAt).toLocaleString()}</span>
               </div>` : ''}
             </div>
           </div>
@@ -780,18 +820,39 @@ class HtmlViews {
         ${getHeadTags(`Edit User: ${user.name} | Alumni Tracking System`)}
       </head>
       <body>
-        <div class="container" style="max-width: 750px; margin-top: 24px;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumni Tracking System">
+              <span class="nav-logo-icon">🎓</span>
+              <span class="nav-brand-text">ATS</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions">
+              <a href="/users/${user.id}" class="btn btn-secondary btn-sm">&larr; Profile</a>
+            </div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 800px; padding-top: 32px; padding-bottom: 64px;">
           ${flashBanner}
-          <div class="card">
-            <div style="margin-bottom: 16px;">
-              <a href="/users/${user.id}" class="btn btn-secondary btn-sm">&larr; Back to Profile</a>
+          <div class="glass-form-card">
+            <div style="margin-bottom: 20px;">
+              <a href="/users/${user.id}" class="btn-glass-pill btn-view">&larr; Back to Profile</a>
             </div>
 
-            <h1 style="margin: 0 0 6px 0; font-size: 1.6rem; color: var(--color-ink);">✏️ Edit User Record #${user.id}</h1>
-            <p style="color: var(--color-ash); margin: 0 0 24px 0; font-size: 0.95rem;">Update profile information and contact details.</p>
+            <h1 style="margin: 0 0 6px 0; font-family: var(--font-serif); font-size: 1.85rem; color: #16191c;">✏️ Edit User Record #${user.id}</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.95rem;">Update profile information and contact details.</p>
 
             <form action="/users/${user.id}/edit" method="POST">
-              <div class="form-grid">
+              <div class="form-grid-2col">
                 <div class="form-group">
                   <label for="name">Full Name *</label>
                   <input type="text" id="name" name="name" class="form-control" value="${user.name || ''}" required />
@@ -831,8 +892,8 @@ class HtmlViews {
                   <input type="text" id="jobTitle" name="jobTitle" class="form-control" value="${user.jobTitle || ''}" />
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid var(--color-stone); padding-top: 16px;">
-                <a href="/users/${user.id}" class="btn btn-secondary">Cancel</a>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
+                <a href="/users/${user.id}" class="btn-glass-pill btn-view">Cancel</a>
                 <button type="submit" class="btn btn-primary">💾 Save Changes (Update User)</button>
               </div>
             </form>

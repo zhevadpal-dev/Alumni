@@ -704,6 +704,207 @@ a {
 }
 
 /* ==========================================================================
+   9. iOS GLASSMORPHISM FORMS, INPUTS & USER PROFILE CARDS
+   ========================================================================== */
+.glass-form-card,
+.card.domain-violet {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 24px !important;
+  padding: 28px !important;
+  margin-bottom: 32px;
+  box-shadow: none !important;
+}
+
+.form-grid-2col,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 680px) {
+  .form-grid-2col,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #16191c;
+  letter-spacing: -0.01em;
+}
+
+.form-control,
+input[type="text"].form-control,
+input[type="email"].form-control,
+input[type="number"].form-control,
+input[type="tel"].form-control,
+input[type="password"].form-control,
+input[type="url"].form-control,
+select.form-control,
+textarea.form-control {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: #16191c;
+  outline: none;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2316191c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.form-control::placeholder {
+  color: #6d6c6b;
+  opacity: 0.85;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #16191c;
+  box-shadow: none !important;
+  outline: none;
+}
+
+/* User Profile Glass Cards */
+.user-glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  padding: 22px 26px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.user-glass-card:hover {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.user-glass-card .user-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #16191c;
+  margin: 0;
+}
+
+.user-glass-card .user-meta {
+  color: #4a4a4c;
+  font-size: 0.9rem;
+  margin: 4px 0;
+  line-height: 1.45;
+}
+
+.user-glass-card .user-meta strong {
+  color: #16191c;
+}
+
+.user-glass-card .user-subtext {
+  color: #4a4a4c;
+  font-size: 0.85rem;
+  margin: 2px 0;
+}
+
+.user-glass-card .user-subtext strong {
+  color: #16191c;
+}
+
+/* Translucent Action Buttons (View, Edit, Delete) */
+.btn-glass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #16191c;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.btn-glass-pill:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #16191c;
+  color: #16191c;
+}
+
+.btn-glass-pill.btn-view {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.btn-glass-pill.btn-edit {
+  background: rgba(255, 238, 216, 0.65);
+  border-color: rgba(255, 203, 164, 0.75);
+  color: #713f12;
+}
+.btn-glass-pill.btn-edit:hover {
+  background: rgba(255, 238, 216, 0.95);
+  border-color: #713f12;
+}
+
+.btn-glass-pill.btn-delete {
+  background: rgba(255, 222, 235, 0.65);
+  border-color: rgba(255, 143, 179, 0.75);
+  color: #9f1239;
+}
+.btn-glass-pill.btn-delete:hover {
+  background: rgba(255, 222, 235, 0.95);
+  border-color: #9f1239;
+}
+
+/* ==========================================================================
    RESPONSIVE QUERIES
    ========================================================================== */
 @media (max-width: 992px) {
