@@ -1,14 +1,14 @@
 /**
- * OpenAPI 3.0.0 Specification for Alumni Tracking System API
+ * OpenAPI 3.0.0 Specification for Alumly API
  */
 const swaggerSpec = {
   openapi: '3.0.0',
   info: {
-    title: 'Alumni Tracking System API',
+    title: 'Alumly API',
     version: '1.0.0',
-    description: 'Comprehensive interactive documentation and API testing playground for the Alumni Tracking System backend platform.',
+    description: 'Comprehensive interactive documentation and API testing playground for the Alumly backend platform.',
     contact: {
-      name: 'Alumni Dev Team',
+      name: 'Alumly Dev Team',
       email: 'zhevadpal@gmail.com'
     }
   },

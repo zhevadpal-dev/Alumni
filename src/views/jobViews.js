@@ -336,9 +336,21 @@ class JobViews {
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
-            <span class="nav-logo-icon">🎓</span>
-            <span class="nav-brand-text">ATS</span>
+          <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+            <span class="nav-logo-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="navAlumlyGradJobs" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF9A76"/>
+                    <stop offset="100%" stop-color="#FF528B"/>
+                  </linearGradient>
+                </defs>
+                <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradJobs)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradJobs)"/>
+              </svg>
+            </span>
+            <span class="nav-brand-text">Alumly</span>
           </a>
 
           <!-- Floating iOS-Style Pill Navigation -->
@@ -346,7 +358,7 @@ class JobViews {
             <ul class="nav-links">
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}" style="${activeTab === 'jobs' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Job Board</a></li>
-              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
@@ -463,7 +475,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Career Opportunities | Alumni Tracking System')}
+        ${getHeadTags('Career Opportunities | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('jobs')}
@@ -497,7 +509,7 @@ class JobViews {
             <div class="job-stat-card">
               <div class="stat-label">Applications Received</div>
               <div class="stat-value">${totalApplications}</div>
-              <div class="stat-sub"><a href="/applications">View ATS pipeline &rarr;</a></div>
+              <div class="stat-sub"><a href="/applications">View pipeline &rarr;</a></div>
             </div>
           </div>
 
@@ -683,7 +695,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumni Job Board`)}
+        ${getHeadTags(`${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumly`)}
       </head>
       <body>
         ${this.renderNavbar('jobs', true)}
@@ -839,7 +851,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Create Job Posting | Alumni Tracking System')}
+        ${getHeadTags('Create Job Posting | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('jobs', true)}
@@ -956,7 +968,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`Edit ${escapeHtml(job.title)} | Alumni Tracking System`)}
+        ${getHeadTags(`Edit ${escapeHtml(job.title)} | Alumly`)}
       </head>
       <body>
         ${this.renderNavbar('jobs', true)}

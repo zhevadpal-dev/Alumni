@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="alumlyFaviconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9A76"/>
+      <stop offset="100%" stop-color="#FF528B"/>
+    </linearGradient>
+  </defs>
+  <!-- Ink Black Squircle Container -->
+  <rect width="32" height="32" rx="9" fill="#16191c"/>
+  <!-- Minimalist A Monogram & Upward Pathway -->
+  <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M11 18L16 14.5L21 18" stroke="url(#alumlyFaviconGrad)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="16" cy="6.5" r="1.8" fill="url(#alumlyFaviconGrad)"/>
+</svg>

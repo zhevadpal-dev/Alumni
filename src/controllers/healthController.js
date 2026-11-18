@@ -15,12 +15,12 @@ class HealthController {
     return res.status(200).json({
       status: 'OK',
       healthy: true,
-      message: 'Alumni Tracking System API is running healthy',
+      message: 'Alumly API is running healthy',
       timestamp: new Date().toISOString(),
       uptime: uptimeSeconds,
       uptimeFormatted: `${Math.floor(uptimeSeconds / 60)}m ${Math.floor(uptimeSeconds % 60)}s`,
       environment: process.env.NODE_ENV || 'development',
-      service: 'Alumni Tracking System Backend',
+      service: 'Alumly Backend',
       version: '1.0.0',
       system: {
         platform: process.platform,

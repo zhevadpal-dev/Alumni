@@ -8,7 +8,8 @@ function getSwaggerHtml(spec) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Alumni Tracking System API - Swagger Documentation</title>
+  <title>Alumly API - Swagger Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.11.0/favicon-32x32.png" sizes="32x32" />
   <style>
@@ -69,7 +70,7 @@ function getSwaggerHtml(spec) {
 </head>
 <body>
   <div class="header-banner">
-    <h1>🎓 Alumni Tracking System API</h1>
+    <h1>Alumly API</h1>
     <a href="/api/swagger.json" target="_blank">📄 Raw OpenAPI JSON</a>
   </div>
 

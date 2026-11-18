@@ -32,9 +32,21 @@ class AnnouncementViews {
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
-            <span class="nav-logo-icon">🎓</span>
-            <span class="nav-brand-text">ATS</span>
+          <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+            <span class="nav-logo-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="navAlumlyGradAnn" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF9A76"/>
+                    <stop offset="100%" stop-color="#FF528B"/>
+                  </linearGradient>
+                </defs>
+                <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradAnn)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradAnn)"/>
+              </svg>
+            </span>
+            <span class="nav-brand-text">Alumly</span>
           </a>
 
           <!-- Floating iOS-Style Pill Navigation -->
@@ -42,7 +54,7 @@ class AnnouncementViews {
             <ul class="nav-links">
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
-              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}" style="${activeTab === 'announcements' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Announcements</a></li>
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
@@ -132,7 +144,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Announcement Management | Alumni Tracking System')}
+        ${getHeadTags('Announcement Management | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -272,7 +284,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`${escapeHtml(announcement.title)} | Alumni Tracking System`)}
+        ${getHeadTags(`${escapeHtml(announcement.title)} | Alumly`)}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -346,7 +358,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`Edit: ${escapeHtml(announcement.title)} | Alumni Tracking System`)}
+        ${getHeadTags(`Edit: ${escapeHtml(announcement.title)} | Alumly`)}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -409,7 +421,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('New Announcement | Alumni Tracking System')}
+        ${getHeadTags('New Announcement | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -477,7 +489,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Announcement Published | Alumni Tracking System')}
+        ${getHeadTags('Announcement Published | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -522,7 +534,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Announcement Updated | Alumni Tracking System')}
+        ${getHeadTags('Announcement Updated | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -565,7 +577,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Announcement Deleted | Alumni Tracking System')}
+        ${getHeadTags('Announcement Deleted | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}
@@ -603,7 +615,7 @@ class AnnouncementViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Error | Alumni Tracking System')}
+        ${getHeadTags('Error | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('announcements')}

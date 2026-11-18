@@ -7,7 +7,7 @@
  * - Zero Drop-Shadows (Flat Hairline Architecture)
  * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
  * - Cards: 1px Fog Border (#d1d4d9)
- * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for ATS, Petal Pink for Events)
+ * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for Applications, Petal Pink for Events)
  */
 
 const { getGlobalStyles, getHeadTags } = require('./styles');
@@ -29,7 +29,8 @@ class HtmlViews {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alumni Tracking System — Modern Higher Ed Platform</title>
+  <title>Alumly — Alumni & Career Network</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -40,9 +41,21 @@ class HtmlViews {
   <!-- 1. FLOATING PILL TOP NAVIGATION BAR (STICKY HOMEBAR) -->
   <header class="top-nav">
     <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumni Tracking System">
-        <span class="nav-logo-icon">🎓</span>
-        <span class="nav-brand-text">ATS</span>
+      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+        <span class="nav-logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="navAlumlyGradHome" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF9A76"/>
+                <stop offset="100%" stop-color="#FF528B"/>
+              </linearGradient>
+            </defs>
+            <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradHome)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradHome)"/>
+          </svg>
+        </span>
+        <span class="nav-brand-text">Alumly</span>
       </a>
 
       <!-- Floating iOS-Style Pill Navigation -->
@@ -50,7 +63,7 @@ class HtmlViews {
         <ul class="nav-links">
           <li><a href="#directory" class="nav-link">Alumni Directory</a></li>
           <li><a href="#jobs" class="nav-link">Job Board</a></li>
-          <li><a href="#applications" class="nav-link">Applications (ATS)</a></li>
+          <li><a href="#applications" class="nav-link">Applications</a></li>
           <li><a href="#pillars" class="nav-link">Platform</a></li>
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
@@ -93,7 +106,7 @@ class HtmlViews {
         <span>•</span>
         <div class="hero-meta-item">
           <span>💼</span>
-          <span>Many-to-Many ATS Routing</span>
+          <span>Many-to-Many Routing</span>
         </div>
         <span>•</span>
         <div class="hero-meta-item">
@@ -141,12 +154,12 @@ class HtmlViews {
         <div class="pillar-card bg-canary">
           <div>
             <div class="pillar-tag">● Applicant Tracking</div>
-            <h3 class="pillar-title">ATS Pipeline & Review</h3>
+            <h3 class="pillar-title">Applications & Review Pipeline</h3>
             <p class="pillar-desc">
               Structured stages from Submission to Technical Interview and Acceptance with attached resumes and reviewer notes (${appCount} candidates).
             </p>
           </div>
-          <a href="/applications" class="btn btn-primary btn-sm">Open ATS Board →</a>
+          <a href="/applications" class="btn btn-primary btn-sm">Open Applications Board →</a>
         </div>
 
         <div class="pillar-card bg-pink">
@@ -371,7 +384,7 @@ class HtmlViews {
     </div>
   </section>
 
-  <!-- 6. ATS PIPELINE OVERVIEW -->
+  <!-- 6. APPLICATIONS PIPELINE OVERVIEW -->
   <section class="section" id="applications">
     <div class="container">
       <div class="section-header text-center">
@@ -390,7 +403,7 @@ class HtmlViews {
           </p>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <a href="/applications" class="btn btn-primary">Open ATS Kanban →</a>
+          <a href="/applications" class="btn btn-primary">Open Applications Board →</a>
           <a href="/api/applications" target="_blank" class="btn btn-secondary">Raw JSON API</a>
         </div>
       </div>
@@ -402,7 +415,16 @@ class HtmlViews {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <h4>🎓 Alumni Tracking System</h4>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <span class="nav-logo-icon" style="width: 30px; height: 30px; border-radius: 8px;" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 18L16 14.5L21 18" stroke="#FF8FB3" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="6.5" r="1.8" fill="#FF8FB3"/>
+              </svg>
+            </span>
+            <span style="font-family: var(--font-sans); font-weight: 700; font-size: 1.25rem; color: var(--color-ink-black); letter-spacing: -0.02em;">Alumly</span>
+          </div>
           <p>
             The editorial-grade career platform and relational directory for academic institutions and their global alumni network.
           </p>
@@ -413,7 +435,7 @@ class HtmlViews {
           <ul>
             <li><a href="#directory">Alumni Directory</a></li>
             <li><a href="#jobs">Job Board</a></li>
-            <li><a href="#applications">Applications ATS</a></li>
+            <li><a href="#applications">Applications</a></li>
             <li><a href="/announcements">Campus Bulletins</a></li>
           </ul>
         </div>
@@ -440,7 +462,7 @@ class HtmlViews {
       </div>
 
       <div class="footer-bottom">
-        <span>&copy; 2026 Alumni Tracking System. All rights reserved.</span>
+        <span>&copy; 2026 Alumly. All rights reserved.</span>
         <span>Seamless Gradient Architecture • 100% Flat Hairline Design</span>
       </div>
     </div>
@@ -458,15 +480,21 @@ class HtmlViews {
     return `<!DOCTYPE html>
 <html lang="tr">
 <head>
-  ${getHeadTags('Hakkında | Alumni Tracking System')}
+  ${getHeadTags('Hakkında | Alumly')}
 </head>
 <body>
   <div class="container">
     <header class="header">
       <div class="brand">
-        <span class="brand-icon">🎓</span>
+        <span class="nav-logo-icon" style="width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: #16191c;" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 18L16 14.5L21 18" stroke="#FF8FB3" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="6.5" r="1.8" fill="#FF8FB3"/>
+          </svg>
+        </span>
         <div>
-          <h1 class="title">Alumni Tracking System</h1>
+          <h1 class="title">Alumly</h1>
           <div class="subtitle">Hakkında & Mimari Bilgiler</div>
         </div>
       </div>
@@ -482,7 +510,7 @@ class HtmlViews {
     <div class="card">
       <h2 style="font-size:1.6rem;font-weight:400;margin-bottom:12px;color:var(--color-ink);">Sistem Hakkında</h2>
       <p style="color:var(--color-ash);margin-bottom:16px;">
-        <strong>Alumni Tracking System</strong>, üniversiteler ve yükseköğretim kurumları için geliştirilmiş modern, ölçeklenebilir ve konteynerize edilmiş bir mezun takip ve kariyer yönetim platformudur.
+        <strong>Alumly</strong>, üniversiteler ve yükseköğretim kurumları için geliştirilmiş modern, ölçeklenebilir ve konteynerize edilmiş bir mezun takip ve kariyer yönetim platformudur.
       </p>
       <p style="color:var(--color-ash);margin-bottom:20px;">
         Mezunların kariyer basamaklarını izleme, iş ve staj ilanları yayınlama, aday başvurularını yönetme ve kurumsal iletişim duyurularını tek bir çatı altında toplar.
@@ -578,15 +606,27 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Alumni Directory | Alumni Tracking System')}
+        ${getHeadTags('Alumni Directory | Alumly')}
       </head>
       <body>
         <!-- 1. FLOATING PILL TOP NAVIGATION BAR -->
         <header class="top-nav">
           <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumni Tracking System">
-              <span class="nav-logo-icon">🎓</span>
-              <span class="nav-brand-text">ATS</span>
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="navAlumlyGradUsers" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#FF9A76"/>
+                      <stop offset="100%" stop-color="#FF528B"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradUsers)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradUsers)"/>
+                </svg>
+              </span>
+              <span class="nav-brand-text">Alumly</span>
             </a>
 
             <!-- Floating iOS-Style Pill Navigation -->
@@ -595,7 +635,7 @@ class HtmlViews {
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/users" class="nav-link active" style="color: var(--color-ink-black); font-weight: 700;">Alumni Directory</a></li>
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
                 <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
@@ -708,21 +748,33 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`${user.name} - Profile | Alumni Tracking System`)}
+        ${getHeadTags(`${user.name} - Profile | Alumly`)}
       </head>
       <body>
         <header class="top-nav">
           <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumni Tracking System">
-              <span class="nav-logo-icon">🎓</span>
-              <span class="nav-brand-text">ATS</span>
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="navAlumlyGradUserProf" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#FF9A76"/>
+                      <stop offset="100%" stop-color="#FF528B"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradUserProf)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradUserProf)"/>
+                </svg>
+              </span>
+              <span class="nav-brand-text">Alumly</span>
             </a>
             <nav class="nav-pill-menu">
               <ul class="nav-links">
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
               </ul>
             </nav>
@@ -817,21 +869,33 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`Edit User: ${user.name} | Alumni Tracking System`)}
+        ${getHeadTags(`Edit User: ${user.name} | Alumly`)}
       </head>
       <body>
         <header class="top-nav">
           <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumni Tracking System">
-              <span class="nav-logo-icon">🎓</span>
-              <span class="nav-brand-text">ATS</span>
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="navAlumlyGradEditUser" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#FF9A76"/>
+                      <stop offset="100%" stop-color="#FF528B"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradEditUser)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradEditUser)"/>
+                </svg>
+              </span>
+              <span class="nav-brand-text">Alumly</span>
             </a>
             <nav class="nav-pill-menu">
               <ul class="nav-links">
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications (ATS)</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
               </ul>
             </nav>
@@ -919,7 +983,7 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Registration Successful | Alumni Tracking System')}
+        ${getHeadTags('Registration Successful | Alumly')}
       </head>
       <body>
         <div class="container" style="max-width: 650px; margin-top: 40px;">
@@ -964,7 +1028,7 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('User Updated | Alumni Tracking System')}
+        ${getHeadTags('User Updated | Alumly')}
       </head>
       <body>
         <div class="container" style="max-width: 650px; margin-top: 40px;">
@@ -1009,7 +1073,7 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('User Deleted | Alumni Tracking System')}
+        ${getHeadTags('User Deleted | Alumly')}
       </head>
       <body>
         <div class="container" style="max-width: 600px; margin-top: 40px;">
@@ -1049,7 +1113,7 @@ class HtmlViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Error | Alumni Tracking System')}
+        ${getHeadTags('Error | Alumly')}
       </head>
       <body>
         <div class="container" style="max-width: 600px; margin-top: 40px;">

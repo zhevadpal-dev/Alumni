@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ALUMNI TRACKING SYSTEM — OFFICIAL HOMEPAGE STYLESHEET
+   ALUMLY — OFFICIAL PLATFORM STYLESHEET
    100% Flat Architecture • Seamless Fixed Gradient • Glassmorphism Top Nav
    ========================================================================== */
 
@@ -130,34 +130,37 @@ a {
   gap: 10px;
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   letter-spacing: -0.02em;
   color: var(--color-ink-black);
   text-decoration: none;
   justify-self: start;
   flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+.nav-logo:hover {
+  opacity: 0.85;
 }
 
 .nav-logo-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   background: var(--color-ink-black);
   color: #ffffff;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: var(--font-mono);
-  font-weight: 600;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
 .nav-brand-text {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: var(--color-ink-black);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* Floating iOS-Style Pill Navigation */

@@ -1,5 +1,5 @@
 /**
- * Alumni Tracking System — Shared View Styles Helper
+ * Alumly — Shared View Styles Helper
  * Canonical design.md & Amplemarket Editorial SaaS Specification
  */
 
@@ -54,11 +54,37 @@ function getGlobalStyles() {
   return cachedCss;
 }
 
+const BRAND_SVG_ICON = `
+<svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="alumlyNavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9A76"/>
+      <stop offset="100%" stop-color="#FF528B"/>
+    </linearGradient>
+  </defs>
+  <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11 18L16 14.5L21 18" stroke="url(#alumlyNavGrad)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="16" cy="6.5" r="1.8" fill="url(#alumlyNavGrad)"/>
+</svg>
+`;
+
+function getBrandLogoHtml(title = "Alumly — Alumni & Career Network") {
+  return `
+    <a href="/" class="nav-logo" title="${title}">
+      <span class="nav-logo-icon">
+        ${BRAND_SVG_ICON}
+      </span>
+      <span class="nav-brand-text">Alumly</span>
+    </a>
+  `;
+}
+
 function getHeadTags(pageTitle) {
   return `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${pageTitle}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -71,5 +97,7 @@ function getHeadTags(pageTitle) {
 
 module.exports = {
   getGlobalStyles,
-  getHeadTags
+  getHeadTags,
+  BRAND_SVG_ICON,
+  getBrandLogoHtml
 };

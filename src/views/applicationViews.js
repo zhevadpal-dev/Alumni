@@ -7,7 +7,7 @@
  * - Zero Drop-Shadows (Flat Hairline Architecture)
  * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
  * - Cards: 1px Fog Border (#d1d4d9)
- * - Pastel Domain Taxonomy (Canary Yellow for ATS Applications)
+ * - Pastel Domain Taxonomy (Canary Yellow for Applications)
  */
 
 const { getGlobalStyles, getHeadTags } = require('./styles');
@@ -262,9 +262,21 @@ class ApplicationViews {
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
         <div class="nav-wrapper">
-          <a href="/" class="nav-logo" title="Alumni Tracking System (ATS)">
-            <span class="nav-logo-icon">🎓</span>
-            <span class="nav-brand-text">ATS</span>
+          <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+            <span class="nav-logo-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="navAlumlyGradApp" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF9A76"/>
+                    <stop offset="100%" stop-color="#FF528B"/>
+                  </linearGradient>
+                </defs>
+                <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradApp)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradApp)"/>
+              </svg>
+            </span>
+            <span class="nav-brand-text">Alumly</span>
           </a>
 
           <!-- Floating iOS-Style Pill Navigation -->
@@ -272,7 +284,7 @@ class ApplicationViews {
             <ul class="nav-links">
               <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
-              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}" style="${activeTab === 'applications' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Applications (ATS)</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}" style="${activeTab === 'applications' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
@@ -389,7 +401,7 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Applications Tracking Board | Alumni Tracking System')}
+        ${getHeadTags('Applications Board | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('applications')}
@@ -551,7 +563,7 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags(`Application #${app.id} | Alumni Tracking System`)}
+        ${getHeadTags(`Application #${app.id} | Alumly`)}
       </head>
       <body>
         ${this.renderNavbar('applications')}
