@@ -665,7 +665,7 @@ class JobViews {
                     ${app.resumeUrl ? `<br><a href="${escapeHtml(app.resumeUrl)}" target="_blank" style="color: #2563eb; font-size: 0.78rem;">📄 View Resume</a>` : ''}
                   </td>
                   <td>
-                    <a href="/applications/${app.id}" class="btn btn-secondary btn-sm">Review →</a>
+                    <a href="/applications/${app.id}" class="btn-action-pill">Review →</a>
                   </td>
                 </tr>
               `).join('')}
@@ -686,9 +686,9 @@ class JobViews {
         ${getHeadTags(`${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumni Job Board`)}
       </head>
       <body>
-        ${this.renderNavbar('jobs')}
+        ${this.renderNavbar('jobs', true)}
 
-        <div class="container">
+        <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
           <div style="margin-bottom: 20px;">
             <a href="/jobs" class="btn-action-pill">← Back to All Job Postings</a>
           </div>
@@ -697,66 +697,66 @@ class JobViews {
 
           <!-- Job Overview Card -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
               <div>
                 <span class="badge ${this.getJobTypeBadgeClass(job.jobType)}">${escapeHtml(job.jobType || 'Full-Time')}</span>
                 <span class="badge ${job.status === 'Active' ? 'badge-active' : 'badge-closed'}" style="margin-left: 6px;">${escapeHtml(job.status)}</span>
-                <h1 style="font-size: 1.8rem; margin: 10px 0 4px 0; color: #0f172a;">${escapeHtml(job.title)}</h1>
-                <div style="font-size: 1.1rem; color: #475569; font-weight: 600;">🏢 ${escapeHtml(job.company)}</div>
+                <h1 style="font-family: var(--font-serif); font-size: 2rem; font-weight: 600; margin: 10px 0 4px 0; color: #16191c; letter-spacing: -0.02em;">${escapeHtml(job.title)}</h1>
+                <div style="font-size: 1.1rem; color: #4a4a4c; font-weight: 600;">🏢 ${escapeHtml(job.company)}</div>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <a href="/jobs/${job.id}/edit" class="btn btn-secondary">✏️ Edit Job</a>
-                <form action="/jobs/${job.id}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this job posting?');" style="display:inline;">
-                  <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+              <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
+                <a href="/jobs/${job.id}/edit" class="btn-action-pill">✏️ Edit Job</a>
+                <form action="/jobs/${job.id}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this job posting?');" style="display:inline; margin: 0;">
+                  <button type="submit" class="btn-action-pill btn-delete">🗑️ Delete</button>
                 </form>
               </div>
             </div>
 
             <!-- Job Key Attributes -->
-            <div class="metrics-grid" style="margin-bottom: 20px;">
-              <div class="metric-card" style="padding: 12px 16px;">
+            <div class="metrics-grid" style="margin-bottom: 24px;">
+              <div class="metric-card" style="padding: 14px 18px;">
                 <div class="metric-label">Location</div>
-                <div style="font-size: 1.05rem; font-weight: 600; color: #0f172a; margin-top: 4px;">📍 ${escapeHtml(job.location || 'Remote')}</div>
+                <div style="font-size: 1.05rem; font-weight: 600; color: #16191c; margin-top: 4px;">📍 ${escapeHtml(job.location || 'Remote')}</div>
               </div>
-              <div class="metric-card" style="padding: 12px 16px;">
+              <div class="metric-card" style="padding: 14px 18px;">
                 <div class="metric-label">Compensation</div>
                 <div style="font-size: 1.05rem; font-weight: 600; color: #15803d; margin-top: 4px;">💰 ${escapeHtml(job.salaryRange || 'Competitive')}</div>
               </div>
-              <div class="metric-card" style="padding: 12px 16px;">
+              <div class="metric-card" style="padding: 14px 18px;">
                 <div class="metric-label">Deadline</div>
-                <div style="font-size: 1.05rem; font-weight: 600; color: #0f172a; margin-top: 4px;">⏰ ${job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Rolling'}</div>
+                <div style="font-size: 1.05rem; font-weight: 600; color: #16191c; margin-top: 4px;">⏰ ${job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Rolling'}</div>
               </div>
-              <div class="metric-card" style="padding: 12px 16px;">
+              <div class="metric-card" style="padding: 14px 18px;">
                 <div class="metric-label">Posted By</div>
-                <div style="font-size: 1.05rem; font-weight: 600; color: #0f172a; margin-top: 4px;">
-                  👤 ${job.poster ? `<a href="/users/${job.poster.id}" style="color: #2563eb; text-decoration: none;">${escapeHtml(job.poster.name)}</a>` : 'System Admin'}
+                <div style="font-size: 1.05rem; font-weight: 600; color: #16191c; margin-top: 4px;">
+                  👤 ${job.poster ? `<a href="/users/${job.poster.id}" style="color: #16191c; font-weight: 600; text-decoration: underline;">${escapeHtml(job.poster.name)}</a>` : 'System Admin'}
                 </div>
               </div>
             </div>
 
             <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 1.1rem; color: #0f172a; margin-bottom: 8px;">Role Overview</h3>
-              <div style="white-space: pre-wrap; color: #334155; line-height: 1.6;">${escapeHtml(job.description)}</div>
+              <h3 style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: #16191c; margin-bottom: 8px;">Role Overview</h3>
+              <div style="white-space: pre-wrap; color: #334155; line-height: 1.6; font-size: 0.95rem;">${escapeHtml(job.description)}</div>
             </div>
 
             ${job.requirements ? `
               <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.1rem; color: #0f172a; margin-bottom: 8px;">Requirements & Qualifications</h3>
-                <div style="white-space: pre-wrap; color: #334155; line-height: 1.6;">${escapeHtml(job.requirements)}</div>
+                <h3 style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: #16191c; margin-bottom: 8px;">Requirements & Qualifications</h3>
+                <div style="white-space: pre-wrap; color: #334155; line-height: 1.6; font-size: 0.95rem;">${escapeHtml(job.requirements)}</div>
               </div>
             ` : ''}
 
-            <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; background: rgba(255, 255, 255, 0.4); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px);">
               ${job.applicationUrl ? `
                 <div>
-                  <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">EXTERNAL APPLICATION:</span><br>
-                  <a href="${escapeHtml(job.applicationUrl)}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: none;">${escapeHtml(job.applicationUrl)} ↗</a>
+                  <span style="font-size: 0.8rem; color: #4a4a4c; font-weight: 600;">EXTERNAL APPLICATION:</span><br>
+                  <a href="${escapeHtml(job.applicationUrl)}" target="_blank" style="color: #16191c; font-weight: 600; text-decoration: underline;">${escapeHtml(job.applicationUrl)} ↗</a>
                 </div>
               ` : ''}
               ${job.contactEmail ? `
                 <div>
-                  <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">INQUIRIES:</span><br>
-                  <a href="mailto:${escapeHtml(job.contactEmail)}" style="color: #2563eb; font-weight: 600; text-decoration: none;">${escapeHtml(job.contactEmail)}</a>
+                  <span style="font-size: 0.8rem; color: #4a4a4c; font-weight: 600;">INQUIRIES:</span><br>
+                  <a href="mailto:${escapeHtml(job.contactEmail)}" style="color: #16191c; font-weight: 600; text-decoration: underline;">${escapeHtml(job.contactEmail)}</a>
                 </div>
               ` : ''}
             </div>
@@ -764,20 +764,20 @@ class JobViews {
 
           <!-- Apply For This Position Section -->
           <div class="card" id="apply-form">
-            <div class="card-header">
+            <div class="card-header" style="margin-bottom: 20px;">
               <div>
                 <h2 class="card-title">📝 Apply for this Position</h2>
-                <p style="color: #64748b; font-size: 0.88rem; margin: 4px 0 0 0;">
+                <p style="color: #4a4a4c; font-size: 0.9rem; margin: 4px 0 0 0;">
                   Submit candidate profile and resume to connect via the Alumni Many-to-Many application network.
                 </p>
               </div>
             </div>
 
             <form action="/jobs/${job.id}/apply" method="POST">
-              <div class="form-grid">
+              <div class="form-grid" style="gap: 16px;">
                 <div class="form-group full">
                   <label for="app_userId">Candidate Applicant *</label>
-                  <select id="app_userId" name="userId" required>
+                  <select id="app_userId" name="userId" class="form-control" required>
                     <option value="">-- Choose Candidate User Profile --</option>
                     ${userOptions}
                   </select>
@@ -785,21 +785,21 @@ class JobViews {
                 </div>
                 <div class="form-group full">
                   <label for="app_coverLetter">Cover Letter / Note to Hiring Team</label>
-                  <textarea id="app_coverLetter" name="coverLetter" placeholder="Summarize your qualifications, motivation, and why you are a great match for this role..."></textarea>
+                  <textarea id="app_coverLetter" name="coverLetter" class="form-control" style="min-height: 110px; resize: vertical;" placeholder="Summarize your qualifications, motivation, and why you are a great match for this role..."></textarea>
                 </div>
                 <div class="form-group">
                   <label for="app_resumeUrl">Resume / Portfolio Link</label>
-                  <input type="url" id="app_resumeUrl" name="resumeUrl" placeholder="https://storage.example.com/resumes/my-cv.pdf">
+                  <input type="url" id="app_resumeUrl" name="resumeUrl" class="form-control" placeholder="https://storage.example.com/resumes/my-cv.pdf">
                   <div class="form-hint">Link to PDF resume, GitHub profile, or personal website.</div>
                 </div>
                 <div class="form-group">
                   <label for="app_notes">Candidate Notes</label>
-                  <input type="text" id="app_notes" name="notes" placeholder="e.g. Available for interview next week">
+                  <input type="text" id="app_notes" name="notes" class="form-control" placeholder="e.g. Available for interview next week">
                 </div>
               </div>
 
-              <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-                <button type="submit" class="btn btn-primary">
+              <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 28px; border-radius: 100px; font-weight: 600;">
                   🚀 Submit Job Application
                 </button>
               </div>
@@ -808,14 +808,14 @@ class JobViews {
 
           <!-- Received Applications List -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
               <div>
                 <h3 class="card-title">👥 Received Applications (${applications.length})</h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin: 4px 0 0 0;">
+                <p style="color: #4a4a4c; font-size: 0.85rem; margin: 4px 0 0 0;">
                   Candidates who have submitted applications for this specific opportunity.
                 </p>
               </div>
-              <a href="/applications" class="btn btn-secondary btn-sm">All Applications Board →</a>
+              <a href="/applications" class="btn-action-pill">All Applications Board →</a>
             </div>
 
             ${applicationsHtml}
