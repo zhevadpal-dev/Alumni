@@ -1,4 +1,4 @@
-# 🎓 Alumni Tracking System
+# 🎓 Alumly — Modern Alumni & Career Network
 
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
@@ -6,12 +6,21 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)](https://github.com/zhevadpal-dev/Alumni)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Brand Guide](https://img.shields.io/badge/Brand-Guide-2563EB?style=flat&logo=markdown&logoColor=white)](brand.md)
-[![Design System](https://img.shields.io/badge/Design-System-E8400D?style=flat&logo=figma&logoColor=white)](design.md)
+[![Brand Guidelines](https://img.shields.io/badge/Brand-Alumly-16191C?style=flat&logo=markdown&logoColor=white)](./brand.md)
+[![Design System](https://img.shields.io/badge/Design%20System-iOS%20Glassmorphism-FF528B?style=flat&logo=figma&logoColor=white)](./design.md)
 
-**Alumni Tracking System** is a scalable, containerized web platform designed for higher education institutions to maintain enduring relationships with graduates, track career pathways, foster professional networking, and streamline institutional communication.
+**Alumly** is a modern, containerized career network and relational directory platform designed for higher education institutions to maintain enduring relationships with graduates, track career pathways, share premier job opportunities, and empower academic communities with an editorial, startup-grade experience.
 
 The backend is built with **Node.js** and **Express**, utilizing **PostgreSQL** for relational data persistence, fully containerized with **Docker & Docker Compose** for streamlined deployment, and hosted on **GitHub** for version control and CI/CD pipelines.
+
+---
+
+## 🎨 Brand & Design Documentation
+
+Comprehensive specifications for the **Alumly** brand identity and iOS glassmorphism design language:
+
+- 📖 **Brand Guidelines:** [Brand Guidelines (brand.md)](./brand.md) — Core brand identity, mission, voice & tone, custom vector logo & favicon, color system, and typographic hierarchy.
+- 📐 **Design System:** [Design System (design.md)](./design.md) — iOS glassmorphism visual language, ambient peach-to-pink canvas gradient, 3-column CSS Grid navigation header, rounded form controls, and component recipes.
 
 ---
 
@@ -40,7 +49,7 @@ The backend is built with **Node.js** and **Express**, utilizing **PostgreSQL** 
 
 ## 🏛️ MVC Architecture & Project Structure
 
-The Alumni Tracking System backend follows the **Model-View-Controller (MVC)** architectural design pattern to achieve a strict separation of concerns, high maintainability, testability, and scalability.
+The Alumly backend follows the **Model-View-Controller (MVC)** architectural design pattern to achieve a strict separation of concerns, high maintainability, testability, and scalability.
 
 ```
                                  ┌─────────────────────────┐
@@ -185,8 +194,8 @@ Alumni/
 │   └── forgetting-test.sh           # Automated in-memory lifecycle verification script (Forgetting Test)
 ├── docs/                            # ARCHITECTURAL DOCUMENTATION
 │   └── ddd.md                       # Comprehensive Data Design & Architecture Documentation (DDD)
-├── brand.md                         # Brand Guidelines, Visual Identity & Tone of Voice Specification
-├── design.md                        # Master Design System (Amplemarket, User Interviews, Hashnode, Alden Synthesis)
+├── brand.md                         # Alumly Brand Guidelines, Identity & Voice Specification
+├── design.md                        # Master Design System (iOS Glassmorphism, Ambient Gradient & 3-Column Header)
 ├── package.json                     # Node.js project manifest, dependencies, and npm scripts
 └── README.md                        # Master project documentation
 ```
@@ -447,7 +456,7 @@ const appWithDetails = await ApplicationModel.getByIdWithDetails(1);
 
 ## 🗄️ Data Design & Architecture
 
-The Alumni Tracking System employs a structured relational data model strictly encapsulated within the **Model Layer** (`src/models/`):
+Alumly employs a structured relational data model strictly encapsulated within the **Model Layer** (`src/models/`):
 
 - **PostgreSQL Relational Persistence:** Active models ([`userModel.js`](src/models/userModel.js) and [`announcementModel.js`](src/models/announcementModel.js)) connect to PostgreSQL 15 (`alumni_db` container) via a robust connection pool (`src/config/db.js`), using parameterized SQL queries with ACID guarantees and named volume persistence (`postgres_data`).
 - **Factory Pattern & Mock Generators (`src/factories/`):**
@@ -862,16 +871,17 @@ Whenever a new route or endpoint is defined in this project, the following proto
 <a id="brand-identity"></a>
 ## 🎨 Brand Identity & Design System
 
-The visual design system, official typography standards, color tokens, and tone of voice guidelines for the Alumni Tracking System are formally specified across two dedicated specifications:
+The visual design system, official typography standards, color tokens, and tone of voice guidelines for **Alumly** are formally specified across two dedicated specifications:
 
-👉 **Brand Identity & Philosophy:** [Brand Guidelines (`brand.md`)](brand.md)  
-👉 **Master Design System & UI Specification:** [Design System (`design.md`)](design.md)
+👉 **Brand Identity & Philosophy:** [Brand Guidelines (brand.md)](./brand.md)  
+👉 **Master Design System & UI Specification:** [Design System (design.md)](./design.md)
 
-### Design System Architecture (The 4-Pillar Synthesis):
-- **🌸 Pastel Domain Taxonomy (Amplemarket):** Flat pastel surfaces for cognitive domain mapping — Soft Violet (`#e2ddfd`) for Alumni, Mint Green (`#b7efb2`) for Jobs, Canary Yellow (`#ffef99`) for ATS, Petal Pink (`#ffd7f0`) for Events, Aqua (`#99fff9`) for Telemetry.
-- **🎓 Editorial Serif & Monospace Eyebrows (User Interviews):** High-contrast editorial serif headers (`Source Serif 4`) delivering academic dignity, paired with monospace tags (`● ALUMNI-PORTAL`) and crisp UI sans (`Inter`).
-- **⚡ Hairline Border & Single CTA Discipline (Hashnode):** Flat layers with 1px stone borders (`#d1d4d9`), zero muddy drop shadows, and strict single dominant CTA discipline per viewport.
-- **📜 Two-Tone Canvas & Word Annotations (Alden):** High-contrast Paper White (`#ffffff`) components over a warm Parchment Cream (`#f7f6f2`) canvas, enhanced with Sky Highlight (`#97cde5`) inline annotations.
+### Design System Architecture (iOS Glassmorphism & Editorial Network):
+- **🌅 Seamless Ambient Canvas:** Full-viewport fixed ambient peach-to-pink gradient canvas (`#FF9A76` → `#FFFFFF` → `#FF528B`).
+- **🪟 iOS Glassmorphism Surfaces:** Translucent frosted-glass cards, tables, and form containers (`backdrop-filter: blur(16px)`), crisp hairline borders (`1px solid rgba(255, 255, 255, 0.65)`), and zero heavy drop-shadows.
+- **🧭 3-Column Symmetrical Header:** Full-width CSS Grid (`1fr auto 1fr`) with the Alumly brand mark flush left, floating frosted-glass nav pill centered, and an empty right-aligned action spacer to mathematically preserve dead-center pill alignment.
+- **🖋️ Editorial Typography & Ink Black CTAs:** High-contrast serif headlines (`Source Serif 4`) paired with clean UI sans (`Inter`) and dominant Ink Black (`#16191c`) pill-shaped CTA buttons.
+- **📝 Generous Rounded Form Controls:** `16px` rounded frosted-glass input fields with subtle `12px` muted captions for effortless user submissions.
 
 ---
 
