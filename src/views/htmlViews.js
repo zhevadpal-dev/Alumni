@@ -410,8 +410,8 @@ class HtmlViews {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <span class="nav-logo-icon" style="width: 30px; height: 30px; border-radius: 8px;" aria-hidden="true">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span class="nav-logo-icon" style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16);" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="footerAlumlyGrad" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -436,7 +436,7 @@ class HtmlViews {
                 </g>
               </svg>
             </span>
-            <span style="font-family: var(--font-sans); font-weight: 700; font-size: 1.25rem; color: var(--color-ink-black); letter-spacing: -0.02em;">Alumly</span>
+            <span class="footer-brand-title" style="font-family: var(--font-sans); font-weight: 700; font-size: 1.25rem; color: #ffffff; letter-spacing: -0.02em;">Alumly</span>
           </div>
           <p>
             The editorial-grade career platform and relational directory for academic institutions and their global alumni network.
