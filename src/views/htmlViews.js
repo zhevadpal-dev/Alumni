@@ -491,18 +491,19 @@ class HtmlViews {
    */
   static renderAbout() {
     return `<!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-  ${getHeadTags('Hakkında | Alumly')}
+  ${getHeadTags('About System | Alumly')}
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="brand">
-        <span class="nav-logo-icon" style="width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: #16191c;" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- FLOATING PILL TOP NAVIGATION BAR -->
+  <header class="top-nav">
+    <div class="nav-wrapper">
+      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+        <span class="nav-logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="aboutAlumlyGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <linearGradient id="navAlumlyGradAbout" x1="0%" y1="100%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#FF9A76"/>
                 <stop offset="100%" stop-color="#FF528B"/>
               </linearGradient>
@@ -514,7 +515,7 @@ class HtmlViews {
               <!-- Cap Under-Bevel / 3D Rim Layer -->
               <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
               <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-              <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#aboutAlumlyGrad)"/>
+              <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradAbout)"/>
               <!-- Center Button Rivet -->
               <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
               <!-- Dangling Tassel Cord -->
@@ -524,41 +525,112 @@ class HtmlViews {
             </g>
           </svg>
         </span>
-        <div>
-          <h1 class="title">Alumly</h1>
-          <div class="subtitle">Hakkında & Mimari Bilgiler</div>
+        <span class="nav-brand-text">Alumly</span>
+      </a>
+
+      <!-- Floating iOS-Style Pill Navigation -->
+      <nav class="nav-pill-menu">
+        <ul class="nav-links">
+          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
+          <li><a href="/jobs" class="nav-link">Job Board</a></li>
+          <li><a href="/applications" class="nav-link">Applications</a></li>
+          <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right-Aligned Action Spacer -->
+      <div class="nav-actions">
+      </div>
+    </div>
+  </header>
+
+  <div class="container" style="max-width: 1000px; padding-top: 24px; padding-bottom: 64px;">
+    <!-- Page Header / Eyebrow -->
+    <div class="about-hero">
+      <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● PLATFORM ARCHITECTURE</span>
+      <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 8px 0; letter-spacing: -0.02em;">About Alumly</h1>
+      <p style="color: #4a4a4c; font-size: 1rem; margin: 0; line-height: 1.5;">The editorial career network and relational directory connecting higher education institutions and their global alumni.</p>
+    </div>
+
+    <!-- Main Frosted Glass Card -->
+    <div class="about-glass-card">
+      <h2 class="about-section-title">Platform Overview</h2>
+      <p class="about-body-text">
+        <strong>Alumly</strong> is a modern, containerized career management platform and relational directory engineered for universities, academic faculties, and collegiate communities.
+      </p>
+      <p class="about-body-text" style="margin-bottom: 32px;">
+        It unifies graduate career mobility tracking, vetted job and internship postings, candidate application lifecycle management, and institutional broadcast bulletins under a single high-performance system.
+      </p>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <h3 class="about-section-title" style="font-size: 1.35rem; margin: 0;">Architecture & Technology Stack</h3>
+        <span class="badge" style="background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(255, 255, 255, 0.85); color: #16191c; font-size: 0.75rem;">
+          PRODUCTION GRADE
+        </span>
+      </div>
+
+      <!-- Nested Frosted-Glass Mini-Cards Grid -->
+      <div class="stack-grid">
+        <!-- 1. Backend -->
+        <div class="stack-card">
+          <div class="stack-card-header">
+            <span style="font-size: 1.25rem;">⚡</span>
+            <span class="stack-card-eyebrow" style="color: #2563eb;">Backend</span>
+          </div>
+          <div class="stack-card-title">Node.js 20 LTS & Express.js</div>
+          <p class="stack-card-desc">High-throughput modular MVC architecture with async handler pipelines and duration logging.</p>
+        </div>
+
+        <!-- 2. Database -->
+        <div class="stack-card">
+          <div class="stack-card-header">
+            <span style="font-size: 1.25rem;">🐘</span>
+            <span class="stack-card-eyebrow" style="color: #059669;">Database</span>
+          </div>
+          <div class="stack-card-title">PostgreSQL 15 Relational DB</div>
+          <p class="stack-card-desc">ACID-compliant storage containerized via Docker with foreign key integrity and connection pooling.</p>
+        </div>
+
+        <!-- 3. Documentation -->
+        <div class="stack-card">
+          <div class="stack-card-header">
+            <span style="font-size: 1.25rem;">📖</span>
+            <span class="stack-card-eyebrow" style="color: #d97706;">Documentation</span>
+          </div>
+          <div class="stack-card-title">OpenAPI 3.0 & Swagger UI</div>
+          <p class="stack-card-desc">Interactive REST documentation, real-time testing console, and exportable Postman collections.</p>
+        </div>
+
+        <!-- 4. Reliability -->
+        <div class="stack-card">
+          <div class="stack-card-header">
+            <span style="font-size: 1.25rem;">🛡️</span>
+            <span class="stack-card-eyebrow" style="color: #dc2626;">Reliability</span>
+          </div>
+          <div class="stack-card-title">404 Route Guardian & 5xx Error Handler</div>
+          <p class="stack-card-desc">Structured fallback middleware preventing HTML leaks with dedicated file-isolated error logging.</p>
+        </div>
+
+        <!-- 5. Design System -->
+        <div class="stack-card">
+          <div class="stack-card-header">
+            <span style="font-size: 1.25rem;">✨</span>
+            <span class="stack-card-eyebrow" style="color: #7c3aed;">Design System</span>
+          </div>
+          <div class="stack-card-title">iOS Glassmorphism UI</div>
+          <p class="stack-card-desc">Multi-stop mesh gradients, multi-layer blur filters, hairline borders, and zero drop-shadow flat architecture.</p>
         </div>
       </div>
-      <nav class="nav-links">
-        <a href="/">🏠 Ana Sayfa</a>
-        <a href="/jobs">💼 İş İlanları</a>
-        <a href="/applications">📝 Başvurular</a>
-        <a href="/users">👥 Mezunlar</a>
-        <a href="/announcements">📢 Duyurular</a>
-      </nav>
-    </header>
 
-    <div class="card">
-      <h2 style="font-size:1.6rem;font-weight:400;margin-bottom:12px;color:var(--color-ink);">Sistem Hakkında</h2>
-      <p style="color:var(--color-ash);margin-bottom:16px;">
-        <strong>Alumly</strong>, üniversiteler ve yükseköğretim kurumları için geliştirilmiş modern, ölçeklenebilir ve konteynerize edilmiş bir mezun takip ve kariyer yönetim platformudur.
-      </p>
-      <p style="color:var(--color-ash);margin-bottom:20px;">
-        Mezunların kariyer basamaklarını izleme, iş ve staj ilanları yayınlama, aday başvurularını yönetme ve kurumsal iletişim duyurularını tek bir çatı altında toplar.
-      </p>
-
-      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:8px;color:var(--color-ink);">Teknoloji Altyapısı</h3>
-      <ul style="color:var(--color-ash);margin-bottom:24px;padding-left:20px;">
-        <li><strong>Backend:</strong> Node.js 20 LTS & Express.js</li>
-        <li><strong>Veritabanı:</strong> PostgreSQL 15 İlişkisel Veritabanı</li>
-        <li><strong>Dokümantasyon:</strong> OpenAPI 3.0 & Swagger UI</li>
-        <li><strong>Güvenlik & Hata Yönetimi:</strong> 404 Route Guardian & 5xx Global Error Handler</li>
-        <li><strong>Tasarım Sistemi:</strong> Modern Arayüz Mimarisi & Cam Efektleri</li>
-      </ul>
-
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
-        <a href="/api/swagger" class="btn btn-secondary">API Swagger Dokümantasyonu</a>
+      <!-- Action Buttons -->
+      <div class="about-actions">
+        <a href="/" class="btn btn-primary" style="border-radius: 100px; padding: 12px 28px; font-weight: 600; font-size: 0.95rem;">
+          ← Back to Home
+        </a>
+        <a href="/api/swagger" target="_blank" class="btn-glass-secondary">
+          📖 Explore API Documentation
+        </a>
       </div>
     </div>
   </div>
