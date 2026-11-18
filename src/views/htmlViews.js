@@ -81,11 +81,8 @@ class HtmlViews {
         </ul>
       </nav>
 
-      <!-- Right-Aligned Action CTA Buttons -->
-      <div class="nav-actions">
-        <a href="/users" class="btn btn-ghost btn-sm">Sign In</a>
-        <a href="#jobs" class="btn btn-primary btn-sm">Explore Careers →</a>
-      </div>
+      <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
+      <div class="nav-actions"></div>
     </div>
   </header>
 
