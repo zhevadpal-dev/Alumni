@@ -54,6 +54,7 @@ html, body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 html {
@@ -65,7 +66,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(135deg, #ffe0d2 0%, #ffffff 40%, #e8ddff 100%);
+  background: linear-gradient(135deg, #FF9A76 0%, #FFCBA4 25%, #FFFFFF 50%, #C490FF 75%, #A05CFF 100%);
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
@@ -97,15 +98,16 @@ a {
 /* ==========================================================================
    2. GLASSMORPHISM TOP NAVIGATION BAR (STICKY HOMEBAR)
    ========================================================================== */
-.top-nav {
+.top-nav,
+.sticky-nav {
   position: sticky;
   top: 0;
   z-index: 100;
   height: var(--nav-height);
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
 }
