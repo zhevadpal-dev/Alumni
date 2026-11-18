@@ -6,6 +6,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)](https://github.com/zhevadpal-dev/Alumni)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Brand Guide](https://img.shields.io/badge/Brand-Guide-2563EB?style=flat&logo=markdown&logoColor=white)](brand.md)
 
 **Alumni Tracking System** is a scalable, containerized web platform designed for higher education institutions to maintain enduring relationships with graduates, track career pathways, foster professional networking, and streamline institutional communication.
 
@@ -183,6 +184,7 @@ Alumni/
 │   └── forgetting-test.sh           # Automated in-memory lifecycle verification script (Forgetting Test)
 ├── docs/                            # ARCHITECTURAL DOCUMENTATION
 │   └── ddd.md                       # Comprehensive Data Design & Architecture Documentation (DDD)
+├── brand.md                         # Brand Guidelines, Visual Identity & Design System Specification
 ├── package.json                     # Node.js project manifest, dependencies, and npm scripts
 └── README.md                        # Master project documentation
 ```
@@ -852,6 +854,21 @@ Whenever a new route or endpoint is defined in this project, the following proto
 4. **Postman Collections:** Update both `alumni-api.postman_collection.json` and `Alumni Tracking System API/` with pre-configured requests.
 5. **Live Server Reload:** Restart the running container (`docker compose restart app`).
 6. **Git Version Control:** Automatically stage all changes, write a descriptive commit message, and push directly to `origin main`.
+
+---
+
+<a id="brand-identity"></a>
+## 🎨 Brand Identity & Design System
+
+The visual design system, official typography standards, color tokens, and tone of voice guidelines for the Alumni Tracking System are formally specified in the project's brand guidelines:
+
+👉 **Read the Full Specification:** [Brand Guidelines (`brand.md`)](brand.md)
+
+### Highlights:
+- **Core Palette:** Corporate Blue (`#2563eb`), Dark Slate (`#0f172a`), Surface Canvas (`#f8fafc`), Card Surface (`#ffffff`), and Border Gray (`#e2e8f0`).
+- **Semantic Accents:** Success Green (`#16a34a`), Warning Amber (`#d97706`), Danger Red (`#dc2626`), and Info Sky (`#0284c7`).
+- **Typography:** Native responsive system font stacks with monospace accents for IDs, paths, and telemetry.
+- **Component Principles:** Card-based elevated surfaces, WCAG 2.1 AA accessible contrast ratios, and consistent button semantics.
 
 ---
 
