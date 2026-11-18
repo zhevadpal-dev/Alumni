@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alumni Tracking System — Higher Ed Career & Network Platform</title>
+  <title>Alumni Tracking System — Modern Higher Ed Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
   <!-- =========================================================================
-       1. STICKY HOMEBAR (TOP NAVIGATION)
+       1. GLASSMORPHISM TOP NAVIGATION BAR (STICKY HOMEBAR)
        ========================================================================= -->
-  <header class="sticky-nav">
+  <header class="top-nav">
     <div class="container nav-wrapper">
       <a href="/" class="nav-logo">
-        <span class="nav-logo-badge">ATS</span>
+        <span class="nav-logo-icon">🎓</span>
         <span>Alumni Tracking System</span>
       </a>
 
@@ -26,7 +26,7 @@
           <li><a href="#directory" class="nav-link">Alumni Directory</a></li>
           <li><a href="#jobs" class="nav-link">Job Board</a></li>
           <li><a href="#applications" class="nav-link">Applications (ATS)</a></li>
-          <li><a href="#platform" class="nav-link">Platform</a></li>
+          <li><a href="#pillars" class="nav-link">Platform</a></li>
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>
@@ -39,7 +39,7 @@
   </header>
 
   <!-- =========================================================================
-       2. HERO SECTION (PHOENIX ORANGE ATMOSPHERIC WASH)
+       2. HERO SECTION
        ========================================================================= -->
   <section class="hero-section">
     <div class="container hero-content">
@@ -56,35 +56,34 @@
         Connect graduates with premier career opportunities, track application lifecycles, and empower academic institutions with an editorial, high-performance database.
       </p>
 
-      <!-- Email Capture Input Joined Inline with Primary Button -->
-      <form action="/users" method="GET" class="hero-capture">
-        <input type="email" placeholder="Enter alumni or university email..." aria-label="University Email" required>
-        <button type="submit" class="btn btn-primary">Get Started</button>
-      </form>
+      <div class="hero-actions">
+        <a href="/users" class="btn btn-primary">Get Started ➔</a>
+        <a href="#jobs" class="btn btn-secondary">Explore Job Board</a>
+      </div>
 
-      <div class="hero-meta-strip">
+      <div class="hero-meta">
         <div class="hero-meta-item">
           <span>🐘</span>
-          <span>ACID Relational Storage</span>
+          <span>PostgreSQL 15 ACID Storage</span>
         </div>
         <span>•</span>
         <div class="hero-meta-item">
           <span>💼</span>
-          <span>Many-to-Many ATS Pipeline</span>
+          <span>Many-to-Many ATS Routing</span>
         </div>
         <span>•</span>
         <div class="hero-meta-item">
           <span>🛡️</span>
-          <span>404/5xx Guardians Active</span>
+          <span>404 & 5xx Guardians Active</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- =========================================================================
-       3. PASTEL TAXONOMY TILES (AMPLEMARKET PILLARS)
+       3. FEATURE SECTION: CATEGORY-CODED PASTEL PILLARS
        ========================================================================= -->
-  <section class="section section-cream" id="platform">
+  <section class="section" id="pillars">
     <div class="container">
       <div class="section-header text-center">
         <span class="eyebrow">Category-Coded Pillars</span>
@@ -94,68 +93,60 @@
         </p>
       </div>
 
-      <div class="pastel-grid">
-        <!-- Tile 1: Alumni Network (Soft Violet) -->
-        <div class="pastel-card bg-violet">
+      <div class="pillars-grid">
+        <!-- Pillar 1: Alumni Directory (Soft Violet) -->
+        <div class="pillar-card bg-violet">
           <div>
-            <div class="pastel-card-tag">● Alumni Directory</div>
-            <h3 class="pastel-card-title">Global Alumni Network</h3>
-            <p class="pastel-card-desc">
+            <div class="pillar-tag">● Alumni Directory</div>
+            <h3 class="pillar-title">Global Alumni Network</h3>
+            <p class="pillar-desc">
               Comprehensive graduate dossiers detailing faculties, graduation classes, current companies, and research credentials.
             </p>
           </div>
-          <div class="pastel-card-footer">
-            <a href="/users" class="btn btn-primary btn-sm">Browse Members →</a>
-          </div>
+          <a href="/users" class="btn btn-primary btn-sm">Browse Members →</a>
         </div>
 
-        <!-- Tile 2: Job Board (Mint Green) -->
-        <div class="pastel-card bg-mint">
+        <!-- Pillar 2: Career Board (Mint Green) -->
+        <div class="pillar-card bg-mint">
           <div>
-            <div class="pastel-card-tag">● Career Opportunities</div>
-            <h3 class="pastel-card-title">Verified Job Board</h3>
-            <p class="pastel-card-desc">
+            <div class="pillar-tag">● Career Opportunities</div>
+            <h3 class="pillar-title">Verified Job Board</h3>
+            <p class="pillar-desc">
               Exclusive employment, internship, and research positions curated by corporate partners and distinguished alumni.
             </p>
           </div>
-          <div class="pastel-card-footer">
-            <a href="/jobs" class="btn btn-primary btn-sm">View Postings →</a>
-          </div>
+          <a href="/jobs" class="btn btn-primary btn-sm">View Postings →</a>
         </div>
 
-        <!-- Tile 3: Applications ATS (Canary Yellow) -->
-        <div class="pastel-card bg-canary">
+        <!-- Pillar 3: Applications ATS (Canary Yellow) -->
+        <div class="pillar-card bg-canary">
           <div>
-            <div class="pastel-card-tag">● Applicant Tracking</div>
-            <h3 class="pastel-card-title">ATS Pipeline & Review</h3>
-            <p class="pastel-card-desc">
+            <div class="pillar-tag">● Applicant Tracking</div>
+            <h3 class="pillar-title">ATS Pipeline & Review</h3>
+            <p class="pillar-desc">
               Structured stages from Submission to Technical Interview and Acceptance with attached resumes and reviewer notes.
             </p>
           </div>
-          <div class="pastel-card-footer">
-            <a href="/applications" class="btn btn-primary btn-sm">Open ATS Board →</a>
-          </div>
+          <a href="/applications" class="btn btn-primary btn-sm">Open ATS Board →</a>
         </div>
 
-        <!-- Tile 4: Announcements (Petal Pink) -->
-        <div class="pastel-card bg-pink">
+        <!-- Pillar 4: Campus Events (Petal Pink) -->
+        <div class="pillar-card bg-pink">
           <div>
-            <div class="pastel-card-tag">● Campus & Events</div>
-            <h3 class="pastel-card-title">University Bulletins</h3>
-            <p class="pastel-card-desc">
+            <div class="pillar-tag">● Campus & Events</div>
+            <h3 class="pillar-title">University Bulletins</h3>
+            <p class="pillar-desc">
               Academic conferences, career fairs, mentorship reunions, and urgent notifications delivered across faculties.
             </p>
           </div>
-          <div class="pastel-card-footer">
-            <a href="/announcements" class="btn btn-primary btn-sm">Read News →</a>
-          </div>
+          <a href="/announcements" class="btn btn-primary btn-sm">Read Bulletins →</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- =========================================================================
-       4. FEATURE SECTION: ALUMNI DIRECTORY
+       4. FEATURE SECTION: ALUMNI DIRECTORY SHOWCASE
        ========================================================================= -->
   <section class="section" id="directory">
     <div class="container">
@@ -168,7 +159,7 @@
           </p>
         </div>
         <div>
-          <a href="/users" class="btn btn-pearl">All Members Directory ➔</a>
+          <a href="/users" class="btn btn-secondary">All Members Directory ➔</a>
         </div>
       </div>
 
@@ -178,22 +169,22 @@
           <div>
             <div class="alumni-card-header">
               <div class="alumni-avatar">CD</div>
-              <span class="alumni-badge">Alumni</span>
+              <span class="badge">Alumni</span>
             </div>
             <h3 class="alumni-name">Canan Dağdeviren</h3>
-            <p class="alumni-title">Associate Professor & Scientist</p>
-            <div class="alumni-details">
-              <div class="alumni-detail-row">
+            <p class="alumni-role">Associate Professor & Scientist</p>
+            <div class="alumni-meta-list">
+              <div class="alumni-meta-row">
                 <span>Department:</span>
-                <strong>Physics & Materials Science</strong>
+                <span>Physics & Materials Science</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Class of:</span>
-                <strong>2009</strong>
+                <span>2009</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Institution:</span>
-                <strong>MIT Media Lab</strong>
+                <span>MIT Media Lab</span>
               </div>
             </div>
           </div>
@@ -204,23 +195,23 @@
         <div class="alumni-card">
           <div>
             <div class="alumni-card-header">
-              <div class="alumni-avatar" style="background-color: var(--color-mint-green); color: #064e3b;">AS</div>
-              <span class="alumni-badge">Alumni</span>
+              <div class="alumni-avatar" style="background: var(--pastel-mint); color: #064e3b;">AS</div>
+              <span class="badge">Alumni</span>
             </div>
             <h3 class="alumni-name">Dr. Aziz Sancar</h3>
-            <p class="alumni-title">Biochemist & Nobel Laureate</p>
-            <div class="alumni-details">
-              <div class="alumni-detail-row">
+            <p class="alumni-role">Biochemist & Nobel Laureate</p>
+            <div class="alumni-meta-list">
+              <div class="alumni-meta-row">
                 <span>Department:</span>
-                <strong>Biochemistry & Biophysics</strong>
+                <span>Biochemistry & Biophysics</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Class of:</span>
-                <strong>1969</strong>
+                <span>1969</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Institution:</span>
-                <strong>UNC School of Medicine</strong>
+                <span>UNC School of Medicine</span>
               </div>
             </div>
           </div>
@@ -231,23 +222,23 @@
         <div class="alumni-card">
           <div>
             <div class="alumni-card-header">
-              <div class="alumni-avatar" style="background-color: var(--color-canary-yellow); color: #713f12;">MY</div>
-              <span class="alumni-badge">Faculty</span>
+              <div class="alumni-avatar" style="background: var(--pastel-canary); color: #713f12;">MY</div>
+              <span class="badge">Faculty</span>
             </div>
             <h3 class="alumni-name">Mehmet Yılmaz</h3>
-            <p class="alumni-title">Staff Infrastructure Engineer</p>
-            <div class="alumni-details">
-              <div class="alumni-detail-row">
+            <p class="alumni-role">Staff Infrastructure Engineer</p>
+            <div class="alumni-meta-list">
+              <div class="alumni-meta-row">
                 <span>Department:</span>
-                <strong>Computer Engineering</strong>
+                <span>Computer Engineering</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Class of:</span>
-                <strong>2016</strong>
+                <span>2016</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Company:</span>
-                <strong>CloudScale Systems</strong>
+                <span>CloudScale Systems</span>
               </div>
             </div>
           </div>
@@ -258,23 +249,23 @@
         <div class="alumni-card">
           <div>
             <div class="alumni-card-header">
-              <div class="alumni-avatar" style="background-color: var(--color-petal-pink); color: #881337;">EK</div>
-              <span class="alumni-badge">Student</span>
+              <div class="alumni-avatar" style="background: var(--pastel-pink); color: #881337;">EK</div>
+              <span class="badge">Student</span>
             </div>
             <h3 class="alumni-name">Elif Kaya</h3>
-            <p class="alumni-title">Senior Graduate Researcher</p>
-            <div class="alumni-details">
-              <div class="alumni-detail-row">
+            <p class="alumni-role">Senior Graduate Researcher</p>
+            <div class="alumni-meta-list">
+              <div class="alumni-meta-row">
                 <span>Department:</span>
-                <strong>Artificial Intelligence</strong>
+                <span>Artificial Intelligence</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Class of:</span>
-                <strong>2024</strong>
+                <span>2024</span>
               </div>
-              <div class="alumni-detail-row">
+              <div class="alumni-meta-row">
                 <span>Laboratory:</span>
-                <strong>Autonomous Robotics Lab</strong>
+                <span>Robotics Research Lab</span>
               </div>
             </div>
           </div>
@@ -285,29 +276,29 @@
   </section>
 
   <!-- =========================================================================
-       5. FEATURE SECTION: JOB POSTINGS
+       5. FEATURE SECTION: JOB POSTINGS SHOWCASE
        ========================================================================= -->
-  <section class="section section-cream" id="jobs">
+  <section class="section" id="jobs">
     <div class="container">
       <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
         <div>
           <span class="eyebrow">Career Opportunities</span>
           <h2 class="section-title">Open Positions for Alumni & Graduates</h2>
           <p class="section-desc">
-            Verified listings posted by alumni founders, faculty labs, and enterprise hiring teams.
+            Verified opportunities posted by alumni founders, faculty labs, and enterprise hiring partners.
           </p>
         </div>
         <div style="display: flex; gap: 10px;">
           <a href="/jobs/new" class="btn btn-primary">+ Post Opportunity</a>
-          <a href="/jobs" class="btn btn-pearl">Browse All Jobs</a>
+          <a href="/jobs" class="btn btn-secondary">Browse All Jobs</a>
         </div>
       </div>
 
       <div class="jobs-list">
         <!-- Job 1 -->
         <div class="job-card">
-          <div class="job-main">
-            <div class="job-tags">
+          <div class="job-info">
+            <div class="job-tag-group">
               <span class="job-tag tag-mint">Full-Time</span>
               <span class="job-tag tag-canary">Remote</span>
               <span class="job-tag tag-violet">Active</span>
@@ -321,17 +312,17 @@
               <span>💰 $110,000 - $140,000</span>
             </div>
           </div>
-          <div class="job-actions">
+          <div>
             <a href="/jobs/1" class="btn btn-primary btn-sm">View & Apply →</a>
           </div>
         </div>
 
         <!-- Job 2 -->
         <div class="job-card">
-          <div class="job-main">
-            <div class="job-tags">
+          <div class="job-info">
+            <div class="job-tag-group">
               <span class="job-tag tag-mint">Full-Time</span>
-              <span class="job-tag tag-pink">Hybrid</span>
+              <span class="job-tag tag-canary">Hybrid</span>
               <span class="job-tag tag-violet">Active</span>
             </div>
             <h3 class="job-title">Lead Machine Learning Scientist</h3>
@@ -343,15 +334,15 @@
               <span>💰 $140,000 - $175,000</span>
             </div>
           </div>
-          <div class="job-actions">
+          <div>
             <a href="/jobs/2" class="btn btn-primary btn-sm">View & Apply →</a>
           </div>
         </div>
 
         <!-- Job 3 -->
         <div class="job-card">
-          <div class="job-main">
-            <div class="job-tags">
+          <div class="job-info">
+            <div class="job-tag-group">
               <span class="job-tag tag-canary">Internship</span>
               <span class="job-tag tag-mint">Summer 2026</span>
               <span class="job-tag tag-violet">Active</span>
@@ -365,7 +356,7 @@
               <span>💰 $45 / hour + Housing Stipend</span>
             </div>
           </div>
-          <div class="job-actions">
+          <div>
             <a href="/jobs/3" class="btn btn-primary btn-sm">View & Apply →</a>
           </div>
         </div>
@@ -374,7 +365,7 @@
   </section>
 
   <!-- =========================================================================
-       6. ATS PIPELINE & DATABASE METRICS (DARK CHARCOAL PANEL)
+       6. ATS PIPELINE OVERVIEW
        ========================================================================= -->
   <section class="section" id="applications">
     <div class="container">
@@ -386,67 +377,31 @@
         </p>
       </div>
 
-      <div class="stats-grid">
-        <div class="stat-tile">
-          <div class="stat-tile-val">100%</div>
-          <div class="stat-tile-lbl">ACID Compliant Database</div>
+      <div style="background: rgba(255, 255, 255, 0.85); border: 1px solid var(--color-fog-border); border-radius: var(--radius-card); padding: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+        <div style="max-width: 600px;">
+          <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-ink-black); margin-bottom: 8px;">Many-to-Many Candidate Routing</h3>
+          <p style="color: var(--color-slate-body); font-size: 0.95rem; line-height: 1.6;">
+            Candidates connect directly to verified opportunities. Each application record enforces unique candidate-to-job pairing with structured review stages from Under Review to Interview and Final Acceptance.
+          </p>
         </div>
-        <div class="stat-tile">
-          <div class="stat-tile-val">4 Stages</div>
-          <div class="stat-tile-lbl">Application Review ATS Workflow</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-val">&lt; 15ms</div>
-          <div class="stat-tile-lbl">Average Response Duration</div>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-tile-val">OpenAPI 3.0</div>
-          <div class="stat-tile-lbl">Self-Documented Swagger Endpoints</div>
-        </div>
-      </div>
-
-      <!-- Dark Panel: Applications Overview -->
-      <div class="dark-panel">
-        <div class="dark-panel-grid">
-          <div>
-            <span class="eyebrow" style="color: var(--color-aqua);">Candidate Tracking Workflow</span>
-            <h3>Many-to-Many Career Routing</h3>
-            <p>
-              Candidates connect directly to verified jobs. Each application record enforces unique applicant-to-job pairing with structured status transitions from Under Review to Interview and Final Acceptance.
-            </p>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <a href="/applications" class="btn btn-pearl">Open ATS Kanban →</a>
-              <a href="/api/applications" target="_blank" class="btn btn-ghost-dark">View Raw JSON</a>
-            </div>
-          </div>
-
-          <div style="background-color: var(--color-indigo-deep); padding: 32px; border-radius: var(--radius-cards);">
-            <div style="font-family: var(--font-mono); font-size: 13px; color: var(--color-aqua); margin-bottom: 12px;">
-              // POSTGRESQL RELATION SCHEMA
-            </div>
-            <div style="font-family: var(--font-mono); font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.7;">
-              users (id, name, email, role, department)<br>
-              &nbsp;&nbsp;↳ 1-to-many ➔ job_postings (id, title, company)<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;↳ many-to-many ➔ applications (<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_id, job_id, status, applied_at<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;)
-            </div>
-          </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="/applications" class="btn btn-primary">Open ATS Kanban →</a>
+          <a href="/api/applications" target="_blank" class="btn btn-secondary">Raw JSON API</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- =========================================================================
-       7. FOOTER (CHARCOAL DARK SURFACE)
+       7. FOOTER
        ========================================================================= -->
   <footer class="site-footer">
     <div class="container">
-      <div class="footer-top">
+      <div class="footer-grid">
         <div class="footer-brand">
           <h4>🎓 Alumni Tracking System</h4>
           <p>
-            The editorial-grade career platform and relational directory for academic institutions and their global alumni.
+            The editorial-grade career platform and relational directory for academic institutions and their global alumni network.
           </p>
         </div>
 
@@ -483,7 +438,7 @@
 
       <div class="footer-bottom">
         <span>&copy; 2026 Alumni Tracking System. All rights reserved.</span>
-        <span>Amplemarket Design Language • Flat Hairline Architecture</span>
+        <span>Seamless Gradient Architecture • 100% Flat Hairline Design</span>
       </div>
     </div>
   </footer>
