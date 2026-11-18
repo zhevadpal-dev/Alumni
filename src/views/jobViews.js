@@ -21,6 +21,10 @@ class JobViews {
   }
 
   static getLegacyJobStyles() {
+    return getGlobalStyles();
+  }
+
+  static getUnusedLegacyStyles() {
     return `
       * { box-sizing: border-box; }
       body {
@@ -329,22 +333,31 @@ class JobViews {
    */
   static renderNavbar(activeTab = 'jobs') {
     return `
-      <header class="header">
-        <div class="brand">
-          <span class="brand-icon">🎓</span>
-          <div>
-            <h1 class="title">Alumni Tracking System</h1>
-            <div class="subtitle">Career Opportunities & Job Applications Portal</div>
+      <!-- FLOATING PILL TOP NAVIGATION BAR -->
+      <header class="top-nav">
+        <div class="nav-wrapper">
+          <a href="/" class="nav-logo" title="Alumni Tracking System">
+            <span class="nav-logo-icon">🎓</span>
+            <span class="nav-brand-text">ATS</span>
+          </a>
+
+          <!-- Floating iOS-Style Pill Navigation -->
+          <nav class="nav-pill-menu">
+            <ul class="nav-links">
+              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
+              <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
+              <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}" style="${activeTab === 'jobs' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Job Board</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications (ATS)</a></li>
+              <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
+              <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+            </ul>
+          </nav>
+
+          <!-- Right-Aligned Action CTA Button -->
+          <div class="nav-actions">
+            <a href="/jobs/new" class="btn btn-primary btn-sm">+ Post Job</a>
           </div>
         </div>
-        <nav class="nav-links">
-          <a href="/" class="${activeTab === 'home' ? 'active' : ''}">🏠 Home</a>
-          <a href="/users" class="${activeTab === 'users' ? 'active' : ''}">👥 Users</a>
-          <a href="/announcements" class="${activeTab === 'announcements' ? 'active' : ''}">📢 Announcements</a>
-          <a href="/jobs" class="${activeTab === 'jobs' ? 'active' : ''}">💼 Jobs</a>
-          <a href="/applications" class="${activeTab === 'applications' ? 'active' : ''}">📝 Applications</a>
-          <a href="/api/swagger" target="_blank">📖 API Docs</a>
-        </nav>
       </header>
     `;
   }
@@ -398,7 +411,7 @@ class JobViews {
 
     const jobCardsHtml = jobs.length > 0
       ? jobs.map(job => `
-          <div class="job-card">
+          <div class="job-glass-card">
             <div class="job-header">
               <div>
                 <a href="/jobs/${job.id}" class="job-title">${escapeHtml(job.title)}</a>
@@ -420,24 +433,25 @@ class JobViews {
             <div class="job-desc">${escapeHtml(job.description)}</div>
 
             <div class="job-footer">
-              <div style="font-size: 0.8rem; color: #94a3b8;">
+              <div style="font-size: 0.85rem; color: #6d6c6b;">
                 Published: ${job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently'}
               </div>
-              <div style="display: flex; gap: 8px;">
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <a href="/jobs/${job.id}" class="btn btn-primary btn-sm">View & Apply →</a>
-                <a href="/jobs/${job.id}/edit" class="btn btn-secondary btn-sm">Edit</a>
-                <form action="/jobs/${job.id}/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this job posting?');">
-                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="/jobs/${job.id}/edit" class="btn-glass-pill btn-edit">Edit</a>
+                <form action="/jobs/${job.id}/delete" method="POST" style="display:inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this job posting?');">
+                  <button type="submit" class="btn-glass-pill btn-delete">Delete</button>
                 </form>
               </div>
             </div>
           </div>
         `).join('')
       : `
-        <div class="empty-state">
-          <div class="empty-icon">💼</div>
-          <h3>No Job Postings Found</h3>
-          <p>No job opportunities match your current filter criteria. Try clearing filters or create a new posting below.</p>
+        <div class="job-glass-card" style="text-align: center; padding: 40px 20px;">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">💼</div>
+          <h3 style="font-family: var(--font-serif); font-size: 1.4rem; color: #16191c; margin: 0 0 8px 0;">No Job Postings Found</h3>
+          <p style="color: #4a4a4c; max-width: 480px; margin: 0 auto 16px auto;">No job opportunities match your current filter criteria. Try clearing filters or create a new posting below.</p>
+          <a href="/jobs" class="btn-glass-pill btn-view">Reset Filter</a>
         </div>
       `;
 
@@ -453,49 +467,53 @@ class JobViews {
         ${getHeadTags('Career Opportunities | Alumni Tracking System')}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('jobs')}
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-            <div class="db-badge">🐘 PostgreSQL Database: Connected (alumni_db)</div>
+        ${this.renderNavbar('jobs')}
+
+        <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● CAREER NETWORK</span>
+              <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Career Opportunities & Job Board</h1>
+              <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">PostgreSQL ACID Persisted &bull; ${totalJobs} Active Postings Available</p>
+            </div>
             <a href="/jobs/new" class="btn btn-primary">➕ Post New Job Opportunity</a>
           </div>
 
           ${this.renderFlashBanner(filter)}
 
-          <!-- Metrics Row -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-label">Total Postings</div>
-              <div class="metric-value">${totalJobs}</div>
-              <div class="metric-sub">Active in PostgreSQL</div>
+          <!-- Horizontal Glass Stats Grid (4-Column) -->
+          <div class="job-stats-grid">
+            <div class="job-stat-card">
+              <div class="stat-label">Total Postings</div>
+              <div class="stat-value">${totalJobs}</div>
+              <div class="stat-sub">Active in PostgreSQL</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-label">Active Opportunities</div>
-              <div class="metric-value" style="color: #16a34a;">${activeJobs}</div>
-              <div class="metric-sub">Open for applications</div>
+            <div class="job-stat-card">
+              <div class="stat-label">Active Opportunities</div>
+              <div class="stat-value">${activeJobs}</div>
+              <div class="stat-sub">Open for applications</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-label">Remote Positions</div>
-              <div class="metric-value" style="color: #4f46e5;">${remoteJobs}</div>
-              <div class="metric-sub">Work from anywhere</div>
+            <div class="job-stat-card">
+              <div class="stat-label">Remote Positions</div>
+              <div class="stat-value">${remoteJobs}</div>
+              <div class="stat-sub">Work from anywhere</div>
             </div>
-            <div class="metric-card">
-              <div class="metric-label">Applications Received</div>
-              <div class="metric-value" style="color: #0284c7;">${totalApplications}</div>
-              <div class="metric-sub"><a href="/applications" style="color: #0284c7; text-decoration: none;">View candidate board →</a></div>
+            <div class="job-stat-card">
+              <div class="stat-label">Applications Received</div>
+              <div class="stat-value">${totalApplications}</div>
+              <div class="stat-sub"><a href="/applications">View ATS pipeline &rarr;</a></div>
             </div>
           </div>
 
-          <!-- Search & Filter Toolbar -->
-          <form action="/jobs" method="GET" class="filter-toolbar">
+          <!-- Modern iOS-Style Search & Filter Toolbar -->
+          <form action="/jobs" method="GET" class="filter-toolbar-glass">
             <div style="flex: 2; min-width: 200px;">
               <label for="search">Search Keywords</label>
-              <input type="text" id="search" name="search" placeholder="Title, company, skills..." value="${escapeHtml(filter.search || '')}">
+              <input type="text" id="search" name="search" class="form-control" placeholder="Title, company, skills..." value="${escapeHtml(filter.search || '')}">
             </div>
             <div style="flex: 1; min-width: 140px;">
               <label for="jobType">Job Type</label>
-              <select id="jobType" name="jobType">
+              <select id="jobType" name="jobType" class="form-control">
                 <option value="">All Types</option>
                 <option value="Full-Time" ${filter.jobType === 'Full-Time' ? 'selected' : ''}>Full-Time</option>
                 <option value="Part-Time" ${filter.jobType === 'Part-Time' ? 'selected' : ''}>Part-Time</option>
@@ -506,7 +524,7 @@ class JobViews {
             </div>
             <div style="flex: 1; min-width: 130px;">
               <label for="status">Status</label>
-              <select id="status" name="status">
+              <select id="status" name="status" class="form-control">
                 <option value="">All Statuses</option>
                 <option value="Active" ${filter.status === 'Active' ? 'selected' : ''}>Active</option>
                 <option value="Closed" ${filter.status === 'Closed' ? 'selected' : ''}>Closed</option>
@@ -514,43 +532,52 @@ class JobViews {
             </div>
             <div style="display: flex; gap: 8px;">
               <button type="submit" class="btn btn-primary">Filter</button>
-              <a href="/jobs" class="btn btn-secondary">Clear</a>
+              <a href="/jobs" class="btn-glass-pill btn-view">Clear</a>
             </div>
           </form>
 
-          <!-- Job Listings List -->
-          <div>
+          <!-- Job Listings List (Frosted Glass Cards) -->
+          <div style="margin-bottom: 36px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 style="margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 600; color: #16191c;">
+                📋 Verified Job Listings (${totalJobs})
+              </h2>
+              <span style="font-family: var(--font-mono); font-size: 0.85rem; color: #4a4a4c;">Showing filtered positions</span>
+            </div>
             ${jobCardsHtml}
           </div>
 
-          <!-- Quick Post Opportunity Form -->
-          <div class="card" style="margin-top: 36px;">
-            <div class="card-header">
+          <!-- Quick Post Opportunity Form (Frosted Glass Container) -->
+          <div class="glass-form-card" id="quick-post-form">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
               <div>
-                <h3 class="card-title">💼 Quick Post: Share a Career Opportunity</h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin: 4px 0 0 0;">
+                <h3 style="margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 600; color: #16191c;">
+                  💼 Quick Post: Share a Career Opportunity
+                </h3>
+                <p style="color: #4a4a4c; font-size: 0.88rem; margin: 4px 0 0 0;">
                   Alumni, recruiters, and faculty can publish new job listings directly to PostgreSQL.
                 </p>
               </div>
+              <span class="badge" style="background: rgba(255, 255, 255, 0.7); color: #16191c; border: 1px solid rgba(255, 255, 255, 0.9);">● DIRECT-POST</span>
             </div>
 
             <form action="/jobs" method="POST">
-              <div class="form-grid">
+              <div class="form-grid-2col">
                 <div class="form-group">
                   <label for="q_title">Job Title *</label>
-                  <input type="text" id="q_title" name="title" required placeholder="e.g. Senior Backend Engineer">
+                  <input type="text" id="q_title" name="title" class="form-control" required placeholder="e.g. Senior Backend Engineer">
                 </div>
                 <div class="form-group">
                   <label for="q_company">Company Name *</label>
-                  <input type="text" id="q_company" name="company" required placeholder="e.g. TechCorp Solutions">
+                  <input type="text" id="q_company" name="company" class="form-control" required placeholder="e.g. TechCorp Solutions">
                 </div>
                 <div class="form-group">
                   <label for="q_location">Location</label>
-                  <input type="text" id="q_location" name="location" placeholder="e.g. Istanbul / Remote" value="Remote">
+                  <input type="text" id="q_location" name="location" class="form-control" placeholder="e.g. Istanbul / Remote" value="Remote">
                 </div>
                 <div class="form-group">
                   <label for="q_jobType">Job Type</label>
-                  <select id="q_jobType" name="jobType">
+                  <select id="q_jobType" name="jobType" class="form-control">
                     <option value="Full-Time" selected>Full-Time</option>
                     <option value="Part-Time">Part-Time</option>
                     <option value="Contract">Contract</option>
@@ -560,35 +587,35 @@ class JobViews {
                 </div>
                 <div class="form-group">
                   <label for="q_salaryRange">Salary Range</label>
-                  <input type="text" id="q_salaryRange" name="salaryRange" placeholder="e.g. $85,000 - $115,000">
+                  <input type="text" id="q_salaryRange" name="salaryRange" class="form-control" placeholder="e.g. $85,000 - $115,000">
                 </div>
                 <div class="form-group">
                   <label for="q_posterId">Posted By (Alumni User)</label>
-                  <select id="q_posterId" name="posterId">
+                  <select id="q_posterId" name="posterId" class="form-control">
                     <option value="">-- Select Poster --</option>
                     ${userOptions}
                   </select>
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="q_description">Job Description *</label>
-                  <textarea id="q_description" name="description" required placeholder="Describe role responsibilities, team overview, and impact..."></textarea>
+                  <textarea id="q_description" name="description" class="form-control" rows="3" required placeholder="Describe role responsibilities, team overview, and impact..."></textarea>
                 </div>
-                <div class="form-group full">
+                <div class="form-group full" style="grid-column: 1 / -1;">
                   <label for="q_requirements">Requirements & Qualifications</label>
-                  <textarea id="q_requirements" name="requirements" style="min-height: 80px;" placeholder="Core qualifications, technologies, years of experience..."></textarea>
+                  <textarea id="q_requirements" name="requirements" class="form-control" rows="2" placeholder="Core qualifications, technologies, years of experience..."></textarea>
                 </div>
                 <div class="form-group">
                   <label for="q_applicationUrl">External Application Link</label>
-                  <input type="url" id="q_applicationUrl" name="applicationUrl" placeholder="https://careers.example.com/apply">
+                  <input type="url" id="q_applicationUrl" name="applicationUrl" class="form-control" placeholder="https://careers.example.com/apply">
                 </div>
                 <div class="form-group">
                   <label for="q_contactEmail">Contact Email</label>
-                  <input type="email" id="q_contactEmail" name="contactEmail" placeholder="recruiting@example.com">
+                  <input type="email" id="q_contactEmail" name="contactEmail" class="form-control" placeholder="recruiting@example.com">
                 </div>
               </div>
 
-              <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
-                <button type="reset" class="btn btn-secondary">Reset Form</button>
+              <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="reset" class="btn-glass-pill btn-view">Reset Form</button>
                 <button type="submit" class="btn btn-primary">🚀 Publish Job Opportunity</button>
               </div>
             </form>

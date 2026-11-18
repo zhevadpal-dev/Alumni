@@ -706,6 +706,7 @@ a {
 /* ==========================================================================
    9. iOS GLASSMORPHISM FORMS, INPUTS & USER PROFILE CARDS
    ========================================================================== */
+.card,
 .glass-form-card,
 .card.domain-violet {
   background: rgba(255, 255, 255, 0.35) !important;
@@ -716,6 +717,14 @@ a {
   padding: 28px !important;
   margin-bottom: 32px;
   box-shadow: none !important;
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: #16191c;
+  margin: 0;
 }
 
 .form-grid-2col,
@@ -902,6 +911,344 @@ select.form-control {
 .btn-glass-pill.btn-delete:hover {
   background: rgba(255, 222, 235, 0.95);
   border-color: #9f1239;
+}
+
+/* ==========================================================================
+   10. iOS GLASSMORPHISM JOB BOARD (STATS GRID, FILTER BAR & LISTINGS)
+   ========================================================================== */
+/* Horizontal Glass Stats Grid */
+.job-stats-grid,
+.metrics-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 28px !important;
+}
+
+@media (max-width: 960px) {
+  .job-stats-grid,
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .job-stats-grid,
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.job-stat-card,
+.metric-card {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+}
+
+.job-stat-card:hover,
+.metric-card:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.job-stat-card .stat-label,
+.metric-card .metric-label {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #4a4a4c !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-bottom: 6px !important;
+}
+
+.job-stat-card .stat-value,
+.metric-card .metric-value {
+  font-family: var(--font-serif) !important;
+  font-size: 2.1rem !important;
+  font-weight: 700 !important;
+  color: #16191c !important;
+  line-height: 1.1 !important;
+  margin: 2px 0 6px 0 !important;
+}
+
+.job-stat-card .stat-sub,
+.metric-card .metric-sub {
+  font-family: var(--font-sans) !important;
+  font-size: 0.82rem !important;
+  color: #6d6c6b !important;
+  margin-top: auto !important;
+}
+
+.job-stat-card .stat-sub a,
+.metric-card .metric-sub a {
+  color: #16191c !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+/* Modern iOS-Style Search & Filter Toolbar */
+.filter-toolbar-glass,
+.filter-toolbar {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 24px !important;
+  padding: 16px 20px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 32px !important;
+  box-shadow: none !important;
+}
+
+.filter-toolbar-glass .filter-group,
+.filter-toolbar > div {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.filter-toolbar-glass label,
+.filter-toolbar label {
+  font-family: var(--font-sans) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: #16191c !important;
+  letter-spacing: -0.01em !important;
+}
+
+.filter-toolbar-glass input,
+.filter-toolbar-glass select,
+.filter-toolbar input,
+.filter-toolbar select {
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  padding: 10px 14px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.9rem !important;
+  color: #16191c !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 100% !important;
+}
+
+.filter-toolbar-glass select,
+.filter-toolbar select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2316191c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  padding-right: 36px !important;
+  cursor: pointer !important;
+}
+
+.filter-toolbar-glass input::placeholder,
+.filter-toolbar input::placeholder {
+  color: #6d6c6b !important;
+  opacity: 0.85 !important;
+}
+
+.filter-toolbar-glass input:focus,
+.filter-toolbar-glass select:focus,
+.filter-toolbar input:focus,
+.filter-toolbar select:focus {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #16191c !important;
+  outline: none !important;
+}
+
+/* Harmonized Job Listing Glass Cards */
+.job-glass-card,
+.job-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  margin-bottom: 20px !important;
+  box-shadow: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.job-glass-card:hover,
+.job-card:hover {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  transform: none !important;
+}
+
+.job-glass-card .job-header,
+.job-card .job-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  margin-bottom: 4px !important;
+}
+
+.job-glass-card .job-title,
+.job-card .job-title {
+  font-family: var(--font-serif) !important;
+  font-size: 1.45rem !important;
+  font-weight: 600 !important;
+  color: #16191c !important;
+  text-decoration: none !important;
+  line-height: 1.25 !important;
+}
+
+.job-glass-card .job-title:hover,
+.job-card .job-title:hover {
+  color: #000000 !important;
+  opacity: 0.8 !important;
+}
+
+.job-glass-card .job-company,
+.job-card .job-company {
+  font-family: var(--font-sans) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #4a4a4c !important;
+  margin-top: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.job-glass-card .job-meta,
+.job-card .job-meta {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  font-size: 0.88rem !important;
+  color: #4a4a4c !important;
+  margin: 6px 0 !important;
+}
+
+.job-glass-card .meta-item,
+.job-card .meta-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  color: #4a4a4c !important;
+}
+
+.job-glass-card .meta-item strong,
+.job-card .meta-item strong {
+  color: #16191c !important;
+}
+
+.job-glass-card .job-desc,
+.job-card .job-desc {
+  font-family: var(--font-sans) !important;
+  font-size: 0.94rem !important;
+  color: #4a4a4c !important;
+  line-height: 1.55 !important;
+  margin: 4px 0 12px 0 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.job-glass-card .job-footer,
+.job-card .job-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: auto !important;
+}
+
+/* Translucent / Pastel Pill Badges */
+.badge-glass-pill,
+.badge-active,
+.badge-closed,
+.badge-full-time,
+.badge-part-time,
+.badge-contract,
+.badge-internship,
+.badge-remote {
+  border-radius: 100px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 5px 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  box-shadow: none !important;
+}
+
+.badge-active {
+  background: rgba(212, 241, 244, 0.8) !important; /* Soft Pastel Mint */
+  color: #064e3b !important;
+  border: 1px solid rgba(6, 78, 59, 0.2) !important;
+}
+
+.badge-closed {
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: #6d6c6b !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.badge-full-time {
+  background: rgba(232, 227, 253, 0.8) !important; /* Soft Pastel Violet */
+  color: #2e2460 !important;
+  border: 1px solid rgba(46, 36, 96, 0.2) !important;
+}
+
+.badge-part-time {
+  background: rgba(255, 228, 214, 0.8) !important; /* Soft Pastel Peach */
+  color: #8c3e1e !important;
+  border: 1px solid rgba(140, 62, 30, 0.2) !important;
+}
+
+.badge-contract {
+  background: rgba(255, 222, 235, 0.8) !important; /* Soft Pastel Rose */
+  color: #881337 !important;
+  border: 1px solid rgba(136, 19, 55, 0.2) !important;
+}
+
+.badge-internship {
+  background: rgba(224, 247, 250, 0.85) !important; /* Soft Pastel Aqua */
+  color: #0e4a4c !important;
+  border: 1px solid rgba(14, 74, 76, 0.2) !important;
+}
+
+.badge-remote {
+  background: rgba(255, 255, 255, 0.75) !important;
+  color: #16191c !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
 }
 
 /* ==========================================================================
