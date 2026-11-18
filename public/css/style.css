@@ -18,11 +18,11 @@
   --color-pearl-surface: #f4f5f7;
 
   /* Flat Pastel Taxonomy Fills */
-  --pastel-violet: #e2ddfd;
-  --pastel-mint: #b7efb2;
-  --pastel-canary: #ffef99;
-  --pastel-pink: #ffd7f0;
-  --pastel-aqua: #e4f0f1;
+  --pastel-violet: #E8E3FD;
+  --pastel-mint: #D4F1F4;
+  --pastel-canary: #FFE4D6;
+  --pastel-pink: #FFDEEB;
+  --pastel-aqua: #E0F7FA;
 
   /* Typography */
   --font-serif: 'Source Serif 4', Georgia, serif;
@@ -563,17 +563,22 @@ a {
 
 .job-tag.tag-mint {
   background: var(--pastel-mint);
-  color: #064e3b;
+  color: #0e4a4c;
 }
 
 .job-tag.tag-canary {
   background: var(--pastel-canary);
-  color: #713f12;
+  color: #8c3e1e;
 }
 
 .job-tag.tag-violet {
   background: var(--pastel-violet);
-  color: #10054d;
+  color: #271a5b;
+}
+
+.job-tag.tag-pink {
+  background: var(--pastel-pink);
+  color: #881337;
 }
 
 .job-title {
