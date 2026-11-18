@@ -131,7 +131,7 @@ a {
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 1.3rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--color-ink-black);
   text-decoration: none;
   justify-self: start;
@@ -151,7 +151,7 @@ a {
   height: 36px;
   background: var(--color-ink-black);
   color: #ffffff;
-  border-radius: 10px;
+  border-radius: 11px;
   flex-shrink: 0;
 }
 
@@ -160,7 +160,7 @@ a {
   font-weight: 700;
   font-size: 1.3rem;
   color: var(--color-ink-black);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 /* Floating iOS-Style Pill Navigation */

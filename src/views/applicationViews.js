@@ -266,14 +266,13 @@ class ApplicationViews {
             <span class="nav-logo-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                  <linearGradient id="navAlumlyGradApp" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <linearGradient id="navAlumlyGradApp" x1="0%" y1="100%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="#FF9A76"/>
                     <stop offset="100%" stop-color="#FF528B"/>
                   </linearGradient>
                 </defs>
-                <path d="M7 24L16 6.5L25 24" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M11 18L16 14.5L21 18" stroke="url(#navAlumlyGradApp)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="16" cy="6.5" r="1.8" fill="url(#navAlumlyGradApp)"/>
+                <path d="M7 24.5C7.2 15.2 10.8 6.5 16 6.5C19.5 6.5 22.2 9 21.8 13.8C21.5 15.5 19.8 16.2 18.5 14.8C19.2 12.2 18 10.2 16 10.2C12.8 10.2 11.2 15.8 11 24.5C10.9 25.3 10.2 26 9.4 26H8.6C7.7 26 7 25.3 7 24.5Z" fill="#FFFFFF"/>
+                <path d="M25 24.5C24.8 17.8 21.5 12.8 17 12.8C13.2 12.8 9.5 15.5 8 16.8C7.2 17.5 7.5 18.8 8.5 18.8C9.5 18.8 11.8 17.5 15 16.2C18 15 20.2 15.8 21 18.8C21.6 20.2 21.6 22.5 21.6 24.5C21.6 25.3 22.3 26 23.1 26H23.9C24.7 26 25 25.3 25 24.5Z" fill="url(#navAlumlyGradApp)"/>
               </svg>
             </span>
             <span class="nav-brand-text">Alumly</span>
