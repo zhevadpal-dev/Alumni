@@ -756,21 +756,16 @@ class HtmlViews {
               </ul>
             </nav>
 
-            <!-- Right-Aligned Action CTA Buttons -->
-            <div class="nav-actions">
-              <a href="#create-user-form" class="btn btn-primary btn-sm">+ New Member</a>
-            </div>
+            <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
+            <div class="nav-actions"></div>
           </div>
         </header>
 
         <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
-            <div>
-              <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● ALUMNI DIRECTORY</span>
-              <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Alumni Directory & User Management</h1>
-              <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">Verified Profiles &bull; ${users.length} Registered Alumni</p>
-            </div>
-            <a href="#create-user-form" class="btn btn-primary btn-sm">+ Register User</a>
+          <div style="margin-bottom: 28px;">
+            <span class="badge" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); color: #16191c; margin-bottom: 8px;">● ALUMNI DIRECTORY</span>
+            <h1 style="font-family: var(--font-serif); font-size: 2.25rem; font-weight: 600; color: #16191c; margin: 4px 0 6px 0; letter-spacing: -0.02em;">Alumni Directory & User Management</h1>
+            <p style="color: #4a4a4c; font-size: 0.95rem; margin: 0;">Verified Profiles &bull; ${users.length} Registered Alumni</p>
           </div>
 
           ${flashBanner}
@@ -825,7 +820,7 @@ class HtmlViews {
                 </div>
               </div>
               <div style="display: flex; justify-content: flex-end;">
-                <button type="submit" class="btn btn-primary">➕ Create User Record</button>
+                <button type="submit" class="btn btn-primary">+ Create User Record</button>
               </div>
             </form>
           </div>
