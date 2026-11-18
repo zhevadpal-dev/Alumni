@@ -27,7 +27,7 @@ class AnnouncementViews {
   /**
    * Universal header navigation bar
    */
-  static renderNavbar(activeTab = 'announcements') {
+  static renderNavbar(activeTab = 'announcements', hideActionBtn = false) {
     return `
       <!-- FLOATING PILL TOP NAVIGATION BAR -->
       <header class="top-nav">
@@ -72,9 +72,9 @@ class AnnouncementViews {
             </ul>
           </nav>
 
-          <!-- Right-Aligned Action CTA Button -->
+          <!-- Right-Aligned Action CTA Button or Balancing Spacer -->
           <div class="nav-actions">
-            <a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>
+            ${hideActionBtn ? '' : '<a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>'}
           </div>
         </div>
       </header>
@@ -299,7 +299,7 @@ class AnnouncementViews {
         ${getHeadTags(`${escapeHtml(announcement.title)} | Alumly`)}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container">
           <div style="margin-bottom: 20px;">
@@ -373,7 +373,7 @@ class AnnouncementViews {
         ${getHeadTags(`Edit: ${escapeHtml(announcement.title)} | Alumly`)}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 760px;">
           <div style="margin-bottom: 20px;">
@@ -436,7 +436,7 @@ class AnnouncementViews {
         ${getHeadTags('New Announcement | Alumly')}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 760px;">
           <div style="margin-bottom: 20px;">
@@ -504,7 +504,7 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Published | Alumly')}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 650px;">
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
@@ -549,7 +549,7 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Updated | Alumly')}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 650px;">
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
@@ -592,7 +592,7 @@ class AnnouncementViews {
         ${getHeadTags('Announcement Deleted | Alumly')}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 600px;">
           <div class="glass-form-card" style="text-align: center; padding: 36px;">
@@ -630,7 +630,7 @@ class AnnouncementViews {
         ${getHeadTags('Error | Alumly')}
       </head>
       <body>
-        ${this.renderNavbar('announcements')}
+        ${this.renderNavbar('announcements', true)}
 
         <div class="container" style="max-width: 600px;">
           <div class="glass-form-card" style="text-align: center; padding: 36px;">

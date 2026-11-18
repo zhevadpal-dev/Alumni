@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for Applications, Petal Pink for Events)
  */
 
-const { getGlobalStyles, getHeadTags } = require('./styles');
+const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON } = require('./styles');
 
 class HtmlViews {
   /**
@@ -1117,23 +1117,43 @@ class HtmlViews {
         ${getHeadTags('Registration Successful | Alumly')}
       </head>
       <body>
-        <div class="container" style="max-width: 650px; margin-top: 40px;">
-          <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
+              <span class="nav-brand-text">Alumly</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions"></div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 650px; padding-top: 32px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
-            <h1 style="color: var(--color-ink); margin: 0 0 8px 0; font-size: 1.8rem;">User Created Successfully!</h1>
-            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user profile has been successfully registered in the directory.</p>
+            <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.8rem;">User Created Successfully!</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.95rem;">The user profile has been successfully registered in the directory.</p>
             
-            <div style="background: var(--color-parchment-cream); border: 1px solid var(--color-stone); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 24px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--color-stone); padding-bottom: 8px;">
-                <strong style="color: var(--color-ink); font-size: 1.15rem; font-family: var(--font-editorial);">${user.name}</strong>
+            <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.7); padding-bottom: 8px;">
+                <strong style="color: #16191c; font-size: 1.15rem; font-family: var(--font-serif);">${user.name}</strong>
                 <span class="badge ${user.role || 'alumni'}">${user.role || 'alumni'}</span>
               </div>
-              <p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>User ID:</strong> #${user.id}</p>
-              <p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Email:</strong> ${user.email}</p>
-              ${user.department ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Department:</strong> ${user.department}</p>` : ''}
-              ${user.graduationYear ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Graduation Year:</strong> ${user.graduationYear}</p>` : ''}
-              ${user.company ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Company:</strong> ${user.company} ${user.jobTitle ? `(${user.jobTitle})` : ''}</p>` : ''}
-              <p style="margin: 4px 0; color: var(--color-ash); font-size: 0.8rem;"><strong>Registered At:</strong> ${new Date(user.createdAt).toLocaleString()}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>User ID:</strong> #${user.id}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Email:</strong> ${user.email}</p>
+              ${user.department ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Department:</strong> ${user.department}</p>` : ''}
+              ${user.graduationYear ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Graduation Year:</strong> ${user.graduationYear}</p>` : ''}
+              ${user.company ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Company:</strong> ${user.company} ${user.jobTitle ? `(${user.jobTitle})` : ''}</p>` : ''}
+              <p style="margin: 4px 0; color: #64686e; font-size: 0.8rem;"><strong>Registered At:</strong> ${new Date(user.createdAt).toLocaleString()}</p>
             </div>
 
             <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -1162,23 +1182,43 @@ class HtmlViews {
         ${getHeadTags('User Updated | Alumly')}
       </head>
       <body>
-        <div class="container" style="max-width: 650px; margin-top: 40px;">
-          <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
+              <span class="nav-brand-text">Alumly</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions"></div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 650px; padding-top: 32px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
-            <h1 style="color: var(--color-ink); margin: 0 0 8px 0; font-size: 1.8rem;">User Record Updated!</h1>
-            <p style="color: var(--color-ash); margin: 0 0 24px 0;">The user profile #${user.id} has been successfully updated.</p>
+            <h1 style="font-family: var(--font-serif); color: #16191c; margin: 0 0 8px 0; font-size: 1.8rem;">User Record Updated!</h1>
+            <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.95rem;">The user profile #${user.id} has been successfully updated.</p>
             
-            <div style="background: var(--color-parchment-cream); border: 1px solid var(--color-stone); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 24px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--color-stone); padding-bottom: 8px;">
-                <strong style="color: var(--color-ink); font-size: 1.15rem; font-family: var(--font-editorial);">${user.name}</strong>
+            <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.7); padding-bottom: 8px;">
+                <strong style="color: #16191c; font-size: 1.15rem; font-family: var(--font-serif);">${user.name}</strong>
                 <span class="badge ${user.role || 'alumni'}">${user.role || 'alumni'}</span>
               </div>
-              <p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>User ID:</strong> #${user.id}</p>
-              <p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Email:</strong> ${user.email}</p>
-              ${user.department ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Department:</strong> ${user.department}</p>` : ''}
-              ${user.graduationYear ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Graduation Year:</strong> ${user.graduationYear}</p>` : ''}
-              ${user.company ? `<p style="margin: 4px 0; color: #334155; font-size: 0.9rem;"><strong>Company:</strong> ${user.company} ${user.jobTitle ? `(${user.jobTitle})` : ''}</p>` : ''}
-              <p style="margin: 4px 0; color: var(--color-ash); font-size: 0.8rem;"><strong>Last Updated:</strong> ${new Date(user.updatedAt || user.createdAt).toLocaleString()}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>User ID:</strong> #${user.id}</p>
+              <p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Email:</strong> ${user.email}</p>
+              ${user.department ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Department:</strong> ${user.department}</p>` : ''}
+              ${user.graduationYear ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Graduation Year:</strong> ${user.graduationYear}</p>` : ''}
+              ${user.company ? `<p style="margin: 4px 0; color: #4a4a4c; font-size: 0.9rem;"><strong>Company:</strong> ${user.company} ${user.jobTitle ? `(${user.jobTitle})` : ''}</p>` : ''}
+              <p style="margin: 4px 0; color: #64686e; font-size: 0.8rem;"><strong>Last Updated:</strong> ${new Date(user.updatedAt || user.createdAt).toLocaleString()}</p>
             </div>
 
             <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
@@ -1207,15 +1247,35 @@ class HtmlViews {
         ${getHeadTags('User Deleted | Alumly')}
       </head>
       <body>
-        <div class="container" style="max-width: 600px; margin-top: 40px;">
-          <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
+              <span class="nav-brand-text">Alumly</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions"></div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 600px; padding-top: 32px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🗑️</div>
-            <h1 style="color: var(--color-status-danger); margin: 0 0 8px 0; font-size: 1.8rem;">User Deleted Successfully</h1>
-            <p style="color: var(--color-ash); margin: 0 0 20px 0;">The user record has been removed from the directory.</p>
+            <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.8rem;">User Deleted Successfully</h1>
+            <p style="color: #4a4a4c; margin: 0 0 20px 0; font-size: 0.95rem;">The user record has been removed from the directory.</p>
             
-            <div style="background: var(--color-status-danger-bg); border: 1px solid var(--color-status-danger-border); border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 24px;">
-              <p style="margin: 4px 0; color: #991b1b; font-size: 0.95rem;"><strong>Deleted User:</strong> ${deletedUser.name} (#${deletedUser.id})</p>
-              <p style="margin: 4px 0; color: #991b1b; font-size: 0.9rem;"><strong>Email:</strong> ${deletedUser.email}</p>
+            <div style="background: rgba(255, 222, 235, 0.45); border: 1px solid rgba(255, 143, 179, 0.5); border-radius: 16px; padding: 18px; text-align: left; margin-bottom: 24px;">
+              <p style="margin: 4px 0; color: #9f1239; font-size: 0.95rem;"><strong>Deleted User:</strong> ${deletedUser.name} (#${deletedUser.id})</p>
+              <p style="margin: 4px 0; color: #9f1239; font-size: 0.9rem;"><strong>Email:</strong> ${deletedUser.email}</p>
             </div>
 
             <div>
@@ -1247,12 +1307,32 @@ class HtmlViews {
         ${getHeadTags('Error | Alumly')}
       </head>
       <body>
-        <div class="container" style="max-width: 600px; margin-top: 40px;">
-          <div class="card" style="border: 1px solid var(--color-stone); text-align: center; padding: 36px; box-shadow: none !important;">
+        <header class="top-nav">
+          <div class="nav-wrapper">
+            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
+              <span class="nav-brand-text">Alumly</span>
+            </a>
+            <nav class="nav-pill-menu">
+              <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
+                <li><a href="/jobs" class="nav-link">Job Board</a></li>
+                <li><a href="/applications" class="nav-link">Applications</a></li>
+                <li><a href="/announcements" class="nav-link">Announcements</a></li>
+                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+              </ul>
+            </nav>
+            <div class="nav-actions"></div>
+          </div>
+        </header>
+
+        <div class="container" style="max-width: 600px; padding-top: 32px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
-            <h1 style="color: var(--color-status-danger); margin: 0 0 8px 0; font-size: 1.7rem;">Action Failed</h1>
-            <p style="color: var(--color-ash); margin: 0 0 20px 0;">An error occurred while processing your request:</p>
-            <div style="background: var(--color-status-danger-bg); border: 1px solid var(--color-status-danger-border); color: #991b1b; padding: 14px; border-radius: 8px; margin-bottom: 24px; font-weight: 500;">
+            <h1 style="font-family: var(--font-serif); color: #9f1239; margin: 0 0 8px 0; font-size: 1.7rem;">Action Failed</h1>
+            <p style="color: #4a4a4c; margin: 0 0 20px 0; font-size: 0.95rem;">An error occurred while processing your request:</p>
+            <div style="background: rgba(254, 242, 242, 0.7); border: 1px solid #fee2e2; color: #991b1b; padding: 16px; border-radius: 16px; margin-bottom: 24px; font-weight: 500;">
               ${errorMessage}
             </div>
             <div>

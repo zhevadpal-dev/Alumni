@@ -1088,16 +1088,17 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Error | Alumni Job Board')}
+        ${getHeadTags('Error | Alumly')}
       </head>
       <body>
-        <div class="container">
-          ${this.renderNavbar('jobs')}
-          <div class="card" style="text-align: center; padding: 40px 24px;">
+        ${this.renderNavbar('jobs', true)}
+
+        <div class="container" style="max-width: 600px; padding-top: 40px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
-            <h2 style="color: #b91c1c; margin-bottom: 12px;">Operation Encountered An Error</h2>
-            <p style="color: #475569; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>
-            <a href="${backUrl}" class="btn btn-primary">Return Back</a>
+            <h1 style="font-family: var(--font-serif); font-size: 1.75rem; color: #b91c1c; margin: 0 0 12px 0;">Operation Encountered An Error</h1>
+            <p style="color: #4a4a4c; max-width: 500px; margin: 0 auto 24px auto; line-height: 1.5;">${escapeHtml(message)}</p>
+            <a href="${backUrl}" class="btn btn-primary">&larr; Return Back</a>
           </div>
         </div>
       </body>

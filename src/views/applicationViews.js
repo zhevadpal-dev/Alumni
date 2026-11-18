@@ -302,10 +302,8 @@ class ApplicationViews {
             </ul>
           </nav>
 
-          <!-- Right-Aligned Action CTA Button -->
-          <div class="nav-actions">
-            <a href="/jobs" class="btn btn-primary btn-sm">💼 Job Board</a>
-          </div>
+          <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
+          <div class="nav-actions"></div>
         </div>
       </header>
     `;
@@ -691,17 +689,17 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        ${getHeadTags('Error | Applications Tracking Board')}
+        ${getHeadTags('Error | Alumly')}
       </head>
       <body>
         ${this.renderNavbar('applications')}
 
-        <div class="container">
-          <div class="glass-form-card" style="text-align: center; padding: 40px 24px;">
+        <div class="container" style="max-width: 600px; padding-top: 40px; padding-bottom: 64px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
-            <h2 style="font-family: var(--font-serif); color: #b91c1c; margin-bottom: 12px;">Application Operation Failed</h2>
-            <p style="color: #4a4a4c; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>
-            <a href="${backUrl}" class="btn btn-primary">Return Back</a>
+            <h1 style="font-family: var(--font-serif); font-size: 1.75rem; color: #b91c1c; margin: 0 0 12px 0;">Application Operation Failed</h1>
+            <p style="color: #4a4a4c; max-width: 500px; margin: 0 auto 24px auto; line-height: 1.5;">${escapeHtml(message)}</p>
+            <a href="${backUrl}" class="btn btn-primary">&larr; Return Back</a>
           </div>
         </div>
       </body>
