@@ -62,10 +62,21 @@ const BRAND_SVG_ICON = `
       <stop offset="100%" stop-color="#FF528B"/>
     </linearGradient>
   </defs>
-  <!-- Primary Geometric Form: Sculpted Pure White Arch -->
-  <path d="M7 24.5C7.2 15.2 10.8 6.5 16 6.5C19.5 6.5 22.2 9 21.8 13.8C21.5 15.5 19.8 16.2 18.5 14.8C19.2 12.2 18 10.2 16 10.2C12.8 10.2 11.2 15.8 11 24.5C10.9 25.3 10.2 26 9.4 26H8.6C7.7 26 7 25.3 7 24.5Z" fill="#FFFFFF"/>
-  <!-- Overlapping Accent Form: Radiant Peach-to-Pink Ribbon -->
-  <path d="M25 24.5C24.8 17.8 21.5 12.8 17 12.8C13.2 12.8 9.5 15.5 8 16.8C7.2 17.5 7.5 18.8 8.5 18.8C9.5 18.8 11.8 17.5 15 16.2C18 15 20.2 15.8 21 18.8C21.6 20.2 21.6 22.5 21.6 24.5C21.6 25.3 22.3 26 23.1 26H23.9C24.7 26 25 25.3 25 24.5Z" fill="url(#alumlyNavGrad)"/>
+  <!-- Bold Sans-Serif Capital Letter 'A' -->
+  <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
+  <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
+  <g transform="rotate(-13 16 8.5)">
+    <!-- Cap Under-Bevel / 3D Rim Layer -->
+    <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
+    <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
+    <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#alumlyNavGrad)"/>
+    <!-- Center Button Rivet -->
+    <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
+    <!-- Dangling Tassel Cord -->
+    <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <!-- Tassel Brush Accent -->
+    <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
+  </g>
 </svg>
 `;
 
