@@ -21,6 +21,10 @@ class ApplicationViews {
   }
 
   static getLegacyAppStyles() {
+    return getGlobalStyles();
+  }
+
+  static getUnusedLegacyStyles() {
     return `
       * { box-sizing: border-box; }
       body {
@@ -255,22 +259,31 @@ class ApplicationViews {
    */
   static renderNavbar(activeTab = 'applications') {
     return `
-      <header class="header">
-        <div class="brand">
-          <span class="brand-icon">🎓</span>
-          <div>
-            <h1 class="title">Alumni Tracking System</h1>
-            <div class="subtitle">Career Opportunities & Job Applications Portal</div>
+      <!-- FLOATING PILL TOP NAVIGATION BAR -->
+      <header class="top-nav">
+        <div class="nav-wrapper">
+          <a href="/" class="nav-logo" title="Alumni Tracking System">
+            <span class="nav-logo-icon">🎓</span>
+            <span class="nav-brand-text">ATS</span>
+          </a>
+
+          <!-- Floating iOS-Style Pill Navigation -->
+          <nav class="nav-pill-menu">
+            <ul class="nav-links">
+              <li><a href="/" class="nav-link ${activeTab === 'home' ? 'active' : ''}">Home</a></li>
+              <li><a href="/users" class="nav-link ${activeTab === 'users' ? 'active' : ''}">Alumni Directory</a></li>
+              <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
+              <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}" style="${activeTab === 'applications' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Applications (ATS)</a></li>
+              <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
+              <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+            </ul>
+          </nav>
+
+          <!-- Right-Aligned Action CTA Button -->
+          <div class="nav-actions">
+            <a href="/jobs" class="btn btn-primary btn-sm">💼 Job Board</a>
           </div>
         </div>
-        <nav class="nav-links">
-          <a href="/" class="${activeTab === 'home' ? 'active' : ''}">🏠 Home</a>
-          <a href="/users" class="${activeTab === 'users' ? 'active' : ''}">👥 Users</a>
-          <a href="/announcements" class="${activeTab === 'announcements' ? 'active' : ''}">📢 Announcements</a>
-          <a href="/jobs" class="${activeTab === 'jobs' ? 'active' : ''}">💼 Jobs</a>
-          <a href="/applications" class="${activeTab === 'applications' ? 'active' : ''}">📝 Applications</a>
-          <a href="/api/swagger" target="_blank">📖 API Docs</a>
-        </nav>
       </header>
     `;
   }
@@ -328,24 +341,24 @@ class ApplicationViews {
           <tr>
             <td><strong>#${app.id}</strong></td>
             <td>
-              <a href="/users/${app.userId}" style="color: #2563eb; font-weight: 600; text-decoration: none;">
+              <a href="/users/${app.userId}" class="candidate-link">
                 ${escapeHtml(app.applicant ? app.applicant.name : 'Candidate #' + app.userId)}
               </a><br>
-              <small style="color: #64748b;">${escapeHtml(app.applicant ? app.applicant.email : '')}</small>
+              <small style="color: #4a4a4c;">${escapeHtml(app.applicant ? app.applicant.email : '')}</small>
             </td>
             <td>
-              <a href="/jobs/${app.jobId}" style="color: #0f172a; font-weight: 600; text-decoration: none;">
+              <a href="/jobs/${app.jobId}" class="candidate-link">
                 ${escapeHtml(app.job ? app.job.title : 'Job #' + app.jobId)}
               </a><br>
-              <small style="color: #64748b;">🏢 ${escapeHtml(app.job ? app.job.company : '')}</small>
+              <small style="color: #4a4a4c;">🏢 ${escapeHtml(app.job ? app.job.company : '')}</small>
             </td>
             <td>
               <span class="badge ${this.getStatusBadgeClass(app.status)}">${escapeHtml(app.status)}</span>
             </td>
-            <td>${new Date(app.appliedAt).toLocaleDateString()}</td>
+            <td style="color: #4a4a4c; font-size: 0.88rem;">${new Date(app.appliedAt).toLocaleDateString()}</td>
             <td>
-              <form action="/applications/${app.id}/status" method="POST" style="display: flex; gap: 4px; align-items: center;">
-                <select name="status" style="padding: 4px 8px; font-size: 0.8rem; width: auto;" onchange="this.form.submit()">
+              <form action="/applications/${app.id}/status" method="POST" style="display: flex; gap: 6px; align-items: center;">
+                <select name="status" class="select-glass-sm" onchange="this.form.submit()">
                   <option value="Submitted" ${app.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
                   <option value="Under Review" ${app.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
                   <option value="Shortlisted" ${app.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
@@ -354,8 +367,8 @@ class ApplicationViews {
                   <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
                   <option value="Withdrawn" ${app.status === 'Withdrawn' ? 'selected' : ''}>Withdrawn</option>
                 </select>
-                <a href="/applications/${app.id}" class="btn btn-secondary btn-sm" title="View Dossier">👁️</a>
-                <button type="submit" formaction="/applications/${app.id}/delete" class="btn btn-danger btn-sm" title="Withdraw / Delete" onclick="return confirm('Withdraw application #${app.id}?');">🗑️</button>
+                <a href="/applications/${app.id}" class="btn-icon-glass" title="View Dossier">👁️</a>
+                <button type="submit" formaction="/applications/${app.id}/delete" class="btn-icon-glass btn-delete" title="Withdraw / Delete" onclick="return confirm('Withdraw application #${app.id}?');">🗑️</button>
               </form>
             </td>
           </tr>
@@ -450,7 +463,7 @@ class ApplicationViews {
           </form>
 
           <!-- Applications Table -->
-          <div class="table-wrapper">
+          <div class="glass-table-container">
             <table>
               <thead>
                 <tr>
@@ -469,35 +482,35 @@ class ApplicationViews {
           </div>
 
           <!-- Quick Candidate Application Submission Form -->
-          <div class="card" style="margin-top: 36px;">
-            <div class="card-header">
+          <div class="glass-form-card" style="margin-top: 36px;">
+            <div class="card-header" style="margin-bottom: 20px;">
               <div>
                 <h3 class="card-title">📝 Submit New Candidate Application</h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin: 4px 0 0 0;">
+                <p style="color: #4a4a4c; font-size: 0.85rem; margin: 4px 0 0 0;">
                   Links a User profile to an active Job Posting in PostgreSQL. Enforces unique (user_id, job_id).
                 </p>
               </div>
             </div>
 
             <form action="/applications" method="POST">
-              <div class="form-grid">
+              <div class="form-grid form-grid-2col">
                 <div class="form-group">
                   <label for="new_userId">Candidate Applicant *</label>
-                  <select id="new_userId" name="userId" required>
+                  <select id="new_userId" name="userId" class="form-control" required>
                     <option value="">-- Choose Candidate User --</option>
                     ${userOptions}
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="new_jobId">Target Job Opportunity *</label>
-                  <select id="new_jobId" name="jobId" required>
+                  <select id="new_jobId" name="jobId" class="form-control" required>
                     <option value="">-- Choose Job Opening --</option>
                     ${jobOptions}
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="new_status">Initial Review Status</label>
-                  <select id="new_status" name="status">
+                  <select id="new_status" name="status" class="form-control">
                     <option value="Submitted" selected>Submitted</option>
                     <option value="Under Review">Under Review</option>
                     <option value="Shortlisted">Shortlisted</option>
@@ -507,20 +520,20 @@ class ApplicationViews {
                 </div>
                 <div class="form-group">
                   <label for="new_resumeUrl">Resume / CV Link</label>
-                  <input type="url" id="new_resumeUrl" name="resumeUrl" placeholder="https://storage.example.com/resumes/candidate.pdf">
+                  <input type="url" id="new_resumeUrl" name="resumeUrl" class="form-control" placeholder="https://storage.example.com/resumes/candidate.pdf">
                 </div>
                 <div class="form-group full">
                   <label for="new_coverLetter">Cover Letter / Statement</label>
-                  <textarea id="new_coverLetter" name="coverLetter" placeholder="Candidate introductory statement or referral background..."></textarea>
+                  <textarea id="new_coverLetter" name="coverLetter" class="form-control" placeholder="Candidate introductory statement or referral background..."></textarea>
                 </div>
                 <div class="form-group full">
                   <label for="new_notes">Recruiter Notes</label>
-                  <input type="text" id="new_notes" name="notes" placeholder="e.g. Recommended by faculty advisor">
+                  <input type="text" id="new_notes" name="notes" class="form-control" placeholder="e.g. Recommended by faculty advisor">
                 </div>
               </div>
 
               <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button type="reset" class="btn btn-secondary" style="border-radius: 100px;">Reset</button>
                 <button type="submit" class="btn btn-primary">✅ Register Application</button>
               </div>
             </form>
@@ -546,23 +559,23 @@ class ApplicationViews {
         <div class="container">
           ${this.renderNavbar('applications')}
 
-          <div style="margin-bottom: 16px;">
-            <a href="/applications" class="btn btn-secondary btn-sm">← Back to Applications Board</a>
+          <div style="margin-bottom: 20px;">
+            <a href="/applications" class="btn-glass-pill">← Back to Applications Board</a>
           </div>
 
           ${this.renderFlashBanner(query)}
 
           <!-- Application Header Card -->
-          <div class="card">
-            <div class="card-header">
+          <div class="glass-form-card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
               <div>
                 <span class="badge ${this.getStatusBadgeClass(app.status)}">${escapeHtml(app.status)}</span>
-                <span style="font-size: 0.85rem; color: #64748b; margin-left: 8px;">Submitted: ${new Date(app.appliedAt).toLocaleString()}</span>
-                <h1 style="font-size: 1.6rem; margin: 10px 0 4px 0; color: #0f172a;">Application #${app.id} Dossier</h1>
+                <span style="font-size: 0.85rem; color: #4a4a4c; margin-left: 8px;">Submitted: ${new Date(app.appliedAt).toLocaleString()}</span>
+                <h1 style="font-family: var(--font-serif); font-size: 1.8rem; margin: 12px 0 4px 0; color: #16191c;">Application #${app.id} Dossier</h1>
               </div>
               <div>
                 <form action="/applications/${app.id}/delete" method="POST" onsubmit="return confirm('Withdraw / Delete application #${app.id}?');" style="display:inline;">
-                  <button type="submit" class="btn btn-danger">🗑️ Withdraw Application</button>
+                  <button type="submit" class="btn-glass-pill btn-delete">🗑️ Withdraw Application</button>
                 </form>
               </div>
             </div>
@@ -571,10 +584,10 @@ class ApplicationViews {
             <div class="metrics-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
               <div class="metric-card">
                 <div class="metric-label">👤 Candidate Profile</div>
-                <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-top: 4px;">
-                  ${app.applicant ? `<a href="/users/${app.applicant.id}" style="color: #2563eb; text-decoration: none;">${escapeHtml(app.applicant.name)}</a>` : 'Candidate #' + app.userId}
+                <div style="font-size: 1.15rem; font-weight: 700; margin-top: 4px;">
+                  ${app.applicant ? `<a href="/users/${app.applicant.id}" class="candidate-link">${escapeHtml(app.applicant.name)}</a>` : 'Candidate #' + app.userId}
                 </div>
-                <div style="font-size: 0.88rem; color: #475569; margin-top: 2px;">
+                <div style="font-size: 0.88rem; color: #4a4a4c; margin-top: 4px; line-height: 1.5;">
                   ✉️ ${escapeHtml(app.applicant ? app.applicant.email : 'N/A')}<br>
                   🎓 Role: ${escapeHtml(app.applicant ? app.applicant.role : 'alumni')} | Dept: ${escapeHtml(app.applicant ? app.applicant.department : 'General')}
                 </div>
@@ -582,10 +595,10 @@ class ApplicationViews {
 
               <div class="metric-card">
                 <div class="metric-label">💼 Target Opportunity</div>
-                <div style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-top: 4px;">
-                  ${app.job ? `<a href="/jobs/${app.job.id}" style="color: #0f172a; text-decoration: none;">${escapeHtml(app.job.title)}</a>` : 'Job #' + app.jobId}
+                <div style="font-size: 1.15rem; font-weight: 700; margin-top: 4px;">
+                  ${app.job ? `<a href="/jobs/${app.job.id}" class="candidate-link">${escapeHtml(app.job.title)}</a>` : 'Job #' + app.jobId}
                 </div>
-                <div style="font-size: 0.88rem; color: #475569; margin-top: 2px;">
+                <div style="font-size: 0.88rem; color: #4a4a4c; margin-top: 4px; line-height: 1.5;">
                   🏢 Company: <strong>${escapeHtml(app.job ? app.job.company : 'N/A')}</strong><br>
                   📍 Location: ${escapeHtml(app.job ? app.job.location : 'Remote')} | Status: ${escapeHtml(app.job ? app.job.status : 'Active')}
                 </div>
@@ -594,36 +607,36 @@ class ApplicationViews {
 
             <!-- Cover Letter -->
             <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 1.1rem; color: #0f172a; margin-bottom: 8px;">Cover Letter / Personal Statement</h3>
-              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; white-space: pre-wrap; color: #334155; line-height: 1.6;">
+              <h3 style="font-family: var(--font-serif); font-size: 1.15rem; color: #16191c; margin-bottom: 10px;">Cover Letter / Personal Statement</h3>
+              <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 18px; white-space: pre-wrap; color: #16191c; line-height: 1.6;">
                 ${escapeHtml(app.coverLetter || 'No cover letter attached.')}
               </div>
             </div>
 
             <!-- Resume Link & Notes -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
-              <div style="background: #f1f5f9; border-radius: 8px; padding: 16px;">
+              <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 18px;">
                 <span class="metric-label">📄 Attached Resume</span><br>
                 ${app.resumeUrl
-                  ? `<a href="${escapeHtml(app.resumeUrl)}" target="_blank" class="btn btn-primary btn-sm" style="margin-top: 8px;">Open Resume Document ↗</a>`
-                  : '<span style="color: #64748b; font-size: 0.88rem;">No resume URL provided</span>'
+                  ? `<a href="${escapeHtml(app.resumeUrl)}" target="_blank" class="btn btn-primary btn-sm" style="margin-top: 10px; display: inline-flex;">Open Resume Document ↗</a>`
+                  : '<span style="color: #6d6c6b; font-size: 0.88rem;">No resume URL provided</span>'
                 }
               </div>
-              <div style="background: #f1f5f9; border-radius: 8px; padding: 16px;">
+              <div style="background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; padding: 18px;">
                 <span class="metric-label">📝 Reviewer Notes</span><br>
-                <div style="margin-top: 6px; color: #334155; font-size: 0.9rem;">
+                <div style="margin-top: 8px; color: #16191c; font-size: 0.92rem; line-height: 1.5;">
                   ${escapeHtml(app.notes || 'No reviewer notes recorded yet.')}
                 </div>
               </div>
             </div>
 
             <!-- Update Review Status Action Panel -->
-            <div style="border-top: 2px solid #e2e8f0; padding-top: 20px;">
-              <h3 style="font-size: 1.05rem; color: #0f172a; margin-bottom: 12px;">Advance Review Workflow</h3>
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
+              <h3 style="font-family: var(--font-serif); font-size: 1.15rem; color: #16191c; margin-bottom: 12px;">Advance Review Workflow</h3>
               <form action="/applications/${app.id}/status" method="POST" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
                 <div style="min-width: 200px;">
                   <label for="status_select">Application Status</label>
-                  <select id="status_select" name="status">
+                  <select id="status_select" name="status" class="form-control">
                     <option value="Submitted" ${app.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
                     <option value="Under Review" ${app.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
                     <option value="Shortlisted" ${app.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
@@ -635,9 +648,9 @@ class ApplicationViews {
                 </div>
                 <div style="flex: 2; min-width: 250px;">
                   <label for="notes_input">Update Reviewer Notes</label>
-                  <input type="text" id="notes_input" name="notes" placeholder="e.g. Cleared technical interview round 2" value="${escapeHtml(app.notes || '')}">
+                  <input type="text" id="notes_input" name="notes" class="form-control" placeholder="e.g. Cleared technical interview round 2" value="${escapeHtml(app.notes || '')}">
                 </div>
-                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">💾 Update Status</button>
+                <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">💾 Update Status</button>
               </form>
             </div>
 
@@ -661,10 +674,10 @@ class ApplicationViews {
       <body>
         <div class="container">
           ${this.renderNavbar('applications')}
-          <div class="card" style="text-align: center; padding: 40px 24px;">
+          <div class="glass-form-card" style="text-align: center; padding: 40px 24px;">
             <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
-            <h2 style="color: #b91c1c; margin-bottom: 12px;">Application Operation Failed</h2>
-            <p style="color: #475569; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>
+            <h2 style="font-family: var(--font-serif); color: #b91c1c; margin-bottom: 12px;">Application Operation Failed</h2>
+            <p style="color: #4a4a4c; max-width: 500px; margin: 0 auto 24px auto;">${escapeHtml(message)}</p>
             <a href="${backUrl}" class="btn btn-primary">Return Back</a>
           </div>
         </div>
