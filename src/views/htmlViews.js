@@ -95,7 +95,7 @@ class HtmlViews {
       </div>
 
       <h1 class="hero-headline">
-        The Modern Network for <strong>Higher Education Alumni</strong>
+        Your Modern <strong>Alumni Network</strong>
       </h1>
 
       <p class="hero-subtext">
