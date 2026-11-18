@@ -37,15 +37,16 @@ class HtmlViews {
 </head>
 <body>
 
-  <!-- 1. GLASSMORPHISM TOP NAVIGATION BAR (STICKY HOMEBAR) -->
+  <!-- 1. FLOATING PILL TOP NAVIGATION BAR (STICKY HOMEBAR) -->
   <header class="top-nav">
-    <div class="container nav-wrapper">
-      <a href="/" class="nav-logo">
+    <div class="nav-wrapper">
+      <a href="/" class="nav-logo" title="Alumni Tracking System">
         <span class="nav-logo-icon">🎓</span>
-        <span>Alumni Tracking System</span>
+        <span class="nav-brand-text">ATS</span>
       </a>
 
-      <nav>
+      <!-- Floating iOS-Style Pill Navigation -->
+      <nav class="nav-pill-menu">
         <ul class="nav-links">
           <li><a href="#directory" class="nav-link">Alumni Directory</a></li>
           <li><a href="#jobs" class="nav-link">Job Board</a></li>
@@ -55,6 +56,7 @@ class HtmlViews {
         </ul>
       </nav>
 
+      <!-- Right-Aligned Action CTA Buttons -->
       <div class="nav-actions">
         <a href="/users" class="btn btn-ghost btn-sm">Sign In</a>
         <a href="#jobs" class="btn btn-primary btn-sm">Explore Careers →</a>
