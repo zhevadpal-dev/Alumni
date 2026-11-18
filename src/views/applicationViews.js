@@ -2,17 +2,25 @@
  * Application Views (Presentation Layer)
  * 
  * Generates server-rendered, responsive HTML view templates for the Application Tracking UI.
- * Provides views for:
- * - Candidate Applications Management Board (/applications)
- * - Single application review & status transition view (/applications/:id)
- * - Error and feedback screens
+ * Canonical design.md Implementation:
+ * - Dual Typography: Source Serif 4 (Headings) + Inter (UI) + JetBrains Mono (Eyebrows)
+ * - Zero Drop-Shadows (Flat Hairline Architecture)
+ * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
+ * - Cards: 1px Fog Border (#d1d4d9)
+ * - Pastel Domain Taxonomy (Canary Yellow for ATS Applications)
  */
+
+const { getGlobalStyles, getHeadTags } = require('./styles');
 
 class ApplicationViews {
   /**
-   * Common CSS styling matching project design standards
+   * Common CSS styling matching project design standards (design.md)
    */
   static getBaseStyles() {
+    return getGlobalStyles();
+  }
+
+  static getLegacyAppStyles() {
     return `
       * { box-sizing: border-box; }
       body {
@@ -369,10 +377,7 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Applications Tracking Board | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Applications Tracking Board | Alumni Tracking System')}
       </head>
       <body>
         <div class="container">
@@ -535,10 +540,7 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Application #${app.id} | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags(`Application #${app.id} | Alumni Tracking System`)}
       </head>
       <body>
         <div class="container">
@@ -654,10 +656,7 @@ class ApplicationViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Error | Applications Tracking Board</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Error | Applications Tracking Board')}
       </head>
       <body>
         <div class="container">

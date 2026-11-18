@@ -78,14 +78,15 @@ The main canvas background is a soft **Parchment Cream (`#f7f6f2`)**, while acti
 
 | Name | Hex / Value | CSS Variable | Tailwind v4 Token | Semantic Role |
 | :--- | :--- | :--- | :--- | :--- |
-| **Ink** | `#111111` | `--color-ink` | `ink` | Primary text, display headings, filled primary CTA buttons |
+| **Deep Teal (Primary CTA)** | `#1c5d5f` | `--color-primary-teal` | `primary-teal` | Primary action buttons, pill shape conversion buttons, brand focus |
+| **Ink** | `#111111` | `--color-ink` | `ink` | Primary text, display headings, dark accents |
 | **Charcoal** | `#272625` | `--color-charcoal` | `charcoal` | Secondary dark surface, dark telemetry panels, footer background |
 | **Midnight Indigo** | `#10054d` | `--color-midnight-indigo` | `midnight-indigo` | Deep institutional brand accent, academic badge headers |
 | **Canvas White** | `#ffffff` | `--color-canvas-white` | `canvas-white` | Card surfaces, modal containers, input backgrounds |
 | **Parchment Cream** | `#f7f6f2` | `--color-parchment-cream` | `parchment-cream` | Main page canvas wash, editorial background layer |
 | **Cream Wash** | `#ecebea` | `--color-cream-wash` | `cream-wash` | Secondary card fills, subtle button backgrounds, hover fills |
 | **Ash** | `#6d6c6b` | `--color-ash` | `ash` | Muted body copy, timestamps, secondary helper text |
-| **Stone (Border)** | `#d1d4d9` | `--color-stone` | `stone` | Hairline card borders, table dividers, subtle input borders |
+| **Stone (Fog Border)** | `#d1d4d9` | `--color-stone` | `stone` | 1px fog card borders, table dividers, subtle input borders |
 | **Phoenix Orange** | `#e8400d` | `--color-phoenix-orange` | `phoenix-orange` | Brand accent, hero button pulse, marketing gradient origin |
 | **Sky Highlight** | `#97cde5` | `--color-sky-highlight` | `sky-highlight` | Inline editorial word annotations, text marker highlight |
 | **Soft Violet** | `#e2ddfd` | `--color-soft-violet` | `soft-violet` | **Taxonomy:** Alumni Directory & Graduate Profiles |
@@ -162,24 +163,19 @@ We establish strict radius roles across interactive and structural elements:
 
 | Component Type | Radius Value | CSS Variable | Tailwind Class | Usage Context |
 | :--- | :--- | :--- | :--- | :--- |
+| **Primary & Action Buttons** | `48px` | `--radius-pill` | `rounded-full` | Primary CTAs (Deep Teal `#1c5d5f`), ghost pills, submit controls |
 | **Pill Badges & Tags** | `9999px` | `--radius-full` | `rounded-full` | Role pills (`Alumni`, `Faculty`), status tags |
-| **Interactive Buttons**| `8px` | `--radius-btn` | `rounded-lg` | Primary CTAs, ghost buttons, form controls |
 | **Form Inputs & Selects**| `8px` | `--radius-input` | `rounded-lg` | Textfields, search bars, filter dropdowns |
-| **Domain Category Cards**| `12px` | `--radius-card` | `rounded-xl` | Pastel taxonomy cards, job cards, dossiers |
+| **Domain Category Cards**| `12px` | `--radius-card` | `rounded-xl` | Pastel taxonomy cards, job cards, dossiers (1px fog border) |
 | **Hero Stages & Modals** | `16px` | `--radius-stage` | `rounded-2xl` | Telemetry stages, code blocks, dialog modals |
 
 ### 🪟 Surface Architecture & Hairline Borders
 
 In accordance with the **Hashnode & Alden** standards:
-- **No Heavy Drop Shadows:** We avoid multi-stop blurred shadows that muddy light backgrounds.
+- **Zero Drop-Shadows (Strict):** No drop-shadows across the entire application (`box-shadow: none !important;`). Elevation is created purely through surface tone layering and 1px crisp borders.
 - **Two-Tone Contrast:** A card with background `#ffffff` placed on `--color-parchment-cream` (`#f7f6f2`) creates clean, readable contrast naturally.
 - **Hairline Definition:** All cards, tables, and stages feature a crisp `1px solid var(--color-stone)` (`#d1d4d9`).
-- **Interactive Lift:** On hover, interactive cards receive a subtle `-2px` translateY lift with an ultra-soft crisp shadow:
-  ```css
-  box-shadow: 0 4px 12px rgba(17, 17, 17, 0.05);
-  border-color: #111111;
-  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms ease;
-  ```
+- **Interactive States:** On hover, interactive cards update their border color (`border-color: #111111;`) without adding blur or shadows.
 
 ---
 
@@ -194,8 +190,8 @@ Every section and major component starts with an uppercase monospace eyebrow tag
 
 ### 6.2 Single Dominant CTA Discipline
 To eliminate decision paralysis:
-- **Primary CTA (`.btn-ink`):** Solid `--color-ink` (`#111111`), white text, `8px` radius. Exactly **one** per hero or card context.
-- **Secondary / Ghost CTA (`.btn-ghost`):** Transparent or Paper White background, hairline border `1px solid var(--color-stone)`, ink text.
+- **Primary CTA (`.btn-primary`):** Solid Deep Teal (`#1c5d5f`), white text, `48px` pill radius (`--radius-pill`). Exactly **one** per hero or card context. Hover state: `#164a4c`. Zero drop-shadows.
+- **Secondary / Ghost CTA (`.btn-secondary`):** Transparent or Paper White background, hairline border `1px solid var(--color-stone)` (`#d1d4d9`), ink text, `48px` pill radius.
 - **Brand Accent CTA (`.btn-phoenix`):** Phoenix Orange (`#e8400d`) reserved exclusively for primary application submissions or key system actions.
 
 ### 6.3 Pastel Domain Taxonomy Cards
@@ -560,13 +556,17 @@ In compliance with project rules:
   --color-canvas-white: #ffffff;
   --color-parchment-cream: #f7f6f2;
   --color-cream-wash: #ecebea;
-  --color-stone: #d1d4d9;
+  --color-stone: #d1d4d9; /* 1px Fog Border */
 
   /* Typography & Ink */
   --color-ink: #111111;
   --color-charcoal: #272625;
   --color-ash: #6d6c6b;
   --color-midnight-indigo: #10054d;
+
+  /* Primary Button Token: Deep Teal */
+  --color-primary-teal: #1c5d5f;
+  --color-primary-teal-hover: #164a4c;
 
   /* Domain Taxonomy Pastels */
   --color-soft-violet: #e2ddfd;
@@ -591,15 +591,16 @@ In compliance with project rules:
   --font-mono: "JetBrains Mono", "IBM Plex Mono", SFMono-Regular, Menlo, monospace;
 
   /* Corner Radii */
-  --radius-btn: 8px;
+  --radius-pill: 48px; /* Strict pill button shape */
+  --radius-btn: 48px;
   --radius-input: 8px;
   --radius-card: 12px;
   --radius-stage: 16px;
   --radius-full: 9999px;
 
-  /* Elevation */
+  /* Elevation (Zero Drop-Shadows) */
   --elevation-hairline: 1px solid var(--color-stone);
-  --elevation-hover: 0 4px 12px rgba(17, 17, 17, 0.05);
+  --elevation-shadow: none !important;
 }
 ```
 
@@ -618,6 +619,9 @@ In compliance with project rules:
   --color-ash: #6d6c6b;
   --color-midnight-indigo: #10054d;
 
+  --color-primary-teal: #1c5d5f;
+  --color-primary-teal-hover: #164a4c;
+
   --color-soft-violet: #e2ddfd;
   --color-mint-green: #b7efb2;
   --color-canary-yellow: #ffef99;
@@ -633,7 +637,8 @@ In compliance with project rules:
   --font-mono: "JetBrains Mono", "IBM Plex Mono", SFMono-Regular, Menlo, monospace;
 
   /* Radii */
-  --radius-btn: 8px;
+  --radius-pill: 48px;
+  --radius-btn: 48px;
   --radius-card: 12px;
   --radius-stage: 16px;
   --radius-full: 9999px;

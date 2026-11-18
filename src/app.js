@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const requestLogger = require('./middlewares/logger');
@@ -12,6 +13,10 @@ const PORT = process.env.PORT || 5001;
 
 // Global request logger middleware (intercepts every incoming request)
 app.use(requestLogger);
+
+// Static assets (serves public directory for css, images, etc.)
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Essential middlewares
 app.use(cors());

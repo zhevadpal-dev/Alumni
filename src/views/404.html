@@ -4,16 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 - Page Not Found | Alumni Tracking System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-shadow: none !important;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
-      color: #0f172a;
+      font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+      background-color: var(--color-parchment-cream, #f7f6f2);
+      color: var(--color-ink, #111111);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -23,56 +28,60 @@
       line-height: 1.6;
     }
     .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      background: var(--color-canvas-white, #ffffff);
+      border: 1px solid var(--color-stone, #d1d4d9) !important;
+      border-radius: 16px;
+      box-shadow: none !important;
       max-width: 560px;
       width: 100%;
-      padding: 40px;
+      padding: 44px;
       text-align: center;
     }
     .badge {
       display: inline-block;
-      font-size: 0.875rem;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       color: #dc2626;
       background-color: #fef2f2;
       border: 1px solid #fee2e2;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 9999px;
       margin-bottom: 16px;
     }
     .error-code {
+      font-family: var(--font-editorial, 'Source Serif 4', Georgia, serif);
       font-size: 5rem;
-      font-weight: 800;
+      font-weight: 400;
       line-height: 1;
-      color: #0284c7;
+      color: var(--color-primary-teal, #1c5d5f);
+      margin-bottom: 12px;
+      letter-spacing: -0.04em;
+    }
+    .title {
+      font-family: var(--font-editorial, 'Source Serif 4', Georgia, serif);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--color-ink, #111111);
       margin-bottom: 12px;
       letter-spacing: -0.03em;
     }
-    .title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
     .message {
-      color: #475569;
+      color: var(--color-ash, #6d6c6b);
       font-size: 1rem;
       margin-bottom: 20px;
     }
     .requested-path {
       display: inline-block;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.875rem;
-      background-color: #f1f5f9;
-      color: #334155;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.85rem;
+      background-color: var(--color-parchment-cream, #f7f6f2);
+      color: var(--color-ink, #111111);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--color-stone, #d1d4d9);
       margin-bottom: 28px;
       word-break: break-all;
     }
@@ -87,44 +96,47 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      background-color: #2563eb;
-      color: #ffffff;
-      padding: 12px 24px;
-      border-radius: 8px;
+      background-color: var(--color-primary-teal, #1c5d5f) !important;
+      color: #ffffff !important;
+      padding: 12px 28px;
+      border-radius: 48px !important;
       text-decoration: none;
       font-weight: 600;
       font-size: 1rem;
-      transition: background-color 0.15s ease, transform 0.1s ease;
+      border: 1px solid var(--color-primary-teal, #1c5d5f);
+      transition: background-color 0.15s ease;
       width: 100%;
       max-width: 280px;
+      box-shadow: none !important;
     }
     .btn-home:hover {
-      background-color: #1d4ed8;
-      transform: translateY(-1px);
+      background-color: var(--color-primary-teal-hover, #164a4c) !important;
+      border-color: var(--color-primary-teal-hover, #164a4c) !important;
+      transform: none !important;
     }
     .quick-links {
       margin-top: 28px;
       padding-top: 20px;
-      border-top: 1px solid #f1f5f9;
+      border-top: 1px solid var(--color-stone-light, #e5e7eb);
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 16px;
     }
     .quick-links a {
-      color: #64748b;
+      color: var(--color-ash, #6d6c6b);
       text-decoration: none;
       font-size: 0.875rem;
       font-weight: 500;
       transition: color 0.15s ease;
     }
     .quick-links a:hover {
-      color: #2563eb;
+      color: var(--color-primary-teal, #1c5d5f);
     }
     .footer {
       margin-top: 24px;
       font-size: 0.8125rem;
-      color: #94a3b8;
+      color: var(--color-ash, #6d6c6b);
     }
   </style>
 </head>

@@ -2,19 +2,25 @@
  * Job Posting Views (Presentation Layer)
  * 
  * Generates server-rendered, responsive HTML view templates for the Job Board UI.
- * Provides views for:
- * - List view with search, filter badges, metrics, and quick-post form (/jobs)
- * - Single job posting detail view with candidate application form & applicant list (/jobs/:id)
- * - Standalone creation form (/jobs/new)
- * - Edit form (/jobs/:id/edit)
- * - Success and error notification pages
+ * Canonical design.md Implementation:
+ * - Dual Typography: Source Serif 4 (Headings) + Inter (UI) + JetBrains Mono (Eyebrows)
+ * - Zero Drop-Shadows (Flat Hairline Architecture)
+ * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
+ * - Cards: 1px Fog Border (#d1d4d9)
+ * - Pastel Domain Taxonomy (Mint Green for Careers & Jobs)
  */
+
+const { getGlobalStyles, getHeadTags } = require('./styles');
 
 class JobViews {
   /**
-   * Common CSS styling matching project design standards
+   * Common CSS styling matching project design standards (design.md)
    */
   static getBaseStyles() {
+    return getGlobalStyles();
+  }
+
+  static getLegacyJobStyles() {
     return `
       * { box-sizing: border-box; }
       body {
@@ -444,10 +450,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Career Opportunities | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Career Opportunities | Alumni Tracking System')}
       </head>
       <body>
         <div class="container">
@@ -657,10 +660,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumni Job Board</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags(`${escapeHtml(job.title)} at ${escapeHtml(job.company)} | Alumni Job Board`)}
       </head>
       <body>
         <div class="container">
@@ -816,10 +816,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Job Posting | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Create Job Posting | Alumni Tracking System')}
       </head>
       <body>
         <div class="container">
@@ -936,10 +933,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edit ${escapeHtml(job.title)} | Alumni Tracking System</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags(`Edit ${escapeHtml(job.title)} | Alumni Tracking System`)}
       </head>
       <body>
         <div class="container">
@@ -1047,10 +1041,7 @@ class JobViews {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Error | Alumni Job Board</title>
-        <style>${this.getBaseStyles()}</style>
+        ${getHeadTags('Error | Alumni Job Board')}
       </head>
       <body>
         <div class="container">

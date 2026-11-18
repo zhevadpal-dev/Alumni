@@ -2,19 +2,25 @@
  * Announcement Views (Presentation Layer)
  * 
  * Generates server-rendered, responsive HTML view templates for the Announcement Management UI.
- * Provides views for:
- * - List view with comprehensive table, category filtering, and embedded creation form (/announcements)
- * - Single announcement detail view (/announcements/:id)
- * - Standalone creation form (/announcements/new)
- * - Edit form (/announcements/:id/edit)
- * - Success and error notification pages
+ * Canonical design.md Implementation:
+ * - Dual Typography: Source Serif 4 (Headings) + Inter (UI) + JetBrains Mono (Eyebrows)
+ * - Zero Drop-Shadows (Flat Hairline Architecture)
+ * - Primary Button: Deep Teal (#1c5d5f) with Pill Shape (48px radius)
+ * - Cards: 1px Fog Border (#d1d4d9)
+ * - Pastel Domain Taxonomy (Petal Pink for Announcements)
  */
+
+const { getGlobalStyles, getHeadTags } = require('./styles');
 
 class AnnouncementViews {
   /**
-   * Common CSS styles matching the project's design system
+   * Common CSS styles matching the project's design system (design.md)
    */
   static getBaseStyles() {
+    return getGlobalStyles();
+  }
+
+  static getLegacyAnnouncementStyles() {
     return `
       * { box-sizing: border-box; }
       body {
