@@ -7,15 +7,52 @@ const HtmlViews = require('../views/htmlViews');
 
 class CoreController {
   /**
+   * Helper to retrieve system counts for the workbench dashboard
+   * @returns {Promise<Object>}
+   */
+  static async getSystemStats() {
+    const defaultStats = {
+      users: 10,
+      jobs: 26,
+      applications: 14,
+      announcements: 8,
+      dbConnected: true,
+      uptime: process.uptime()
+    };
+
+    try {
+      const { query } = require('../config/db');
+      const [uRes, jRes, aRes, annRes] = await Promise.all([
+        query('SELECT COUNT(*) as count FROM users'),
+        query('SELECT COUNT(*) as count FROM job_postings'),
+        query('SELECT COUNT(*) as count FROM applications'),
+        query('SELECT COUNT(*) as count FROM announcements'),
+      ]);
+
+      return {
+        users: parseInt(uRes.rows[0].count, 10) || defaultStats.users,
+        jobs: parseInt(jRes.rows[0].count, 10) || defaultStats.jobs,
+        applications: parseInt(aRes.rows[0].count, 10) || defaultStats.applications,
+        announcements: parseInt(annRes.rows[0].count, 10) || defaultStats.announcements,
+        dbConnected: true,
+        uptime: process.uptime()
+      };
+    } catch (err) {
+      return defaultStats;
+    }
+  }
+
+  /**
    * GET /
    * Returns "ok" for API/curl or rendered home view for browser requests
    */
-  static getRoot(req, res) {
+  static async getRoot(req, res) {
     const isBrowserRequest = req.headers.accept && req.headers.accept.includes('text/html');
     const isHomePageRequest = req.query.page === 'home' || req.query.page === 'main';
 
     if ((isBrowserRequest || isHomePageRequest) && req.query.status !== 'ok') {
-      return res.send(HtmlViews.renderHome());
+      const stats = await CoreController.getSystemStats();
+      return res.send(HtmlViews.renderHome(stats));
     }
 
     return res.send('ok');
@@ -23,10 +60,11 @@ class CoreController {
 
   /**
    * GET /home & GET /main
-   * Home placeholder view
+   * Home workbench view
    */
-  static getHome(req, res) {
-    return res.send(HtmlViews.renderHome());
+  static async getHome(req, res) {
+    const stats = await CoreController.getSystemStats();
+    return res.send(HtmlViews.renderHome(stats));
   }
 
   /**

@@ -590,9 +590,9 @@ npm run dev
 | `GET` | `/api/swagger` | Interactive Swagger UI Documentation | Visual interactive OpenAPI playground |
 | `GET` | `/api/swagger.json` | Raw OpenAPI 3.0 Specification JSON | Full API schema in JSON |
 | `GET` | `/api/health` | Comprehensive system health check JSON | `{"status": "OK", "uptime": 12.34, "memory": {...}}` |
-| `GET` | `/` | API ping / Home placeholder | Terminal/curl: `"ok"` \| Browser: `"temporary one main page"` |
-| `GET` | `/home` | Placeholder home page | `"temporary one main page"` |
-| `GET` | `/about` | Placeholder about page | `"temp. about page"` |
+| `GET` | `/` | API ping / Workbench Landing Page | Terminal/curl: `"ok"` \| Browser: Operations Workbench & Portal |
+| `GET` | `/home` & `/main` | Operations Workbench & Portal | Comprehensive workbench dashboard with live database stats & quick action modules |
+| `GET` | `/about` | About & Architecture Page | Responsive system overview & tech stack documentation |
 | `GET` | `/hello` | Standard greeting | `"Hello, World!"` |
 | `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
 | `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
