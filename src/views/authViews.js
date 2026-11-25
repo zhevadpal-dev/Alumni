@@ -77,7 +77,7 @@ class AuthViews {
       </nav>
 
       <!-- Right Column: Logged-in User Pill or Balancing Spacer -->
-      <div class="nav-actions">${renderUserSessionControls()}</div>
+      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
     </div>
   </header>
 
@@ -352,7 +352,7 @@ class AuthViews {
         <div class="register-actions">
           <button type="submit" class="btn btn-primary register-submit-btn" id="registerSubmitBtn" ${values.kvkkConsent ? '' : 'disabled'}>Create Account</button>
           <p class="register-footer-link">
-            Already have an account? <a href="/users">Sign in</a>
+            Already have an account? <a href="/login">Sign in</a>
           </p>
         </div>
       </form>
@@ -700,6 +700,151 @@ class AuthViews {
         if (isOpen && !combobox.contains(e.target)) {
           closeDropdown();
         }
+      });
+    })();
+  </script>
+</body>
+</html>`;
+  }
+
+  /**
+   * Render the Login page (GET /login or re-render with error on POST /login)
+   *
+   * @param {Object} [options={}]
+   * @param {string|null} [options.error=null] - Generic authentication error message
+   * @param {Object} [options.values={}] - Preserved form values (email only)
+   * @returns {string} HTML markup
+   */
+  static renderLoginPage(options = {}) {
+    const { error = null, values = {} } = options;
+
+    const errorAlertHtml = error
+      ? `
+        <div class="glass-alert-error" role="alert" aria-live="polite">
+          <div class="glass-alert-icon" aria-hidden="true">!</div>
+          <div class="glass-alert-body">
+            <strong>Sign in failed</strong>
+            <p>${escapeHtml(error)}</p>
+          </div>
+        </div>
+      `
+      : '';
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${getHeadTags('Sign In | Alumly')}
+</head>
+<body>
+  <!-- Unified Full-Width 3-Column CSS Grid Header -->
+  <header class="top-nav">
+    <div class="nav-wrapper">
+      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+        <span class="nav-logo-icon" aria-hidden="true">
+          ${BRAND_SVG_ICON}
+        </span>
+        <span class="nav-brand-text">Alumly</span>
+      </a>
+
+      <!-- Centered Floating iOS-Style Frosted-Glass Pill Navigation -->
+      <nav class="nav-pill-menu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
+          <li><a href="/jobs" class="nav-link">Job Board</a></li>
+          <li><a href="/applications" class="nav-link">Applications</a></li>
+          <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right Column: Logged-in User Pill or Balancing Spacer -->
+      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
+    </div>
+  </header>
+
+  <!-- Compact Centered Frosted-Glass Login Stage -->
+  <main class="container login-stage">
+    <div class="register-glass-card login-glass-card">
+      <div class="register-header">
+        <span class="badge register-eyebrow">● WELCOME BACK</span>
+        <h1 class="register-title">Sign in to Alumly</h1>
+        <p class="register-subtitle">Access the alumni directory, career board, and your saved applications.</p>
+      </div>
+
+      ${errorAlertHtml}
+
+      <form action="/login" method="POST" id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email Address *</label>
+          <input
+            type="email"
+            id="loginEmail"
+            name="email"
+            class="form-control"
+            placeholder="e.g. name@example.com"
+            value="${escapeHtml(values.email || '')}"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label for="loginPassword">Password *</label>
+          <div class="password-input-wrapper">
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              class="form-control password-input"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              data-target="loginPassword"
+              aria-label="Toggle password visibility"
+              aria-pressed="false"
+            >
+              <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c6.4 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                <path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3.6 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                <line x1="2" y1="2" x2="22" y2="22"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="register-actions">
+          <button type="submit" class="btn btn-primary register-submit-btn">Sign In</button>
+          <p class="register-footer-link">
+            Don't have an account? <a href="/register">Create one</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var toggleButtons = document.querySelectorAll('.password-toggle-btn');
+      toggleButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-target');
+          var input = document.getElementById(targetId);
+          if (!input) return;
+          var isCurrentlyHidden = input.type === 'password';
+          input.type = isCurrentlyHidden ? 'text' : 'password';
+          btn.classList.toggle('is-visible', isCurrentlyHidden);
+          btn.setAttribute('aria-pressed', String(isCurrentlyHidden));
+        });
       });
     })();
   </script>

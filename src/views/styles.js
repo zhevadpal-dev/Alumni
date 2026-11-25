@@ -126,10 +126,14 @@ function escapeAttr(str) {
  * @param {string} [extraHtml='']
  * @returns {string}
  */
-function renderUserSessionControls(extraHtml = '') {
+function renderUserSessionControls(extraHtml = '', options = {}) {
   const user = getCurrentUser();
   if (!user) {
-    return extraHtml || '';
+    if (options.hideSignIn) {
+      return extraHtml || '';
+    }
+    const signInHtml = '<a href="/login" class="btn-signin-pill">Sign In</a>';
+    return `${extraHtml || ''}${signInHtml}`;
   }
 
   const fullName = (user.full_name || user.name || 'Member').trim();

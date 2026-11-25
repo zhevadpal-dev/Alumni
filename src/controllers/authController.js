@@ -105,6 +105,70 @@ class AuthController {
   }
 
   /**
+   * GET /login
+   * Renders the Alumly Login page. Redirects to / if already logged in.
+   */
+  static async renderLogin(req, res) {
+    if (req.session && req.session.user) {
+      return res.redirect('/');
+    }
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(AuthViews.renderLoginPage());
+  }
+
+  /**
+   * POST /login
+   * Authenticates email + password against PostgreSQL scrypt hash, establishes
+   * signed HTTP-only session cookie, and redirects to / (or returns JSON).
+   */
+  static async handleLogin(req, res) {
+    const acceptsJsonOnly =
+      req.xhr ||
+      (req.headers.accept &&
+        req.headers.accept.includes('application/json') &&
+        !req.headers.accept.includes('text/html'));
+
+    const email = req.body?.email || '';
+    const password = req.body?.password || '';
+
+    try {
+      const user = await UserModel.authenticate(email, password);
+
+      if (typeof req.loginUser === 'function') {
+        req.loginUser(user);
+      }
+
+      if (acceptsJsonOnly) {
+        return res.status(200).json({
+          status: 'success',
+          message: 'Signed in successfully.',
+          data: user
+        });
+      }
+
+      return res.redirect('/');
+    } catch (err) {
+      const statusCode = err.statusCode && err.statusCode < 500 ? err.statusCode : 401;
+
+      if (acceptsJsonOnly) {
+        return res.status(statusCode).json({
+          status: 'error',
+          message: err.message
+        });
+      }
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(statusCode).send(
+        AuthViews.renderLoginPage({
+          error: err.message,
+          values: { email }
+        })
+      );
+    }
+  }
+
+  /**
    * POST /logout & GET /logout
    * Destroys the signed user session cookie and redirects to Home (/).
    */

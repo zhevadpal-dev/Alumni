@@ -82,7 +82,7 @@ class HtmlViews {
       </nav>
 
       <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-      <div class="nav-actions">${renderUserSessionControls()}</div>
+      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
     </div>
   </header>
 

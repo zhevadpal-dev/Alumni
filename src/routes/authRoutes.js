@@ -13,6 +13,8 @@ const asyncHandler = require('../middlewares/asyncHandler');
 
 router.get('/register', asyncHandler(AuthController.renderRegister));
 router.post('/register', asyncHandler(AuthController.handleRegister));
+router.get('/login', asyncHandler(AuthController.renderLogin));
+router.post('/login', asyncHandler(AuthController.handleLogin));
 router.post('/logout', asyncHandler(AuthController.handleLogout));
 router.get('/logout', asyncHandler(AuthController.handleLogout));
 

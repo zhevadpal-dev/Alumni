@@ -522,6 +522,56 @@ const swaggerSpec = {
         }
       }
     },
+    '/login': {
+      get: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Render Alumly Login page',
+        description: 'Returns the server-rendered Alumly iOS glassmorphism Sign In page. Redirects to / if already logged in.',
+        responses: {
+          '200': {
+            description: 'HTML Login page rendered successfully',
+            content: { 'text/html': { schema: { type: 'string' } } }
+          },
+          '302': { description: 'Already logged in — redirects to /' }
+        }
+      },
+      post: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Authenticate user and establish session',
+        description: 'Verifies email and password against PostgreSQL scrypt hash, sets signed HTTP-only alumly_session cookie, and redirects to / or returns 200 JSON.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['email', 'password'],
+                properties: {
+                  email: { type: 'string', format: 'email', example: 'deniz.arslan@university.edu' },
+                  password: { type: 'string', example: 'Alumly@2026' }
+                }
+              }
+            },
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['email', 'password'],
+                properties: {
+                  email: { type: 'string' },
+                  password: { type: 'string' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '200': { description: 'Signed in successfully (JSON response)' },
+          '302': { description: 'Signed in successfully (Browser redirect to /)' },
+          '400': { description: 'Missing email or password' },
+          '401': { description: 'Invalid email or password' }
+        }
+      }
+    },
     '/logout': {
       post: {
         tags: ['Authentication & Registration (AuthController)'],

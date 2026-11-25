@@ -1932,6 +1932,60 @@
         "description": "Clears the signed HTTP-only alumly_session cookie and logs out the current user."
       },
       "response": []
+    },
+    {
+      "name": "Web Login Page (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "Renders the Alumly iOS glassmorphism Sign In page (redirects to / if already authenticated)."
+      },
+      "response": []
+    },
+    {
+      "name": "Login Account (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"deniz.arslan@university.edu\",\n  \"password\": \"Alumly@2026\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "Authenticates email and password against PostgreSQL scrypt hash and establishes signed HTTP-only alumly_session cookie."
+      },
+      "response": []
     }
   ]
 }

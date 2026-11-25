@@ -1,0 +1,14 @@
+$kind: http-request
+description: Authenticates user email and password against PostgreSQL scrypt hash and establishes signed HTTP-only session cookie.
+url: "{{baseUrl}}/login"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "deniz.arslan@university.edu",
+      "password": "Alumly@2026"
+    }
+order: 3455

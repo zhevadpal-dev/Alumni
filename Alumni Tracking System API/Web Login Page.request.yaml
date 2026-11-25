@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders the Alumly iOS glassmorphism Sign In page (redirects to / if already logged in).
+url: "{{baseUrl}}/login"
+method: GET
+headers:
+  Accept: text/html
+order: 3452

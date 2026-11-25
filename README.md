@@ -616,6 +616,8 @@ npm run dev
 | :--- | :--- | :--- | :--- |
 | `GET` | `/register` | Render Alumly iOS glassmorphism Register page (`Alumni` / `Student` segmented control) | Supports optional `?role=student` query param |
 | `POST` | `/register` | Register a new `alumni` or `student` account (enforces 5-rule strong password, mandatory `kvkkConsent`, scrypt hashing, auto-login via signed HTTP-only session cookie) | Body: `name`, `email`, `password`, `confirmPassword`, `role`, `department`, `graduationYear`, `kvkkConsent`, optional `company`, `jobTitle`, `linkedinUrl` |
+| `GET` | `/login` | Render Alumly iOS glassmorphism Sign In page (redirects to `/` if already logged in) | Server-rendered HTML login card with show/hide password toggle |
+| `POST` | `/login` | Authenticate `email` & `password` against PostgreSQL `scrypt` hash and establish signed HTTP-only session cookie | Body: `email`, `password` -> redirects to `/` or returns 200 JSON |
 | `POST` / `GET` | `/logout` | Destroy signed user session cookie (`alumly_session`) and redirect to `/` | Clears `res.locals.currentUser` |
 
 ### 🚀 REST API User Endpoints (`ApiUserController` ➡️ `/api/users`)

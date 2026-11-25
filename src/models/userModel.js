@@ -8,7 +8,7 @@
  */
 
 const { query } = require('../config/db');
-const { hashPassword } = require('../utils/password');
+const { hashPassword, verifyPassword } = require('../utils/password');
 
 class UserModel {
   /**
@@ -217,6 +217,51 @@ class UserModel {
       linkedinUrl: linkedinUrl || null,
       passwordHash
     });
+  }
+
+  /**
+   * Authenticate a user by email and password using scrypt verification.
+   * Returns a generic 401 error without revealing whether the email exists.
+   *
+   * @param {string} email - User email address
+   * @param {string} password - Plaintext password
+   * @returns {Promise<Object>} Authenticated user record (without password_hash)
+   */
+  static async authenticate(email, password) {
+    const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+    const rawPassword = password ? String(password) : '';
+
+    if (!cleanEmail || !rawPassword) {
+      const error = new Error('Please enter both your email address and password.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const sql = `
+      SELECT ${this.SAFE_COLUMNS}, password_hash AS "passwordHash"
+      FROM users
+      WHERE LOWER(email) = LOWER($1)
+      LIMIT 1
+    `;
+
+    const res = await query(sql, [cleanEmail]);
+    const userRow = res.rows[0];
+
+    if (!userRow || !userRow.passwordHash) {
+      const error = new Error('Invalid email or password.');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const isMatch = await verifyPassword(rawPassword, userRow.passwordHash);
+    if (!isMatch) {
+      const error = new Error('Invalid email or password.');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const { passwordHash, ...safeUser } = userRow;
+    return safeUser;
   }
 
   // ==========================================
