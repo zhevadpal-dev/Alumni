@@ -2301,23 +2301,27 @@ textarea.form-control {
 }
 
 .combobox-input {
-  padding-right: 42px !important;
+  padding-right: 44px !important;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .combobox-chevron-btn {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: 16px;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   background: transparent;
   border: none;
   color: rgba(22, 25, 28, 0.55);
-  cursor: pointer;
+  pointer-events: none;
   border-radius: 9999px;
   transition: transform 0.2s ease, color 0.15s ease;
   padding: 0;
