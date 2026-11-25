@@ -187,17 +187,36 @@ class AuthViews {
         <!-- Section 2: Academic & Profile Info -->
         <div class="register-section-label">Academic Profile</div>
         <div class="form-grid-2col">
-          <div class="form-group">
+          <div class="form-group combobox-group" id="departmentCombobox">
             <label for="department">Department / Major *</label>
-            <input
-              type="text"
-              id="department"
-              name="department"
-              class="form-control"
-              placeholder="e.g. Computer Engineering"
-              value="${escapeHtml(values.department || '')}"
-              required
-            />
+            <div class="combobox-wrapper">
+              <input
+                type="text"
+                id="department"
+                name="department"
+                class="form-control combobox-input"
+                placeholder="Select or type your major"
+                value="${escapeHtml(values.department || '')}"
+                autocomplete="off"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-controls="departmentListbox"
+                required
+              />
+              <button
+                type="button"
+                class="combobox-chevron-btn"
+                id="departmentToggleBtn"
+                aria-label="Toggle departments list"
+                tabindex="-1"
+              >
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M5.5 7.75L10 12.25L14.5 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="combobox-dropdown" id="departmentListbox" role="listbox" aria-label="University Departments and Majors"></div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -329,6 +348,167 @@ class AuthViews {
 
       passwordInput.addEventListener('input', checkPasswordMatch);
       confirmInput.addEventListener('input', checkPasswordMatch);
+
+      // Scrollable iOS Glassmorphism Combobox for Department / Major
+      var MAJORS = [
+        'Management Information Systems',
+        'Computer Engineering',
+        'Software Engineering',
+        'Data Science & Artificial Intelligence',
+        'Business Administration',
+        'Economics',
+        'Finance & Banking',
+        'Industrial Engineering',
+        'Electrical & Electronics Engineering',
+        'Mechanical Engineering',
+        'Civil Engineering',
+        'Architecture',
+        'Interior Architecture & Environmental Design',
+        'Psychology',
+        'Law',
+        'Medicine',
+        'Pharmacy',
+        'Nursing & Health Sciences',
+        'Communication & Media',
+        'International Relations',
+        'Political Science',
+        'Graphic Design',
+        'Mathematics',
+        'Physics',
+        'Chemistry',
+        'Molecular Biology & Genetics',
+        'Sociology',
+        'English Language & Literature'
+      ];
+
+      var combobox = document.getElementById('departmentCombobox');
+      var deptInput = document.getElementById('department');
+      var deptToggle = document.getElementById('departmentToggleBtn');
+      var deptList = document.getElementById('departmentListbox');
+      var activeIndex = -1;
+      var isOpen = false;
+
+      function renderOptions(queryText) {
+        var trimmed = (queryText || '').trim();
+        var lower = trimmed.toLowerCase();
+        var matches = MAJORS.filter(function (major) {
+          return !lower || major.toLowerCase().indexOf(lower) !== -1;
+        });
+
+        var exactMatch = MAJORS.some(function (major) {
+          return major.toLowerCase() === lower;
+        });
+
+        deptList.innerHTML = '';
+        activeIndex = -1;
+
+        matches.forEach(function (major) {
+          var item = document.createElement('div');
+          item.className = 'combobox-option';
+          item.setAttribute('role', 'option');
+          item.setAttribute('data-value', major);
+          if (major.toLowerCase() === lower) {
+            item.classList.add('is-selected');
+            item.setAttribute('aria-selected', 'true');
+          }
+          item.textContent = major;
+          item.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            selectMajor(major);
+          });
+          deptList.appendChild(item);
+        });
+
+        if (trimmed && !exactMatch) {
+          var customItem = document.createElement('div');
+          customItem.className = 'combobox-option combobox-custom-option';
+          customItem.setAttribute('role', 'option');
+          customItem.setAttribute('data-value', trimmed);
+          customItem.textContent = 'Use custom major: "' + trimmed + '"';
+          customItem.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            selectMajor(trimmed);
+          });
+          deptList.appendChild(customItem);
+        }
+      }
+
+      function openDropdown() {
+        renderOptions(deptInput.value);
+        deptList.classList.add('is-open');
+        combobox.classList.add('is-open');
+        deptInput.setAttribute('aria-expanded', 'true');
+        isOpen = true;
+      }
+
+      function closeDropdown() {
+        deptList.classList.remove('is-open');
+        combobox.classList.remove('is-open');
+        deptInput.setAttribute('aria-expanded', 'false');
+        activeIndex = -1;
+        isOpen = false;
+      }
+
+      function selectMajor(value) {
+        deptInput.value = value;
+        closeDropdown();
+      }
+
+      function highlightOption(index) {
+        var options = deptList.querySelectorAll('.combobox-option');
+        if (!options.length) return;
+        options.forEach(function (el) { el.classList.remove('is-active'); });
+        if (index < 0) index = options.length - 1;
+        if (index >= options.length) index = 0;
+        activeIndex = index;
+        options[activeIndex].classList.add('is-active');
+        options[activeIndex].scrollIntoView({ block: 'nearest' });
+      }
+
+      deptInput.addEventListener('focus', openDropdown);
+      deptInput.addEventListener('click', function () {
+        if (!isOpen) openDropdown();
+      });
+      deptInput.addEventListener('input', function () {
+        if (!isOpen) openDropdown();
+        else renderOptions(deptInput.value);
+      });
+
+      deptInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeDropdown();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (!isOpen) openDropdown();
+          highlightOption(activeIndex + 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (!isOpen) openDropdown();
+          highlightOption(activeIndex - 1);
+        } else if (e.key === 'Enter' && isOpen && activeIndex >= 0) {
+          var options = deptList.querySelectorAll('.combobox-option');
+          if (options[activeIndex]) {
+            e.preventDefault();
+            selectMajor(options[activeIndex].getAttribute('data-value'));
+          }
+        }
+      });
+
+      deptToggle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        if (isOpen) {
+          closeDropdown();
+        } else {
+          deptInput.focus();
+          openDropdown();
+        }
+      });
+
+      document.addEventListener('click', function (e) {
+        if (isOpen && !combobox.contains(e.target)) {
+          closeDropdown();
+        }
+      });
     })();
   </script>
 </body>

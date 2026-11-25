@@ -2286,3 +2286,123 @@ textarea.form-control {
     font-size: 1.75rem;
   }
 }
+
+
+/* ==========================================================================
+   16. GLASSMORPHISM COMBOBOX (DEPARTMENT / MAJOR SELECTOR)
+   ========================================================================== */
+.combobox-group {
+  position: relative;
+}
+
+.combobox-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.combobox-input {
+  padding-right: 42px !important;
+}
+
+.combobox-chevron-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  color: rgba(22, 25, 28, 0.55);
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: transform 0.2s ease, color 0.15s ease;
+  padding: 0;
+}
+
+.combobox-chevron-btn:hover {
+  color: #16191c;
+}
+
+.combobox-group.is-open .combobox-chevron-btn {
+  transform: translateY(-50%) rotate(180deg);
+  color: #16191c;
+}
+
+.combobox-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  max-height: 220px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+  box-shadow: none !important;
+}
+
+.combobox-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.combobox-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.combobox-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(22, 25, 28, 0.18);
+  border-radius: 9999px;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(22, 25, 28, 0.32);
+}
+
+.combobox-option {
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #16191c;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+  line-height: 1.35;
+}
+
+.combobox-option:hover,
+.combobox-option.is-active {
+  background: rgba(22, 25, 28, 0.08);
+}
+
+.combobox-option.is-selected {
+  background: rgba(22, 25, 28, 0.12);
+  font-weight: 600;
+}
+
+.combobox-custom-option {
+  color: #4d5358;
+  font-style: italic;
+  border-top: 1px solid rgba(22, 25, 28, 0.08);
+  margin-top: 4px;
+  padding-top: 10px;
+}
