@@ -1,48 +1,69 @@
-# 🏛️ Data Design & Architecture Documentation (DDD)
+# 🏛️ Alumly — Domain-Driven Design & Data Architecture Documentation (`ddd.md`)
 
-> **Platform:** Alumni Tracking System  
-> **Status:** Active (PostgreSQL 15 Relational Persistence & In-Memory Fallback)  
-> **Version:** 1.3.0  
-> **Author:** Alumni Engineering Team  
+> **Platform:** Alumly — Modern Alumni & Career Network  
+> **Persistence Layer:** PostgreSQL 15 Relational Database (`src/config/db.js`)  
+> **Version:** 2.0.0  
+> **Status:** Active Canonical Domain Specification  
+> **Related Specs:** [`brand.md`](../brand.md) · [`design.md`](../design.md) · [`README.md`](../README.md) · Root copy: [`ddd.md`](../ddd.md)
 
 ---
 
 ## 📑 Table of Contents
-1. [Executive Summary](#1-executive-summary)
-2. [Data Layer Architecture & Philosophy](#2-data-layer-architecture--philosophy)
-3. [Entity Specifications & Attributes](#3-entity-specifications--attributes)
-   - [3.1 User Entity](#31-user-entity)
-   - [3.2 Announcement Entity](#32-announcement-entity)
-   - [3.3 Job Posting Entity](#33-job-posting-entity)
-   - [3.4 Application Entity (Many-to-Many Action Join)](#34-application-entity-many-to-many-action-join)
-4. [Entity Relationship Diagram (ERD)](#4-entity-relationship-diagram-erd)
-5. [In-Memory Store vs. Target Relational Schema](#5-in-memory-store-vs-target-relational-schema)
-6. [Validation & Business Rules](#6-validation--business-rules)
-   - [6.1 User Domain Constraints](#61-user-domain-constraints)
-   - [6.2 Announcement Domain Constraints](#62-announcement-domain-constraints)
-   - [6.3 Job Posting Domain Constraints](#63-job-posting-domain-constraints)
-   - [6.4 Application Domain Constraints](#64-application-domain-constraints)
+1. [Executive Summary & Ubiquitous Language](#1-executive-summary--ubiquitous-language)
+2. [Bounded Contexts & Domain Architecture](#2-bounded-contexts--domain-architecture)
+3. [Users Domain & User Roles (Core Aggregate)](#3-users-domain--user-roles-core-aggregate)
+   - [3.1 User Aggregate & Entity Specification](#31-user-aggregate--entity-specification)
+   - [3.2 Role Value Object & Role Definitions](#32-role-value-object--role-definitions)
+   - [3.3 Role-Permission Matrix](#33-role-permission-matrix)
+   - [3.4 Access Boundaries & Enforcement Status](#34-access-boundaries--enforcement-status)
+   - [3.5 User Relationships & Cross-Aggregate Interactions](#35-user-relationships--cross-aggregate-interactions)
+4. [Supporting Aggregates & Entity Specifications](#4-supporting-aggregates--entity-specifications)
+   - [4.1 Announcement Aggregate](#41-announcement-aggregate)
+   - [4.2 Job Posting Aggregate](#42-job-posting-aggregate)
+   - [4.3 Application Aggregate (Many-to-Many Join)](#43-application-aggregate-many-to-many-join)
+5. [Entity Relationship Diagram (ERD)](#5-entity-relationship-diagram-erd)
+6. [Domain Invariants & Validation Rules](#6-domain-invariants--validation-rules)
 7. [Data Lifecycle & State Transitions](#7-data-lifecycle--state-transitions)
-8. [Target PostgreSQL DDL Specification](#8-target-postgresql-ddl-specification)
-9. [Migration Strategy & Zero-Downtime Roadmap](#9-migration-strategy--zero-downtime-roadmap)
-10. [Observability, Telemetry & Fault Tolerance Architecture](#10-observability-telemetry--fault-tolerance-architecture)
-    - [10.1 Global Request Duration Telemetry](#101-global-request-duration-telemetry)
-    - [10.2 Dual-Mode 404 Route Guardian](#102-dual-mode-404-route-guardian)
-    - [10.3 5xx Global Error Handler & Promise Interception](#103-5xx-global-error-handler--promise-interception)
-    - [10.4 Persistent File-Based Error Auditing](#104-persistent-file-based-error-auditing)
+8. [PostgreSQL 15 DDL & Migration Reference](#8-postgresql-15-ddl--migration-reference)
+9. [Observability, Telemetry & Fault Tolerance Architecture](#9-observability-telemetry--fault-tolerance-architecture)
 
 ---
 
-## 1. Executive Summary
+## 1. Executive Summary & Ubiquitous Language
 
-The **Alumni Tracking System** employs a decoupled, multi-tier data architecture following strict **Model-View-Controller (MVC)** principles.
+**Alumly** is a containerized web platform and RESTful API built on **Node.js**, **Express**, and **PostgreSQL 15**, structured around **Model-View-Controller (MVC)** separation and **Domain-Driven Design (DDD)** principles.
 
-- **Current State:** Active models ([`src/models/userModel.js`](../src/models/userModel.js) and [`src/models/announcementModel.js`](../src/models/announcementModel.js)) encapsulate in-memory array collections with defensive cloning, deterministic ID generators, query filtering, and schema validation. This allows instantaneous boot times, zero external database setup friction for development/testing, and complete container portability.
-- **Target State:** The system is pre-configured with a containerized PostgreSQL 15 database (`alumni_db`), ready for seamless transition to durable relational persistence via Knex.js query builder or native connection pools without altering controller or view contracts.
+All active domain models (`UserModel`, `AnnouncementModel`, `JobPostingModel`, `ApplicationModel`) execute parameterized SQL queries directly against PostgreSQL 15 via the connection pool in `src/config/db.js`, enforcing ACID transactions, referential integrity, and domain invariants.
+
+### 📖 Ubiquitous Language Glossary
+
+| Domain Term | Definition in Alumly |
+| :--- | :--- |
+| **Member / User** | Any registered individual within the Alumly ecosystem—spanning graduates, current students, academic faculty, teachers, and platform administrators. |
+| **Role** | A constrained Value Object (`alumni`, `student`, `faculty`, `teacher`, `admin`) classifying a member's institutional relationship and intended platform responsibilities. |
+| **Alumni Directory** | The searchable, filterable registry of all Alumly members (`/users` and `/api/users`). |
+| **Job Posting** | A career opportunity, internship, or contract opening published to the Job Board (`/jobs` and `/api/jobs`) and optionally attributed to a posting `User` (`posterId`). |
+| **Application** | A candidate's formal submission linking a `User` (applicant) to a `JobPosting`, tracking recruitment workflow state from `Submitted` through `Accepted` / `Rejected` / `Withdrawn`. |
+| **Announcement** | An institutional broadcast, reunion alert, career notice, or academic bulletin (`/announcements` and `/api/announcements`) optionally linked to an authoring `User` (`authorId`). |
 
 ---
 
-## 2. Data Layer Architecture & Philosophy
+## 2. Bounded Contexts & Domain Architecture
+
+Alumly is organized into four cohesive **Bounded Contexts** backed by a shared relational persistence layer:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         ALUMLY PLATFORM DOMAINS                         │
+├──────────────────────────────┬──────────────────────────────────────────┤
+│ Bounded Context              │ Core Aggregate / Responsibility          │
+├──────────────────────────────┼──────────────────────────────────────────┤
+│ 1. Identity & Directory      │ User Aggregate (Profiles, Roles, Search) │
+│ 2. Career Opportunities      │ JobPosting Aggregate (Listings, Filters) │
+│ 3. Recruitment & Applications│ Application Aggregate (M:N Join, Status) │
+│ 4. Institutional Broadcasts  │ Announcement Aggregate (News, Events)    │
+└──────────────────────────────┴──────────────────────────────────────────┘
+```
 
 ```text
 ┌────────────────────────────────────────────────────────┐
@@ -51,273 +72,285 @@ The **Alumni Tracking System** employs a decoupled, multi-tier data architecture
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│           Controllers (Input Parsing & Orchestration)  │
-│      - apiUserController / userController              │
-│      - apiAnnouncementController / announcementController│
+│   Controllers (Input Parsing, Content Negotiation)     │
+│   - userController / apiUserController                 │
+│   - jobController / apiJobController                   │
+│   - applicationController / apiApplicationController   │
+│   - announcementController / apiAnnouncementController │
 └───────────────────────────┬────────────────────────────┘
-                            │ Invokes Model methods
+                            │ Delegates to Domain Models
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│           Model Layer (Data Abstraction Layer)         │
-│   - Defensive Immutability (Shallow Copy on Read/Write)│
-│   - Input Validation & Domain Rule Enforcement         │
-│   - Query Filtering, Substring Search, Pagination      │
-└─────────────┬────────────────────────────┬─────────────┘
-              │                            │
-   (Phase 1: Current Runtime)   (Phase 2: Target Relational)
-              ▼                            ▼
-┌───────────────────────────┐┌───────────────────────────┐
-│ In-Memory Array Store     ││ PostgreSQL 15 Relational  │
-│ - Node.js Process Heap    ││ - ACID Transactions       │
-│ - Seed Data Bootstrapping ││ - Foreign Key Integrity   │
-│ - Ephemeral Lifecycle     ││ - Durable Named Volumes   │
-└───────────────────────────┘└───────────────────────────┘
+│        Domain Model Layer (src/models/)                │
+│   - Domain Validation & Invariant Enforcement          │
+│   - Relational Querying & Eager Association Loading    │
+│   - Parameterized SQL Execution (src/config/db.js)     │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│        PostgreSQL 15 Relational Persistence            │
+│   - ACID Transactions & Foreign Key Constraints        │
+│   - Composite Uniqueness & B-Tree Indexing             │
+│   - Durable Storage via Docker Named Volumes           │
+└────────────────────────────────────────────────────────┘
 ```
 
-### 2.1 The In-Memory Lifecycle & "The Forgetting Test"
-Because data is held in-process during Phase 1:
-- State mutations survive normal HTTP lifecycles and controller dispatches.
-- State is intentionally **forgotten** when containers are stopped (`docker compose down`) and restarted (`docker compose up -d`), resetting cleanly to canonical seed datasets.
-- This design provides reproducible, side-effect-free automated testing across CI/CD pipelines.
+---
+
+## 3. Users Domain & User Roles (Core Aggregate)
+
+The **Identity & Directory** bounded context centers on the `User` aggregate root (`src/models/userModel.js`). Every other core aggregate in Alumly (`JobPosting`, `Application`, `Announcement`) references `User` as an author, poster, or candidate applicant.
+
+### 3.1 User Aggregate & Entity Specification
+
+- **Aggregate Root:** `User`
+- **Unique Identity:** `id` (`SERIAL PRIMARY KEY`, positive integer $\ge 1$) and natural business key `email` (case-insensitive unique constraint).
+- **Source of Truth:** `src/migrations/001_create_initial_tables.sql`, `src/models/userModel.js`, `src/controllers/userController.js`, `src/controllers/apiUserController.js`.
+
+#### Persisted Core Attributes (`users` table)
+
+| Attribute (JS) | PostgreSQL Column | SQL Type | Nullable | Default | Constraints & Domain Invariants | Description |
+| :--- | :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `id` | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Surrogate aggregate identifier |
+| `name` | `name` | `VARCHAR(255)` | **No** | — | Required, non-empty string, trimmed | Full name of the member |
+| `email` | `email` | `VARCHAR(255)` | **No** | — | Unique (`UNIQUE`), RFC 5322 regex (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`), trimmed & lowercased | Primary institutional or personal email |
+| `role` | `role` | `VARCHAR(50)` | **No** | `'alumni'` | Whitelist: `'alumni'`, `'student'`, `'faculty'`, `'teacher'`, `'admin'` (normalized lowercase) | Institutional role classification |
+| `department` | `department` | `VARCHAR(255)` | Yes | `NULL` | Optional trimmed string | Academic department or faculty program |
+| `graduationYear` | `graduation_year` | `INTEGER` | Yes | `NULL` | 4-digit integer in range `1900–2100` | Graduation or expected completion year |
+| `createdAt` | `created_at` | `TIMESTAMP` | **No** | `NOW()` | System-managed immutable timestamp | Record creation timestamp |
+| `updatedAt` | `updated_at` | `TIMESTAMP` | **No** | `NOW()` | Updated on every `PUT` / `PATCH` mutation | Last modification timestamp |
+
+#### Extended Profile Attributes (Accepted in Controllers & Web UI)
+
+> [!NOTE]
+> The web forms (`src/views/htmlViews.js`) and controllers (`userController.js`, `apiUserController.js`) also accept optional career/contact attributes—**`phone`**, **`company`**, and **`jobTitle`**—in user payloads. In the current PostgreSQL migration (`001_create_initial_tables.sql`) and `UserModel` SQL statements, only the 8 core columns above are actively persisted; adding `phone`, `company`, and `job_title` columns to `users` is a straightforward additive migration for future releases.
+
+#### User Aggregate Invariants
+1. **Mandatory Identity Fields:** `name` and `email` must be non-empty strings on creation (`POST`) and full replacement (`PUT`). Invalid payloads return `HTTP 400 Bad Request`.
+2. **Case-Insensitive Email Uniqueness:** Emails are trimmed and lowercased prior to duplicate lookup (`UserModel.findByEmail`) and backed by the PostgreSQL `UNIQUE` constraint (`23505`). Duplicate emails return `HTTP 409 Conflict`.
+3. **Strict Role Whitelist:** `role` is validated against `UserModel.ROLES`. Any unrecognized role value is rejected with `HTTP 400 Bad Request`. If omitted during creation, `role` defaults to `'alumni'`.
+4. **Graduation Year Bounds:** When supplied, `graduationYear` must parse to an integer between `1900` and `2100` inclusive.
 
 ---
 
-## 3. Entity Specifications & Attributes
+### 3.2 Role Value Object & Role Definitions
 
-### 3.1 User Entity
+The `Role` Value Object is canonically defined in `UserModel.ROLES` (`src/models/userModel.js`) and exposed in all Alumni Directory creation/edit forms (`src/views/htmlViews.js`):
 
-The `User` entity models graduates, enrolled students, faculty members, and institutional staff.
+```text
+UserModel.ROLES = ['alumni', 'student', 'faculty', 'teacher', 'admin']
+```
 
-| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique identifier |
-| `name` | `String` | `VARCHAR(255)` | **No** | — | Min 1 character, trimmed | Full name of the individual |
-| `email` | `String` | `VARCHAR(255)` | **No** | — | Unique, RFC 5322 regex format, lowercased | Institutional / personal email |
-| `role` | `String` | `VARCHAR(50)` | **No** | `'alumni'` | Whitelist: `'alumni'`, `'student'`, `'faculty'`, `'admin'` | Authorization role |
-| `department` | `String` \| `null` | `VARCHAR(255)` | Yes | `null` | Trimmed string | Academic degree / faculty program |
-| `graduationYear`| `Number` \| `null` | `INTEGER` | Yes | `null` | Range: $1900 \le \text{year} \le 2100$ | Year of graduation / completion |
-| `phone` | `String` \| `null` | `VARCHAR(50)` | Yes | `null` | E.164 or common dial formats | Primary telephone number |
-| `company` | `String` \| `null` | `VARCHAR(255)` | Yes | `null` | Trimmed string | Current employer or startup |
-| `jobTitle` | `String` \| `null` | `VARCHAR(255)` | Yes | `null` | Trimmed string | Professional or academic title |
-| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Record creation timestamp |
-| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last modification timestamp |
+| Role Value | Display Label | Purpose in the Alumly Ecosystem | Primary Responsibilities |
+| :--- | :--- | :--- | :--- |
+| **`alumni`** *(default)* | **Alumni** | Graduates of the institution forming the core professional and mentorship network. | Maintain graduate profile in the Alumni Directory, share career opportunities on the Job Board (`posterId`), apply to open roles via `Application`, and read institutional announcements. |
+| **`student`** | **Student** | Currently enrolled undergraduate or graduate students preparing for internships and early-career transitions. | Browse the Alumni Directory for networking, discover internships and entry-level roles on the Job Board, submit and track job applications, and stay informed via Announcements. |
+| **`faculty`** | **Faculty** | University professors, department heads, and academic researchers bridging academia and industry. | Maintain academic profile, post research internships or academic openings (e.g., AI Research Internships), author departmental/academic announcements, and mentor students/alumni. |
+| **`teacher`** | **Teacher** | Academic instructors and lecturers participating in student guidance and campus communication. | Maintain instructor profile, browse alumni career trajectories, share academic or career announcements, and connect students with relevant opportunities. |
+| **`admin`** | **Admin** | Institutional administrators and Alumni Relations Office staff governing platform operations. | Full administrative oversight across all modules: manage user directory records and role assignments, moderate/curate job postings, oversee application pipelines, and publish/manage official institutional announcements. |
 
 ---
 
-### 3.2 Announcement Entity
+### 3.3 Role-Permission Matrix
 
-The `Announcement` entity represents institutional broadcasts, career opportunities, event alerts, and news bulletins.
+The matrix below documents the canonical Alumly domain authorization model across all four core modules.
 
-| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique announcement ID |
-| `title` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Headline or subject |
-| `content` | `String` | `TEXT` | **No** | — | Required, non-empty text | Body content / description |
-| `author` | `String` | `VARCHAR(255)` | **No** | `'Alumni Relations Office'` | Non-empty string | Department or publisher |
-| `authorId` *(Relational)* | `Number` \| `null` | `INTEGER` | Yes | `null` | `FK` referencing `users(id)` ON DELETE SET NULL | Author user reference |
-| `category` | `String` | `VARCHAR(50)` | **No** | `'General'` | Whitelist: `'General'`, `'Event'`, `'Career'`, `'Academic'`, `'News'`, `'Urgent'` | Classification category |
-| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Creation timestamp |
-| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last update timestamp |
+**Legend:** `C` = Create · `R` = Read · `U` = Update · `D` = Delete · `(Own)` = Scoped to records owned/created by the user
 
-### 3.3 Job Posting Entity
+| Role | Alumni Directory (`/users`) | Job Board (`/jobs`) | Applications (`/applications`) | Announcements (`/announcements`) |
+| :--- | :--- | :--- | :--- | :--- |
+| **`alumni`** | `R` (Directory) · `U` (Own profile) | `R` (All) · `C / U / D` (Own postings) | `C` (Apply) · `R / U` (Own applications; review applicants on own jobs) | `R` (All bulletins) |
+| **`student`** | `R` (Directory) · `U` (Own profile) | `R` (All active listings) | `C` (Apply) · `R / U` (Own applications, e.g., withdraw) | `R` (All bulletins) |
+| **`faculty`** | `R` (Directory) · `U` (Own profile) | `R` (All) · `C / U / D` (Own academic/research postings) | `R / U` (Review applicants for own postings) | `R` (All) · `C / U / D` (Own academic/event bulletins) |
+| **`teacher`** | `R` (Directory) · `U` (Own profile) | `R` (All) · `C / U / D` (Own postings) | `R / U` (Review applicants for own postings) | `R` (All) · `C / U / D` (Own bulletins) |
+| **`admin`** | `C / R / U / D` (Full user & role management) | `C / R / U / D` (All job postings & moderation) | `C / R / U / D` (All applications & pipeline statuses) | `C / R / U / D` (All institutional broadcasts) |
 
-The `JobPosting` entity represents career opportunities, internships, and professional openings shared by alumni, corporate partners, or university career coordinators.
+---
 
-| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique job posting ID |
-| `title` | `String` | `VARCHAR(120)` | **No** | — | Required, non-empty, trimmed, maximum 120 characters | Job title or position designation |
-| `company` | `String` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Organization or enterprise offering the position |
-| `city` / `location` | `String` \| `null` | `VARCHAR(255)` | Yes | `'Remote'` | Optional trimmed string, defaults to `'Remote'` | City or physical location / remote designation |
-| `jobType` | `String` | `VARCHAR(50)` | **No** | `'Full-Time'` | Whitelist: `'Full-Time'`, `'Part-Time'`, `'Contract'`, `'Internship'`, `'Remote'` | Employment type classification |
-| `description` | `String` \| `null` | `TEXT` | Yes | `null` | Optional text | Detailed role responsibilities & scope |
-| `requirements` | `String` \| `null` | `TEXT` | Yes | `null` | Free text / bullet points | Qualifications, skills, prerequisites |
-| `salaryRange` | `String` \| `null` | `VARCHAR(100)` | Yes | `null` | Free text (e.g. `"$90k - $120k"`) | Compensation package or estimated range |
-| `applicationUrl`| `String` \| `null` | `VARCHAR(500)` | Yes | `null` | Valid `http://` or `https://` URL | External application or career portal link |
-| `contactEmail` | `String` \| `null` | `VARCHAR(255)` | Yes | `null` | RFC 5322 regex format, lowercased | Inquiries or resume submission email |
-| `posterId` | `Number` \| `null` | `INTEGER` | Yes | `null` | `FK` referencing `users(id)` ON DELETE SET NULL | Alumni or employer user who posted the listing |
-| `status` | `String` | `VARCHAR(50)` | **No** | `'Active'` | Whitelist: `'Active'`, `'Closed'`, `'Draft'`, `'Expired'` | Current lifecycle listing status |
-| `deadline` | `String` (ISO 8601) \| `null`| `TIMESTAMPTZ` | Yes | `null` | Valid ISO 8601 timestamp | Application deadline cutoff timestamp |
-| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Initial posting timestamp |
-| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last record modification timestamp |
+### 3.4 Access Boundaries & Enforcement Status
 
-### 3.4 Application Entity (Many-to-Many Action Join)
+- **Job Board Boundaries:**
+  - `admin`, `alumni`, `faculty`, and `teacher` roles are intended to publish and manage opportunities (`posterId`).
+  - `student` accounts are consumers of the Job Board—focused on discovering internships and full-time openings rather than publishing employer listings.
+- **Announcements Boundaries:**
+  - `admin`, `faculty`, and `teacher` roles represent official institutional voices authorized to publish, edit, and retire campus bulletins (`authorId`).
+  - `alumni` and `student` roles consume announcements in read-only mode.
+- **User Administration Boundaries:**
+  - Only `admin` should delete arbitrary member accounts or reassign roles (`alumni` → `admin`, etc.). Non-admin members are scoped to viewing the directory and editing their own profiles.
+- **Current Codebase Enforcement Note:**
+  - **Enforced Today:** Domain-level role validation (`UserModel.ROLES` whitelist, case normalization, and `'alumni'` default) is actively enforced on every `POST`, `PUT`, and `PATCH` request in `UserModel`, and role filtering is supported via `GET /api/users?role=<role>`.
+  - **Planned Security Layer:** Route-level authentication (JWT/session middleware) and RBAC guard middleware are not yet mounted on Express routes so all web and API CRUD workflows remain directly testable in local/containerized environments. Introducing auth + RBAC middleware will enforce the matrix above at the HTTP boundary without modifying domain models.
 
-The `Application` entity models the many-to-many relationship between `User` (applicant) and `JobPosting` (career listing), serving as an audit and workflow tracking table for recruitment lifecycles.
+---
 
-| Field Name | In-Memory JS Type | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `id` | `Number` (Integer) | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key, positive integer ($\ge 1$) | Unique application record ID |
-| `userId` | `Number` (Integer) | `INTEGER` | **No** | — | `FK` referencing `users(id)` ON DELETE CASCADE | Applicant user ID |
-| `jobId` | `Number` (Integer) | `INTEGER` | **No** | — | `FK` referencing `job_postings(id)` ON DELETE CASCADE | Targeted job posting ID |
-| `status` | `String` | `VARCHAR(50)` | **No** | `'Submitted'` | Whitelist: `'Submitted'`, `'Under Review'`, `'Shortlisted'`, `'Interview Scheduled'`, `'Accepted'`, `'Rejected'`, `'Withdrawn'` | Workflow / review stage |
-| `coverLetter` | `String` \| `null` | `TEXT` | Yes | `null` | Candidate pitch or cover note | Optional cover letter / introduction |
-| `resumeUrl` | `String` \| `null` | `VARCHAR(500)` | Yes | `null` | Valid `http://` or `https://` URL | Digital CV / resume link |
-| `notes` | `String` \| `null` | `TEXT` | Yes | `null` | Internal review remarks | Employer / reviewer feedback |
-| `appliedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Application submission timestamp |
-| `createdAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Record creation timestamp |
-| `updatedAt` | `String` (ISO 8601) | `TIMESTAMPTZ` | **No** | `NOW()` | System timestamp | Last status change timestamp |
+### 3.5 User Relationships & Cross-Aggregate Interactions
+
+Defined canonically in `src/models/index.js` (`RELATIONS.User`) and `src/models/userModel.js`:
+
+| Relationship | Cardinality | Foreign Key & Cascade Policy | Model Accessor | REST API Sub-Route |
+| :--- | :---: | :--- | :--- | :--- |
+| **`User` → `Announcement`** | **1 : N** (`hasMany`) | `announcements.author_id` → `users.id` (`ON DELETE SET NULL`) | `UserModel.getAnnouncements(userId)` | `GET /api/users/:id/announcements` |
+| **`User` → `JobPosting`** | **1 : N** (`hasMany`) | `job_postings.poster_id` → `users.id` (`ON DELETE SET NULL`) | `UserModel.getJobPostings(userId)` | `GET /api/users/:id/jobs` |
+| **`User` → `Application`** | **1 : N** (`hasMany`) | `applications.user_id` → `users.id` (`ON DELETE CASCADE`) | `UserModel.getApplications(userId)` | `GET /api/users/:id/applications` |
+| **`User` ↔ `JobPosting`** | **M : N** (`through Application`) | `applications(user_id, job_id)` (`UNIQUE`, `ON DELETE CASCADE`) | `UserModel.getAppliedJobs(userId)` | `GET /api/users/:id/applied-jobs` |
+| **`User` (Eager Graph)** | **Aggregate Snapshot** | Parallel fetch of all 4 associations | `UserModel.findByIdWithRelations(id)` | `GET /api/users/:id/relations` |
+
+#### Referential Integrity Semantics on User Deletion
+- **Historical Preservation (`ON DELETE SET NULL`):** Deleting a `User` preserves published `announcements` and `job_postings` for institutional history by nullifying `author_id` and `poster_id`.
+- **Candidate Privacy (`ON DELETE CASCADE`):** Deleting a `User` automatically purges all personal `applications` submitted by that user.
+
+---
+
+## 4. Supporting Aggregates & Entity Specifications
+
+### 4.1 Announcement Aggregate
+
+The `Announcement` aggregate (`src/models/announcementModel.js`) models institutional broadcasts, event invitations, career fairs, and academic news.
+
+| Field Name (JS) | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key ($\ge 1$) | Unique announcement ID |
+| `title` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Headline or subject |
+| `content` | `TEXT` | **No** | — | Required, non-empty text | Body content |
+| `author` | `VARCHAR(255)` | **No** | `'Alumni Relations Office'` | Non-empty display label | Publishing office or name |
+| `authorId` | `INTEGER` | Yes | `NULL` | `FK` → `users(id)` `ON DELETE SET NULL` | Authoring `User` reference |
+| `category` | `VARCHAR(50)` | **No** | `'General'` | Whitelist: `'General'`, `'Event'`, `'Career'`, `'Academic'`, `'News'`, `'Urgent'` | Bulletin category |
+| `createdAt` | `TIMESTAMP` | **No** | `NOW()` | System timestamp | Publication timestamp |
+| `updatedAt` | `TIMESTAMP` | **No** | `NOW()` | System timestamp | Last update timestamp |
+
+### 4.2 Job Posting Aggregate
+
+The `JobPosting` aggregate (`src/models/jobPostingModel.js`) represents career opportunities, internships, and contract roles published on the Alumly Job Board.
+
+| Field Name (JS) | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key ($\ge 1$) | Unique job posting ID |
+| `title` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Position title |
+| `company` | `VARCHAR(255)` | **No** | — | Required, non-empty, trimmed | Hiring organization |
+| `location` | `VARCHAR(255)` | **No** | `'Remote'` | Trimmed string | City, hybrid, or remote |
+| `jobType` | `VARCHAR(50)` | **No** | `'Full-Time'` | Whitelist: `'Full-Time'`, `'Part-Time'`, `'Contract'`, `'Internship'`, `'Remote'` | Employment classification |
+| `description` | `TEXT` | **No** | — | Role responsibilities & overview | Detailed job description |
+| `requirements` | `TEXT` | Yes | `NULL` | Skills & qualifications | Candidate prerequisites |
+| `salaryRange` | `VARCHAR(100)` | Yes | `NULL` | Free text (e.g., `"$80,000 - $110,000"`) | Compensation range |
+| `applicationUrl` | `VARCHAR(500)` | Yes | `NULL` | Valid `http://` or `https://` URL | External application portal |
+| `contactEmail` | `VARCHAR(255)` | Yes | `NULL` | RFC 5322 email, lowercased | Recruiter contact email |
+| `posterId` | `INTEGER` | Yes | `NULL` | `FK` → `users(id)` `ON DELETE SET NULL` | Posting `User` reference |
+| `status` | `VARCHAR(50)` | **No** | `'Active'` | Whitelist: `'Active'`, `'Closed'`, `'Draft'`, `'Expired'` | Lifecycle listing status |
+| `deadline` | `TIMESTAMPTZ` | Yes | `NULL` | Valid ISO 8601 timestamp | Application cutoff date |
+| `createdAt` | `TIMESTAMPTZ` | **No** | `CURRENT_TIMESTAMP` | System timestamp | Creation timestamp |
+| `updatedAt` | `TIMESTAMPTZ` | **No** | `CURRENT_TIMESTAMP` | Auto-updated via trigger | Last modification timestamp |
+
+### 4.3 Application Aggregate (Many-to-Many Join)
+
+The `Application` aggregate (`src/models/applicationModel.js`) models the Many-to-Many relationship between `User` (applicant) and `JobPosting` (career listing), tracking candidate progression through the recruitment pipeline.
+
+| Field Name (JS) | PostgreSQL Type | Nullable | Default | Constraints & Rules | Description |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `SERIAL` (INT PK) | **No** | Auto-inc | Primary Key ($\ge 1$) | Unique application ID |
+| `userId` | `INTEGER` | **No** | — | `FK` → `users(id)` `ON DELETE CASCADE` | Candidate `User` ID |
+| `jobId` | `INTEGER` | **No** | — | `FK` → `job_postings(id)` `ON DELETE CASCADE` | Target `JobPosting` ID |
+| `status` | `VARCHAR(50)` | **No** | `'Submitted'` | Whitelist: `'Submitted'`, `'Under Review'`, `'Shortlisted'`, `'Interview Scheduled'`, `'Accepted'`, `'Rejected'`, `'Withdrawn'` | Recruitment workflow stage |
+| `coverLetter` | `TEXT` | Yes | `NULL` | Optional candidate pitch | Cover letter / note |
+| `resumeUrl` | `VARCHAR(500)` | Yes | `NULL` | Valid `http://` or `https://` URL | Digital CV / portfolio link |
+| `notes` | `TEXT` | Yes | `NULL` | Optional reviewer/candidate remarks | Evaluation notes |
+| `appliedAt` | `TIMESTAMPTZ` | **No** | `CURRENT_TIMESTAMP` | System timestamp | Submission timestamp |
+| `createdAt` | `TIMESTAMPTZ` | **No** | `CURRENT_TIMESTAMP` | System timestamp | Record creation timestamp |
+| `updatedAt` | `TIMESTAMPTZ` | **No** | `CURRENT_TIMESTAMP` | Auto-updated via trigger | Last status update timestamp |
 
 > [!IMPORTANT]
-> **Many-to-Many Integrity:** The composite unique constraint `UNIQUE(user_id, job_id)` prevents candidate spam by enforcing that an individual user can only submit one active application per job listing.
+> **Duplicate Application Safeguard:** The composite constraint `CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)` guarantees that a single `User` can hold at most one application per `JobPosting`. Duplicate attempts fail with `HTTP 409 Conflict`.
 
 ---
 
-## 4. Entity Relationship Diagram (ERD)
+## 5. Entity Relationship Diagram (ERD)
 
 ```mermaid
 erDiagram
-    USER ||--o{ ANNOUNCEMENT : "publishes / authors"
-    USER ||--o{ JOB_POSTING : "posts / creates"
-    USER ||--o{ APPLICATION : "submits"
-    JOB_POSTING ||--o{ APPLICATION : "receives"
-    USER ||--o{ EVENT_RSVP : "registers"
+    USER ||--o{ ANNOUNCEMENT : "authors (author_id)"
+    USER ||--o{ JOB_POSTING : "posts (poster_id)"
+    USER ||--o{ APPLICATION : "submits (user_id)"
+    JOB_POSTING ||--o{ APPLICATION : "receives (job_id)"
 
     USER {
         int id PK "Serial primary key"
         string name "Full name (Required)"
-        string email UK "Unique RFC email address"
-        string role "alumni | student | faculty | admin"
-        string department "Academic department"
-        int graduationYear "Valid year 1900-2100"
-        string phone "Contact number"
-        string company "Current employer"
-        string jobTitle "Current position"
-        timestamptz createdAt "Record creation timestamp"
-        timestamptz updatedAt "Last update timestamp"
+        string email UK "Unique lowercased RFC email"
+        string role "alumni | student | faculty | teacher | admin"
+        string department "Academic department (Optional)"
+        int graduation_year "Valid 4-digit year 1900-2100"
+        timestamp created_at "Creation timestamp"
+        timestamp updated_at "Last update timestamp"
     }
 
     ANNOUNCEMENT {
         int id PK "Serial primary key"
         string title "Headline (Required)"
         string content "Body text (Required)"
-        string author "Publishing department name"
-        int authorId FK "References USER(id)"
+        string author "Publishing office / author display name"
+        int author_id FK "References USER(id) ON DELETE SET NULL"
         string category "General | Event | Career | Academic | News | Urgent"
-        timestamptz createdAt "Publication timestamp"
-        timestamptz updatedAt "Last update timestamp"
+        timestamp created_at "Publication timestamp"
+        timestamp updated_at "Last update timestamp"
     }
 
     JOB_POSTING {
         int id PK "Serial primary key"
-        string title "Position title (Required, max 120 chars)"
-        string company "Hiring company name (Required)"
-        string city "City / Work location (Optional, default 'Remote')"
-        string location "Location alias / Remote (Optional)"
-        string jobType "Full-Time | Part-Time | Contract | Internship | Remote"
-        string description "Role responsibilities (Optional)"
+        string title "Position title (Required)"
+        string company "Hiring organization (Required)"
+        string location "City or Remote (Default: Remote)"
+        string job_type "Full-Time | Part-Time | Contract | Internship | Remote"
+        string description "Role responsibilities"
         string requirements "Qualifications and skills"
-        string salaryRange "Compensation bracket"
-        string applicationUrl "External application portal URL"
-        string contactEmail "Contact / recruiter email"
-        int posterId FK "References USER(id)"
+        string salary_range "Compensation bracket"
+        string application_url "External application URL"
+        string contact_email "Recruiter contact email"
+        int poster_id FK "References USER(id) ON DELETE SET NULL"
         string status "Active | Closed | Draft | Expired"
-        timestamptz deadline "Application closing timestamp"
-        timestamptz createdAt "Listing creation timestamp"
-        timestamptz updatedAt "Last update timestamp"
+        timestamptz deadline "Application deadline"
+        timestamptz created_at "Creation timestamp"
+        timestamptz updated_at "Last update timestamp"
     }
 
     APPLICATION {
         int id PK "Serial primary key"
-        int userId FK "References USER(id) ON DELETE CASCADE"
-        int jobId FK "References JOB_POSTING(id) ON DELETE CASCADE"
+        int user_id FK "References USER(id) ON DELETE CASCADE"
+        int job_id FK "References JOB_POSTING(id) ON DELETE CASCADE"
         string status "Submitted | Under Review | Shortlisted | Interview Scheduled | Accepted | Rejected | Withdrawn"
-        string coverLetter "Candidate pitch statement"
-        string resumeUrl "URL to uploaded resume / CV"
-        string notes "Internal evaluation remarks"
-        timestamptz appliedAt "Application submission timestamp"
-        timestamptz createdAt "Record creation timestamp"
-        timestamptz updatedAt "Last status modification timestamp"
-    }
-
-    EVENT_RSVP {
-        int id PK "Serial primary key"
-        int userId FK "References USER(id)"
-        int announcementId FK "References ANNOUNCEMENT(id)"
-        string status "Attending | Maybe | Declined"
-        timestamptz rsvpDate "RSVP timestamp"
+        string cover_letter "Candidate cover note"
+        string resume_url "URL to resume / portfolio"
+        string notes "Evaluation or candidate remarks"
+        timestamptz applied_at "Submission timestamp"
+        timestamptz created_at "Creation timestamp"
+        timestamptz updated_at "Last update timestamp"
     }
 ```
 
 ---
 
-## 5. In-Memory Store vs. Target Relational Schema
+## 6. Domain Invariants & Validation Rules
 
-| Dimension | Active In-Memory Layer | Target PostgreSQL 15 Relational Layer |
-| :--- | :--- | :--- |
-| **Storage Backend** | Node.js V8 heap (`Array<Object>`) | Disk-backed ACID B-Tree tables in PostgreSQL container |
-| **Primary Keys** | Runtime `Math.max(...ids) + 1` counter | Native SQL `SERIAL` sequences (`nextval()`) |
-| **Integrity Checks** | Application-level JS code in Model classes | Database-level `UNIQUE`, `CHECK`, and `FOREIGN KEY` constraints |
-| **Concurrency** | Single-threaded JavaScript event loop | Multi-process MVCC (Multi-Version Concurrency Control) with row locking |
-| **Indexing** | Array scans (`Array.prototype.find`, `filter`) | B-Tree indexes on `email`, `role`, `category`, and composite search indexes |
-| **Persistence** | Volatile (Resets on container restart) | Durable across container stops via `postgres_data` Docker volume |
-| **Filter & Pagination** | Slice & sort algorithms in Model layer | SQL `ORDER BY`, `WHERE`, `LIMIT`, and `OFFSET` queries |
+### 6.1 User Domain Invariants
+1. **Email Integrity:** Validated against `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`, normalized to trimmed lowercase, and checked for uniqueness before insert/update (`400 Bad Request` / `409 Conflict`).
+2. **Role Value Object Validation:** Must match one of `['alumni', 'student', 'faculty', 'teacher', 'admin']` (case-insensitive input normalized to lowercase); defaults to `'alumni'` when omitted.
+3. **Graduation Year Range:** Optional integer strictly bounded between `1900` and `2100`.
+4. **Query & Search Support:** Supports filtering by `role`, substring matching on `department`, free-text search (`search` / `q`) across `name`, `email`, and `department`, plus `limit` / `page` pagination.
 
----
+### 6.2 Announcement Domain Invariants
+1. **Mandatory Content:** `title` and `content` must be non-empty trimmed strings.
+2. **Category Whitelist:** Case-insensitive match against `['General', 'Event', 'Career', 'Academic', 'News', 'Urgent']`, defaulting to `'General'`.
+3. **Author Attribution:** Defaults to `'Alumni Relations Office'` when omitted; optionally linked to `users(id)` via `author_id`.
 
-## 6. Validation & Business Rules
+### 6.3 Job Posting Domain Invariants
+1. **Mandatory Fields:** `title` and `company` are required non-empty strings.
+2. **Employment Type Whitelist:** `['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote']`, defaulting to `'Full-Time'`.
+3. **Status Lifecycle Whitelist:** `['Active', 'Closed', 'Draft', 'Expired']`, defaulting to `'Active'`.
+4. **Contact & Link Validation:** `applicationUrl` (when provided) must use `http://` or `https://`; `contactEmail` (when provided) must satisfy email format validation.
 
-### 6.1 User Domain Constraints
-1. **Email Integrity:**
-   - Evaluated against regex `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`.
-   - Automatically normalized to lowercase and trimmed before uniqueness verification.
-   - Rejection code: `HTTP 400 Bad Request` (or `409 Conflict` via API).
-2. **Role Authorization Whitelist:**
-   - Must strictly match one of: `['alumni', 'student', 'faculty', 'admin']`.
-   - Defaults to `'alumni'` when omitted in creation payloads.
-3. **Graduation Year Range:**
-   - Must be an integer between `1900` and `2100`.
-4. **Defensive Immutability:**
-   - All read accessors (`findAll`, `findById`, `findByEmail`) return shallow copies:
-     ```javascript
-     return { ...user };
-     ```
-   - Prevents external controllers from corrupting in-memory reference pointers.
-
-### 6.2 Announcement Domain Constraints
-1. **Mandatory Content:**
-   - `title` and `content` must be non-empty strings.
-2. **Category Enforcement:**
-   - Must match case-insensitively one of: `['General', 'Event', 'Career', 'Academic', 'News', 'Urgent']`.
-   - Normalized to canonical PascalCase capitalization upon insertion.
-3. **Default Author Attribution:**
-   - If not provided, author defaults to `'Alumni Relations Office'`.
-
-### 6.3 Job Posting Domain Constraints
-1. **Mandatory Core Fields & Length Constraints:**
-   - `title`: Strictly required, non-empty, trimmed string with a maximum length of 120 characters ($1 \le \text{length} \le 120$). Postings with missing titles or titles exceeding 120 characters are rejected with `HTTP 400 Bad Request`.
-   - `company`: Strictly required, non-empty, trimmed string identifying the hiring organization.
-2. **Optional Specification Fields:**
-   - `city` (location): Optional string denoting physical work city, campus, or remote arrangement (defaults to `'Remote'` when omitted).
-   - `description`: Optional text for role overview, duties, and responsibilities. Postings without an extensive description remain valid to allow rapid opportunity sharing.
-3. **Employment Type Whitelist:**
-   - Must match case-insensitively one of: `['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote']`.
-   - Defaults to `'Full-Time'` when omitted.
-4. **Publication Status Lifecycle:**
-   - Must match one of: `['Active', 'Closed', 'Draft', 'Expired']`.
-   - Defaults to `'Active'`.
-   - Postings with an expired `deadline` timestamp automatically transition or filter to `'Expired'`.
-5. **Application Link & Contact Validation:**
-   - `applicationUrl` (when supplied) must match valid web URL protocols (`http://` or `https://`).
-   - `contactEmail` (when supplied) must satisfy RFC 5322 email regex and normalize to lowercase.
-   - For an active posting, at least one point of contact (`applicationUrl` or `contactEmail`) is recommended.
-6. **Referential Integrity & User Linking:**
-   - `posterId` references `users(id)`. If the posting author's account is removed, the foreign key cascades via `ON DELETE SET NULL` to preserve historical job archives.
-
-### 6.4 Application Domain Constraints
-1. **Many-to-Many Uniqueness Safeguard:**
-   - Enforced by database constraint `CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)`.
-   - A single candidate cannot submit redundant duplicate applications for the same job posting.
-   - Violation produces `HTTP 409 Conflict`.
-2. **Referential Integrity & Cascade Action:**
-   - `userId` must reference a valid `users.id`. If the user account is purged, their applications cascade delete (`ON DELETE CASCADE`).
-   - `jobId` must reference an active `job_postings.id`. If the job posting is deleted, all submitted applications cascade delete (`ON DELETE CASCADE`).
-3. **Application Status Workflow Whitelist:**
-   - Must match case-insensitively one of: `['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn']`.
-   - Defaults to `'Submitted'` on creation.
-   - Status transitions are recorded via automated `updatedAt` triggers.
-4. **URL Format Verification:**
-   - `resumeUrl` (when supplied) must begin with `http://` or `https://`.
+### 6.4 Application Domain Invariants
+1. **Composite Uniqueness:** `UNIQUE (user_id, job_id)` prevents duplicate applications by the same candidate for the same job (`409 Conflict`).
+2. **Workflow Status Whitelist:** `['Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn']`, defaulting to `'Submitted'`.
+3. **Referential Cascades:** Deleting either the candidate `User` or target `JobPosting` cascades deletion to dependent `Application` rows.
 
 ---
 
@@ -329,230 +362,58 @@ erDiagram
  └──────┬──────┘
         │
         ▼
- ┌─────────────┐      Invalid
- │ Validate()  ├──────────────────▶ Emit HTTP 400 Bad Request
+ ┌─────────────┐      Invalid / Duplicate
+ │ Validate()  ├──────────────────────────▶ Emit HTTP 400 / 409
  └──────┬──────┘
         │ Valid
         ▼
  ┌─────────────┐
- │ Active /    │ ◀─── Read via GET (filter, search, pagination)
- │ Stored State│ ───▶ Mutate via PUT / PATCH (re-validates constraints)
+ │ Persisted   │ ◀─── Read via GET (filter, search, pagination, relations)
+ │ PostgreSQL  │ ───▶ Mutate via PUT / PATCH (re-validates invariants)
  └──────┬──────┘
         │
         ▼ DELETE
  ┌─────────────┐
- │ Splice/Drop │ ───▶ Emit HTTP 200/204 Deleted Confirmation
+ │ Delete Row  │ ───▶ Cascade / Set Null FKs ───▶ Emit HTTP 200 Confirmation
  └─────────────┘
 ```
 
 ---
 
-## 8. Target PostgreSQL DDL Specification
+## 8. PostgreSQL 15 DDL & Migration Reference
 
-The following SQL schema provides the production migration specification for PostgreSQL 15:
+Production tables are managed via sequential SQL migrations in `src/migrations/`:
+- [`001_create_initial_tables.sql`](../src/migrations/001_create_initial_tables.sql) — `users`, `announcements`, and initial seed records (`admin`, `alumni`, `student`, `faculty`).
+- [`002_create_job_postings_table.sql`](../src/migrations/002_create_job_postings_table.sql) — `job_postings`, `announcements.author_id` FK, B-Tree indexes, `update_timestamp_column()` trigger, and initial job seeds.
+- [`003_create_applications_table.sql`](../src/migrations/003_create_applications_table.sql) — `applications` M:N join table, `uq_applications_user_job`, indexes, trigger, and sample applications.
 
 ```sql
--- =============================================================================
--- Migration: 001_create_alumni_tracking_schema.sql
--- =============================================================================
-
--- Enable UUID extension if needed in future iterations
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- 1. Users Table
+-- Canonical Users Table Specification (aligned with UserModel.ROLES)
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    role VARCHAR(50) NOT NULL DEFAULT 'alumni' 
-        CHECK (role IN ('alumni', 'student', 'faculty', 'admin')),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'alumni'
+        CHECK (role IN ('alumni', 'student', 'faculty', 'teacher', 'admin')),
     department VARCHAR(255),
-    graduation_year INTEGER 
+    graduation_year INTEGER
         CHECK (graduation_year BETWEEN 1900 AND 2100),
-    phone VARCHAR(50),
-    company VARCHAR(255),
-    job_title VARCHAR(255),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
-
--- Indexes for frequent queries
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_department ON users(department);
-
--- 2. Announcements Table
-CREATE TABLE IF NOT EXISTS announcements (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    author VARCHAR(255) NOT NULL DEFAULT 'Alumni Relations Office',
-    author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    category VARCHAR(50) NOT NULL DEFAULT 'General'
-        CHECK (category IN ('General', 'Event', 'Career', 'Academic', 'News', 'Urgent')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes for announcements
-CREATE INDEX IF NOT EXISTS idx_announcements_category ON announcements(category);
-CREATE INDEX IF NOT EXISTS idx_announcements_created_at ON announcements(created_at DESC);
-
--- 3. Job Postings Table
-CREATE TABLE IF NOT EXISTS job_postings (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(120) NOT NULL CHECK (char_length(title) <= 120),
-    company VARCHAR(255) NOT NULL,
-    city VARCHAR(255) DEFAULT 'Remote',
-    location VARCHAR(255) DEFAULT 'Remote',
-    job_type VARCHAR(50) NOT NULL DEFAULT 'Full-Time'
-        CHECK (job_type IN ('Full-Time', 'Part-Time', 'Contract', 'Internship', 'Remote')),
-    description TEXT,
-    requirements TEXT,
-    salary_range VARCHAR(100),
-    application_url VARCHAR(500),
-    contact_email VARCHAR(255),
-    poster_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'Active'
-        CHECK (status IN ('Active', 'Closed', 'Draft', 'Expired')),
-    deadline TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes for job postings
-CREATE INDEX IF NOT EXISTS idx_job_postings_poster_id ON job_postings(poster_id);
-CREATE INDEX IF NOT EXISTS idx_job_postings_status ON job_postings(status);
-CREATE INDEX IF NOT EXISTS idx_job_postings_job_type ON job_postings(job_type);
-CREATE INDEX IF NOT EXISTS idx_job_postings_company ON job_postings(company);
-CREATE INDEX IF NOT EXISTS idx_job_postings_created_at ON job_postings(created_at DESC);
-
--- Automatic timestamp trigger function
-CREATE OR REPLACE FUNCTION update_timestamp_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER set_timestamp_users
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_column();
-
-CREATE TRIGGER set_timestamp_announcements
-BEFORE UPDATE ON announcements
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_column();
-
-CREATE TRIGGER set_timestamp_job_postings
-BEFORE UPDATE ON job_postings
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_column();
-
--- 4. Applications Table (Many-to-Many Action Join)
-CREATE TABLE IF NOT EXISTS applications (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    job_id INTEGER NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
-    status VARCHAR(50) NOT NULL DEFAULT 'Submitted'
-        CHECK (status IN ('Submitted', 'Under Review', 'Shortlisted', 'Interview Scheduled', 'Accepted', 'Rejected', 'Withdrawn')),
-    cover_letter TEXT,
-    resume_url VARCHAR(500),
-    notes TEXT,
-    applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_applications_user_job UNIQUE (user_id, job_id)
-);
-
--- Indexes for applications
-CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
-CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id);
-CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
-CREATE INDEX IF NOT EXISTS idx_applications_applied_at ON applications(applied_at DESC);
-
-CREATE TRIGGER set_timestamp_applications
-BEFORE UPDATE ON applications
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_column();
 ```
 
 ---
 
-## 9. Migration Strategy & Zero-Downtime Roadmap
+## 9. Observability, Telemetry & Fault Tolerance Architecture
 
-To migrate from the in-memory array implementation to PostgreSQL without breaking existing APIs or views:
+To ensure operational reliability across both Web and REST API layers, Alumly enforces a standardized Express middleware pipeline:
 
-1. **Repository / Adapter Pattern:**
-   Introduce a Data Access Object (DAO) interface matching existing method signatures:
-   - `findAll(filter)`
-   - `findById(id)`
-   - `create(data)`
-   - `update(id, data)`
-   - `delete(id)`
-2. **Environment Toggle (`DATA_SOURCE`):**
-   ```env
-   DATA_SOURCE=postgres # Options: 'memory' | 'postgres'
-   ```
-   Allows fallback to in-memory during local lightweight unit testing and seamless activation of PostgreSQL in staging/production environments.
-3. **Zero Controller Changes:**
-   Controllers (`apiUserController`, `apiAnnouncementController`, etc.) continue consuming `UserModel` and `AnnouncementModel` contracts without needing to know whether queries are satisfied via memory slices or PostgreSQL connection pools.
-
----
-
-## 10. Observability, Telemetry & Fault Tolerance Architecture
-
-To guarantee high availability, strict security boundaries, and operational observability across both API and Web presentation layers, the Alumni Tracking System integrates dedicated architectural middleware:
-
-### 10.1 Global Request Duration Telemetry
-- **Implementation:** [`src/middlewares/logger.js`](../src/middlewares/logger.js)
-- **Mechanism:** Intercepts every incoming HTTP transaction upon arrival using high-resolution monotonic timestamps (`process.hrtime` / `Date.now()`).
-- **Hook Point:** Hooks into `res.on('finish')` to calculate exact end-to-end request-response cycle duration in milliseconds.
-- **Log Format:** Standard single-line terminal output:
-  ```text
-  [time] [method] [route] [res.type] [duration]
-  15:25:41 GET /api/users 200 10ms
-  15:25:41 POST /api/users 400 5ms
-  ```
-
-### 10.2 Dual-Mode 404 Route Guardian
-- **Implementation:** [`src/middlewares/guardian404.js`](../src/middlewares/guardian404.js) & [`src/views/404.html`](../src/views/404.html)
-- **Placement:** Positioned strictly after all registered application routes to intercept any unmatched request.
-- **Content Negotiation & Routing:**
-  - **API Endpoints (`/api/*` or `Accept: application/json`):** Returns structured JSON error payloads with `HTTP 404 Not Found`:
-    ```json
-    {
-      "status": "error",
-      "message": "Route not found",
-      "path": "/api/nonexistent",
-      "method": "GET"
-    }
-    ```
-  - **Web Browser Routes:** Delivers a responsive, accessible generic 404 HTML Error Page with a "Return to Homepage" link (`/`) and quick-navigation shortcuts to Alumni Directory, Job Board, Announcements, and Swagger documentation.
-
-### 10.3 5xx Global Error Handler & Promise Interception
-- **Implementation:** [`src/middlewares/guardian5xx.js`](../src/middlewares/guardian5xx.js) & [`src/middlewares/asyncHandler.js`](../src/middlewares/asyncHandler.js)
-- **Signature:** Standard Express 4-parameter error handler `(err, req, res, next)`.
-- **Fault Shielding:**
-  - Traps all unhandled exceptions, parser errors, and database connection faults.
-  - Prevents raw HTML stack traces from leaking to client environments.
-  - Emits uniform JSON response for internal server errors:
-    ```json
-    {
-      "status": "error",
-      "message": "Internal Server Error"
-    }
-    ```
-  - Asynchronous controller handlers are wrapped via `asyncHandler` higher-order function, ensuring rejected promises automatically forward to `next(err)`.
-
-### 10.4 Persistent File-Based Error Auditing
-- **Implementation:** [`src/middlewares/guardian5xx.js`](../src/middlewares/guardian5xx.js) -> `logs/error.logs`
-- **Mechanism:** On every captured error, asynchronously appends structured forensic data:
-  - ISO 8601 Timestamp
-  - HTTP Status Code, Method, and Request Path
-  - Error Message
-  - Complete Stack Trace
-- **Security & Version Control:** The `logs/` directory and `*.logs` files are strictly isolated via `.gitignore`, preventing sensitive server stack traces or environment details from leaking to version control repositories.
-
+1. **Global Request Duration Logger (`src/middlewares/logger.js`):**
+   - Intercepts every incoming request and logs completion in standard format: `[time] [method] [route] [res.type] [duration]`.
+2. **Dual-Mode 404 Route Guardian (`src/middlewares/guardian404.js` & `src/views/404.html`):**
+   - Mounted strictly after all valid routes.
+   - Returns structured JSON `404` for `/api/*` or `Accept: application/json` requests, and renders the Alumly iOS glassmorphism `404.html` page for browser requests.
+3. **5xx Global Error Guardian & Async Wrapping (`src/middlewares/guardian5xx.js` & `src/middlewares/asyncHandler.js`):**
+   - Uses the 4-parameter Express error signature `(err, req, res, next)` placed at the very end of the middleware chain.
+   - Logs full stack traces to `console.error`, appends structured forensic records to `logs/error.logs` (excluded from Git via `.gitignore`), and returns structured JSON `{ "status": "error", "message": "Internal Server Error" }` with HTTP `500`.
