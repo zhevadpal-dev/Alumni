@@ -28,6 +28,10 @@ const swaggerSpec = {
       description: 'RESTful API user endpoints returning standard JSON payloads (/api/users)'
     },
     {
+      name: 'Admin Panel (AdminController)',
+      description: 'Protected platform administration dashboard and CRUD actions (/admin, Admin role only)'
+    },
+    {
       name: 'Authentication & Registration (AuthController)',
       description: 'Public self-registration endpoints for Alumni and Student accounts (/register)'
     },
@@ -441,6 +445,73 @@ const swaggerSpec = {
             }
           }
         }
+      }
+    },
+    '/admin': {
+      get: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Render Alumly Admin Panel Dashboard',
+        description: 'Protected by requireAuth + requireRole("Admin"). Displays live KPIs and management tables for Users, Jobs, Announcements, and Applications.',
+        responses: {
+          '200': { description: 'Admin Panel HTML dashboard rendered successfully' },
+          '302': { description: 'Unauthenticated — redirects to /login' },
+          '403': { description: 'Non-admin user — renders 403 Access Denied glass page' }
+        }
+      }
+    },
+    '/admin/users/{id}/role': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Update a user role inline (Admin only)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=users with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/users/{id}/delete': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Delete a user record (Admin only, blocks self-deletion)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=users with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/jobs/{id}/delete': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Delete a job posting (Admin only)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=jobs with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/announcements': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Publish a new announcement from Admin Panel (Admin only)',
+        responses: { '302': { description: 'Redirects to /admin?tab=announcements with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/announcements/{id}/delete': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Delete an announcement (Admin only)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=announcements with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/applications/{id}/status': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Update application pipeline status (Admin only)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=applications with status banner' }, '403': { description: 'Forbidden' } }
+      }
+    },
+    '/admin/applications/{id}/delete': {
+      post: {
+        tags: ['Admin Panel (AdminController)'],
+        summary: 'Delete an application record (Admin only)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '302': { description: 'Redirects to /admin?tab=applications with status banner' }, '403': { description: 'Forbidden' } }
       }
     },
     '/register': {

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders the protected Alumly Admin Panel (requires authenticated Admin session; returns 403 for non-admins).
+url: "{{baseUrl}}/admin"
+method: GET
+headers:
+  Accept: text/html
+order: 3470

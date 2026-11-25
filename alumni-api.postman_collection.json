@@ -1986,6 +1986,29 @@
         "description": "Authenticates email and password against PostgreSQL scrypt hash and establishes signed HTTP-only alumly_session cookie."
       },
       "response": []
+    },
+    {
+      "name": "Web Admin Panel (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin"
+          ]
+        },
+        "description": "Renders the protected Alumly Admin Panel (requires authenticated Admin session; returns 403 for non-admins or 302 to /login if signed out)."
+      },
+      "response": []
     }
   ]
 }

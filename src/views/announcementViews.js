@@ -10,7 +10,7 @@
  * - Soft Pastel Badges: Color-coded pills (Academic, Career, Event, Urgent)
  */
 
-const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls, renderAdminNavItem } = require('./styles');
 
 class AnnouncementViews {
   /**
@@ -68,6 +68,7 @@ class AnnouncementViews {
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}" style="${activeTab === 'announcements' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Announcements</a></li>
+              ${renderAdminNavItem(activeTab)}
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
           </nav>

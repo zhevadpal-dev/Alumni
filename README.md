@@ -620,6 +620,19 @@ npm run dev
 | `POST` | `/login` | Authenticate `email` & `password` against PostgreSQL `scrypt` hash and establish signed HTTP-only session cookie | Body: `email`, `password` -> redirects to `/` or returns 200 JSON |
 | `POST` / `GET` | `/logout` | Destroy signed user session cookie (`alumly_session`) and redirect to `/` | Clears `res.locals.currentUser` |
 
+### 🛡️ Admin Panel Endpoints (`AdminController` ➡️ `/admin` — `Admin` Role Only)
+
+| Method | Endpoint | Description | Protection |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin` | Render unified Alumly iOS glassmorphism Admin Panel with KPIs & 4 management tabs | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/users/:id/role` | Update a user's role inline (`student`, `alumni`, `faculty`, `teacher`, `admin`) | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/users/:id/delete` | Delete a user record (blocks deleting own active Admin account) | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/jobs/:id/delete` | Delete a job posting from the Admin Panel | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/announcements` | Publish a new institutional announcement from the Admin Panel | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/announcements/:id/delete` | Delete an announcement from the Admin Panel | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/applications/:id/status` | Update a candidate application's pipeline status | `requireAuth`, `requireRole('Admin')` |
+| `POST` | `/admin/applications/:id/delete` | Remove an application record | `requireAuth`, `requireRole('Admin')` |
+
 ### 🚀 REST API User Endpoints (`ApiUserController` ➡️ `/api/users`)
 
 | Method | Endpoint | Description | Example Request / Output |

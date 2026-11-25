@@ -5,7 +5,7 @@
  * canonical Alumly iOS Glassmorphism Design System.
  */
 
-const { getHeadTags, BRAND_SVG_ICON, renderUserSessionControls } = require('./styles');
+const { getHeadTags, BRAND_SVG_ICON, renderUserSessionControls, renderAdminNavItem } = require('./styles');
 
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -72,6 +72,7 @@ class AuthViews {
           <li><a href="/jobs" class="nav-link">Job Board</a></li>
           <li><a href="/applications" class="nav-link">Applications</a></li>
           <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          ${renderAdminNavItem()}
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>
@@ -766,6 +767,7 @@ class AuthViews {
           <li><a href="/jobs" class="nav-link">Job Board</a></li>
           <li><a href="/applications" class="nav-link">Applications</a></li>
           <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          ${renderAdminNavItem()}
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>
@@ -907,6 +909,7 @@ class AuthViews {
           <li><a href="/jobs" class="nav-link">Job Board</a></li>
           <li><a href="/applications" class="nav-link">Applications</a></li>
           <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          ${renderAdminNavItem()}
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>

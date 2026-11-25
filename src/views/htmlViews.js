@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for Applications, Petal Pink for Events)
  */
 
-const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON, renderUserSessionControls } = require('./styles');
+const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON, renderUserSessionControls, renderAdminNavItem } = require('./styles');
 const { getCurrentUser } = require('../middlewares/session');
 
 class HtmlViews {
@@ -78,6 +78,7 @@ class HtmlViews {
           <li><a href="#jobs" class="nav-link">Job Board</a></li>
           <li><a href="#applications" class="nav-link">Applications</a></li>
           <li><a href="#pillars" class="nav-link">Platform</a></li>
+          ${renderAdminNavItem()}
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>
@@ -533,6 +534,7 @@ class HtmlViews {
           <li><a href="/jobs" class="nav-link">Job Board</a></li>
           <li><a href="/applications" class="nav-link">Applications</a></li>
           <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          ${renderAdminNavItem()}
           <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
         </ul>
       </nav>
@@ -754,7 +756,8 @@ class HtmlViews {
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
                 <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+                ${renderAdminNavItem()}
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
 
@@ -1174,7 +1177,8 @@ class HtmlViews {
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
                 <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+                ${renderAdminNavItem()}
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
             <div class="nav-actions">${renderUserSessionControls()}</div>
@@ -1239,7 +1243,8 @@ class HtmlViews {
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
                 <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+                ${renderAdminNavItem()}
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
             <div class="nav-actions">${renderUserSessionControls()}</div>
@@ -1304,7 +1309,8 @@ class HtmlViews {
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
                 <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+                ${renderAdminNavItem()}
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
             <div class="nav-actions">${renderUserSessionControls()}</div>
@@ -1364,7 +1370,8 @@ class HtmlViews {
                 <li><a href="/jobs" class="nav-link">Job Board</a></li>
                 <li><a href="/applications" class="nav-link">Applications</a></li>
                 <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+                ${renderAdminNavItem()}
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
             <div class="nav-actions">${renderUserSessionControls()}</div>

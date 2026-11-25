@@ -160,10 +160,28 @@ function renderUserSessionControls(extraHtml = '', options = {}) {
   `;
 }
 
+/**
+ * Render the conditional "Admin Panel" navigation item ONLY for Admin users.
+ * Regular Student, Alumni, Faculty, Teacher, or logged-out visitors never see it.
+ *
+ * @param {string} [activeTab='']
+ * @returns {string}
+ */
+function renderAdminNavItem(activeTab = '') {
+  const user = getCurrentUser();
+  if (!user || String(user.role || '').toLowerCase() !== 'admin') {
+    return '';
+  }
+  const isActive = activeTab === 'admin';
+  const activeStyle = isActive ? ' style="color: var(--color-ink-black); font-weight: 700;"' : '';
+  return `<li><a href="/admin" class="nav-link${isActive ? ' active' : ''}"${activeStyle}>Admin Panel</a></li>`;
+}
+
 module.exports = {
   getGlobalStyles,
   getHeadTags,
   BRAND_SVG_ICON,
   getBrandLogoHtml,
-  renderUserSessionControls
+  renderUserSessionControls,
+  renderAdminNavItem
 };

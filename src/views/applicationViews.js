@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Canary Yellow for Applications)
  */
 
-const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls, renderAdminNavItem } = require('./styles');
 
 class ApplicationViews {
   /**
@@ -298,6 +298,7 @@ class ApplicationViews {
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}" style="${activeTab === 'applications' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
+              ${renderAdminNavItem(activeTab)}
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
           </nav>

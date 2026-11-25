@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Mint Green for Careers & Jobs)
  */
 
-const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls, renderAdminNavItem } = require('./styles');
 
 class JobViews {
   /**
@@ -372,6 +372,7 @@ class JobViews {
               <li><a href="/jobs" class="nav-link ${activeTab === 'jobs' ? 'active' : ''}" style="${activeTab === 'jobs' ? 'color: var(--color-ink-black); font-weight: 700;' : ''}">Job Board</a></li>
               <li><a href="/applications" class="nav-link ${activeTab === 'applications' ? 'active' : ''}">Applications</a></li>
               <li><a href="/announcements" class="nav-link ${activeTab === 'announcements' ? 'active' : ''}">Announcements</a></li>
+              ${renderAdminNavItem(activeTab)}
               <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
             </ul>
           </nav>

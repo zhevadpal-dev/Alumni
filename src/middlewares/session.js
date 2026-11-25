@@ -8,6 +8,7 @@
 
 const crypto = require('crypto');
 const { AsyncLocalStorage } = require('async_hooks');
+const { query } = require('../config/db');
 
 const COOKIE_NAME = 'alumly_session';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -118,9 +119,33 @@ function getCurrentUser() {
  * Express middleware: parses signed session cookie, exposes res.locals.currentUser,
  * req.session, req.loginUser(user), and req.logoutUser().
  */
-function sessionMiddleware(req, res, next) {
+async function sessionMiddleware(req, res, next) {
   const cookies = parseCookies(req.headers.cookie);
-  const currentUser = verifySessionToken(cookies[COOKIE_NAME]);
+  let currentUser = verifySessionToken(cookies[COOKIE_NAME]);
+
+  // Sync live role & profile name from PostgreSQL so role promotions take effect immediately
+  if (currentUser && currentUser.id) {
+    try {
+      const dbRes = await query(
+        'SELECT id, name, email, role FROM users WHERE id = $1 LIMIT 1',
+        [currentUser.id]
+      );
+      if (dbRes.rows[0]) {
+        const fresh = dbRes.rows[0];
+        currentUser = {
+          id: fresh.id,
+          full_name: fresh.name,
+          name: fresh.name,
+          email: fresh.email,
+          role: fresh.role || 'alumni'
+        };
+      } else {
+        currentUser = null;
+      }
+    } catch (_) {
+      // Keep verified cookie payload if DB lookup temporarily fails
+    }
+  }
 
   const context = { currentUser };
   req.session = { user: currentUser };

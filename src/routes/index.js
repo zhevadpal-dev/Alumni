@@ -8,6 +8,7 @@ const router = express.Router();
 
 const coreRoutes = require('./coreRoutes');
 const authRoutes = require('./authRoutes');
+const adminRoutes = require('./adminRoutes');
 const healthRoutes = require('./healthRoutes');
 const swaggerRoutes = require('./swaggerRoutes');
 const apiUserRoutes = require('./apiUserRoutes');
@@ -22,6 +23,7 @@ const applicationRoutes = require('./applicationRoutes');
 // Mount modular sub-routers
 router.use(coreRoutes);
 router.use(authRoutes);
+router.use(adminRoutes);
 router.use(healthRoutes);
 router.use(swaggerRoutes);
 router.use(apiUserRoutes);
