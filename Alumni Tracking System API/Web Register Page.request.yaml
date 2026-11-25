@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders the Alumly iOS glassmorphism Registration page with dynamic Alumni/Student role segmented control.
+url: "{{baseUrl}}/register"
+method: GET
+headers:
+  Accept: text/html
+order: 3400

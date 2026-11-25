@@ -28,6 +28,10 @@ const swaggerSpec = {
       description: 'RESTful API user endpoints returning standard JSON payloads (/api/users)'
     },
     {
+      name: 'Authentication & Registration (AuthController)',
+      description: 'Public self-registration endpoints for Alumni and Student accounts (/register)'
+    },
+    {
       name: 'Web Users (UserController)',
       description: 'Web MVC user endpoints supporting HTML views and web requests (/users)'
     },
@@ -436,6 +440,84 @@ const swaggerSpec = {
               }
             }
           }
+        }
+      }
+    },
+    '/register': {
+      get: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Render Alumly Register page',
+        description: 'Returns the server-rendered Alumly iOS glassmorphism Registration page with dynamic Alumni/Student role segmented control.',
+        parameters: [
+          {
+            name: 'role',
+            in: 'query',
+            required: false,
+            description: 'Pre-select role tab (alumni or student)',
+            schema: { type: 'string', enum: ['alumni', 'student'] }
+          }
+        ],
+        responses: {
+          '200': {
+            description: 'HTML Register page rendered successfully',
+            content: {
+              'text/html': {
+                schema: { type: 'string' }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Register a new Alumni or Student account',
+        description: 'Validates registration fields, restricts role strictly to alumni or student (never allows admin self-registration), hashes password with scrypt, checks duplicate email, and persists user to PostgreSQL.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['name', 'email', 'password', 'confirmPassword', 'role', 'department', 'graduationYear'],
+                properties: {
+                  name: { type: 'string', example: 'Deniz Arslan' },
+                  email: { type: 'string', format: 'email', example: 'deniz.arslan@university.edu' },
+                  password: { type: 'string', minLength: 6, example: 'secret123' },
+                  confirmPassword: { type: 'string', minLength: 6, example: 'secret123' },
+                  role: { type: 'string', enum: ['alumni', 'student'], example: 'alumni' },
+                  department: { type: 'string', example: 'Computer Engineering' },
+                  graduationYear: { type: 'integer', example: 2024 },
+                  company: { type: 'string', example: 'TechCorp Global' },
+                  jobTitle: { type: 'string', example: 'Software Engineer' },
+                  linkedinUrl: { type: 'string', format: 'uri', example: 'https://linkedin.com/in/denizarslan' }
+                }
+              }
+            },
+            'application/x-www-form-urlencoded': {
+              schema: {
+                type: 'object',
+                required: ['name', 'email', 'password', 'confirmPassword', 'role', 'department', 'graduationYear'],
+                properties: {
+                  name: { type: 'string' },
+                  email: { type: 'string' },
+                  password: { type: 'string' },
+                  confirmPassword: { type: 'string' },
+                  role: { type: 'string', enum: ['alumni', 'student'] },
+                  department: { type: 'string' },
+                  graduationYear: { type: 'integer' },
+                  company: { type: 'string' },
+                  jobTitle: { type: 'string' },
+                  linkedinUrl: { type: 'string' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          '201': { description: 'Account registered successfully (JSON response)' },
+          '302': { description: 'Account registered successfully (Browser redirect to /users with flash message)' },
+          '400': { description: 'Validation error (missing fields, password mismatch, or disallowed role)' },
+          '409': { description: 'Duplicate email address conflict' }
         }
       }
     },

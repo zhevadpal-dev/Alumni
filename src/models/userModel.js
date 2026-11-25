@@ -8,12 +8,31 @@
  */
 
 const { query } = require('../config/db');
+const { hashPassword } = require('../utils/password');
 
 class UserModel {
   /**
    * Allowed user roles within the platform
    */
   static ROLES = ['alumni', 'student', 'faculty', 'teacher', 'admin'];
+
+  /**
+   * Roles strictly allowed for public self-registration (/register)
+   */
+  static PUBLIC_REGISTRATION_ROLES = ['alumni', 'student'];
+
+  /**
+   * Standard safe projection columns (NEVER includes password_hash)
+   */
+  static SAFE_COLUMNS = `
+    id, name, email, role, department,
+    graduation_year AS "graduationYear",
+    phone, company,
+    job_title AS "jobTitle",
+    linkedin_url AS "linkedinUrl",
+    created_at AS "createdAt",
+    updated_at AS "updatedAt"
+  `;
 
   // ==========================================
   // CREATE (C)
@@ -51,12 +70,9 @@ class UserModel {
     }
 
     const sql = `
-      INSERT INTO users (name, email, role, department, graduation_year, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-      RETURNING id, name, email, role, department, 
-                graduation_year AS "graduationYear", 
-                created_at AS "createdAt", 
-                updated_at AS "updatedAt"
+      INSERT INTO users (name, email, role, department, graduation_year, phone, company, job_title, linkedin_url, password_hash, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+      RETURNING ${this.SAFE_COLUMNS}
     `;
 
     const values = [
@@ -66,7 +82,12 @@ class UserModel {
         ? userData.role.trim().toLowerCase()
         : 'alumni',
       userData.department && userData.department.trim() ? userData.department.trim() : null,
-      userData.graduationYear ? parseInt(userData.graduationYear, 10) : null
+      userData.graduationYear ? parseInt(userData.graduationYear, 10) : null,
+      userData.phone && String(userData.phone).trim() ? String(userData.phone).trim() : null,
+      userData.company && String(userData.company).trim() ? String(userData.company).trim() : null,
+      userData.jobTitle && String(userData.jobTitle).trim() ? String(userData.jobTitle).trim() : null,
+      userData.linkedinUrl && String(userData.linkedinUrl).trim() ? String(userData.linkedinUrl).trim() : null,
+      userData.passwordHash || null
     ];
 
     try {
@@ -80,6 +101,105 @@ class UserModel {
       }
       throw dbErr;
     }
+  }
+
+  /**
+   * Public self-registration for Alumni and Student accounts (/register).
+   * Enforces strict role restriction (never allows admin/faculty/teacher self-registration),
+   * password strength & confirmation match, duplicate email protection, and scrypt hashing.
+   *
+   * @param {Object} data - Registration payload
+   * @returns {Promise<Object>} Newly created user record (without password_hash)
+   */
+  static async register(data) {
+    const errors = [];
+
+    if (!data || typeof data !== 'object') {
+      const error = new Error('Invalid registration payload.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const name = data.name ? String(data.name).trim() : '';
+    const email = data.email ? String(data.email).trim().toLowerCase() : '';
+    const password = data.password ? String(data.password) : '';
+    const confirmPassword = data.confirmPassword ? String(data.confirmPassword) : '';
+    const role = data.role ? String(data.role).trim().toLowerCase() : '';
+    const department = data.department ? String(data.department).trim() : '';
+    const graduationYearRaw = data.graduationYear !== undefined && data.graduationYear !== null
+      ? String(data.graduationYear).trim()
+      : '';
+    const linkedinUrl = data.linkedinUrl ? String(data.linkedinUrl).trim() : '';
+    const company = data.company ? String(data.company).trim() : '';
+    const jobTitle = data.jobTitle ? String(data.jobTitle).trim() : '';
+
+    if (!name) errors.push('Full Name is required.');
+    if (!email) {
+      errors.push('Email Address is required.');
+    } else if (!this.isValidEmail(email)) {
+      errors.push('Please provide a valid email address.');
+    }
+
+    if (!password) {
+      errors.push('Password is required.');
+    } else if (password.length < 6) {
+      errors.push('Password must be at least 6 characters long.');
+    }
+
+    if (!confirmPassword) {
+      errors.push('Please confirm your password.');
+    } else if (password && password !== confirmPassword) {
+      errors.push('Passwords do not match.');
+    }
+
+    if (!role || !this.PUBLIC_REGISTRATION_ROLES.includes(role)) {
+      errors.push('Public registration is strictly restricted to Alumni or Student accounts.');
+    }
+
+    if (!department) {
+      errors.push('Department / Major is required.');
+    }
+
+    if (!graduationYearRaw) {
+      errors.push(role === 'student' ? 'Expected Graduation Year is required.' : 'Graduation Year is required.');
+    } else {
+      const year = parseInt(graduationYearRaw, 10);
+      if (isNaN(year) || year < 1900 || year > 2100) {
+        errors.push('Graduation Year must be a valid 4-digit year between 1900 and 2100.');
+      }
+    }
+
+    if (linkedinUrl && !/^https?:\/\/.+/i.test(linkedinUrl)) {
+      errors.push('LinkedIn Profile URL must start with http:// or https://.');
+    }
+
+    if (errors.length > 0) {
+      const error = new Error(errors.join(' '));
+      error.statusCode = 400;
+      error.validationErrors = errors;
+      throw error;
+    }
+
+    const existing = await this.findByEmail(email);
+    if (existing) {
+      const error = new Error('An account with this email address already exists. Please sign in or use a different email.');
+      error.statusCode = 409;
+      throw error;
+    }
+
+    const passwordHash = await hashPassword(password);
+
+    return this.create({
+      name,
+      email,
+      role,
+      department,
+      graduationYear: parseInt(graduationYearRaw, 10),
+      company: role === 'alumni' ? (company || null) : null,
+      jobTitle: role === 'alumni' ? (jobTitle || null) : null,
+      linkedinUrl: linkedinUrl || null,
+      passwordHash
+    });
   }
 
   // ==========================================
@@ -100,10 +220,7 @@ class UserModel {
    */
   static async findAll(filter = {}) {
     let sql = `
-      SELECT id, name, email, role, department, 
-             graduation_year AS "graduationYear", 
-             created_at AS "createdAt", 
-             updated_at AS "updatedAt"
+      SELECT ${this.SAFE_COLUMNS}
       FROM users
     `;
 
@@ -164,10 +281,7 @@ class UserModel {
     if (isNaN(numericId)) return null;
 
     const sql = `
-      SELECT id, name, email, role, department, 
-             graduation_year AS "graduationYear", 
-             created_at AS "createdAt", 
-             updated_at AS "updatedAt"
+      SELECT ${this.SAFE_COLUMNS}
       FROM users
       WHERE id = $1
     `;
@@ -186,10 +300,7 @@ class UserModel {
     if (!email || typeof email !== 'string') return null;
 
     const sql = `
-      SELECT id, name, email, role, department, 
-             graduation_year AS "graduationYear", 
-             created_at AS "createdAt", 
-             updated_at AS "updatedAt"
+      SELECT ${this.SAFE_COLUMNS}
       FROM users
       WHERE LOWER(email) = LOWER($1)
     `;
@@ -239,12 +350,13 @@ class UserModel {
           role = $3,
           department = $4,
           graduation_year = $5,
+          phone = $6,
+          company = $7,
+          job_title = $8,
+          linkedin_url = $9,
           updated_at = NOW()
-      WHERE id = $6
-      RETURNING id, name, email, role, department, 
-                graduation_year AS "graduationYear", 
-                created_at AS "createdAt", 
-                updated_at AS "updatedAt"
+      WHERE id = $10
+      RETURNING ${this.SAFE_COLUMNS}
     `;
 
     const values = [
@@ -255,6 +367,10 @@ class UserModel {
         : existing.role,
       userData.department !== undefined ? (userData.department ? userData.department.trim() : null) : existing.department,
       userData.graduationYear !== undefined ? (userData.graduationYear ? parseInt(userData.graduationYear, 10) : null) : existing.graduationYear,
+      userData.phone !== undefined ? (userData.phone ? String(userData.phone).trim() : null) : existing.phone,
+      userData.company !== undefined ? (userData.company ? String(userData.company).trim() : null) : existing.company,
+      userData.jobTitle !== undefined ? (userData.jobTitle ? String(userData.jobTitle).trim() : null) : existing.jobTitle,
+      userData.linkedinUrl !== undefined ? (userData.linkedinUrl ? String(userData.linkedinUrl).trim() : null) : existing.linkedinUrl,
       numericId
     ];
 
@@ -308,7 +424,11 @@ class UserModel {
       email: partialData.email !== undefined ? partialData.email : existing.email,
       role: partialData.role !== undefined ? partialData.role : existing.role,
       department: partialData.department !== undefined ? partialData.department : existing.department,
-      graduationYear: partialData.graduationYear !== undefined ? partialData.graduationYear : existing.graduationYear
+      graduationYear: partialData.graduationYear !== undefined ? partialData.graduationYear : existing.graduationYear,
+      phone: partialData.phone !== undefined ? partialData.phone : existing.phone,
+      company: partialData.company !== undefined ? partialData.company : existing.company,
+      jobTitle: partialData.jobTitle !== undefined ? partialData.jobTitle : existing.jobTitle,
+      linkedinUrl: partialData.linkedinUrl !== undefined ? partialData.linkedinUrl : existing.linkedinUrl
     };
 
     return this.update(numericId, updatedData);

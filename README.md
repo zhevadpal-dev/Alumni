@@ -610,6 +610,13 @@ npm run dev
 | `GET` | `/hello/:name` | Parameterized greeting | `/hello/emre` -> `"Hello, Emre!"` |
 | `GET` | `/sum/:num1/:num2` | Summation of two integers | `/sum/15/25` -> `40` |
 
+### 🔐 Public Registration Endpoints (`AuthController` ➡️ `/register`)
+
+| Method | Endpoint | Description | Example Request / Output |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/register` | Render Alumly iOS glassmorphism Register page (`Alumni` / `Student` segmented control) | Supports optional `?role=student` query param |
+| `POST` | `/register` | Register a new `alumni` or `student` account (strictly blocks `admin` self-registration, hashes password with `scrypt`, checks duplicate email) | Body: `name`, `email`, `password`, `confirmPassword`, `role`, `department`, `graduationYear`, optional `company`, `jobTitle`, `linkedinUrl` |
+
 ### 🚀 REST API User Endpoints (`ApiUserController` ➡️ `/api/users`)
 
 | Method | Endpoint | Description | Example Request / Output |

@@ -1,0 +1,22 @@
+$kind: http-request
+description: Registers a new Alumni or Student account with scrypt password hashing, strict role restriction, and duplicate email validation.
+url: "{{baseUrl}}/register"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Deniz Arslan",
+      "email": "deniz.arslan@university.edu",
+      "password": "secret123",
+      "confirmPassword": "secret123",
+      "role": "alumni",
+      "department": "Computer Engineering",
+      "graduationYear": 2024,
+      "company": "TechCorp Global",
+      "jobTitle": "Software Engineer",
+      "linkedinUrl": "https://linkedin.com/in/denizarslan"
+    }
+order: 3450

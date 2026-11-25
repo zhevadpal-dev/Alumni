@@ -103,7 +103,7 @@ class HtmlViews {
       </p>
 
       <div class="hero-actions">
-        <a href="/users" class="btn btn-primary">Get Started ➔</a>
+        <a href="/register" class="btn btn-primary">Get Started ➔</a>
         <a href="#jobs" class="btn btn-secondary">Explore Job Board</a>
       </div>
     </div>

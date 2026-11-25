@@ -1855,6 +1855,60 @@
         "description": "Tests 409 Conflict error when user has already applied for the specified job posting."
       },
       "response": []
+    },
+    {
+      "name": "Web Register Page (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "register"
+          ]
+        },
+        "description": "Renders the Alumly iOS glassmorphism Registration page with dynamic Alumni/Student segmented control."
+      },
+      "response": []
+    },
+    {
+      "name": "Register New Account (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Deniz Arslan\",\n  \"email\": \"deniz.arslan@university.edu\",\n  \"password\": \"secret123\",\n  \"confirmPassword\": \"secret123\",\n  \"role\": \"alumni\",\n  \"department\": \"Computer Engineering\",\n  \"graduationYear\": 2024,\n  \"company\": \"TechCorp Global\",\n  \"jobTitle\": \"Software Engineer\",\n  \"linkedinUrl\": \"https://linkedin.com/in/denizarslan\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "register"
+          ]
+        },
+        "description": "Registers a new Alumni or Student account with scrypt password hashing, role restriction, and duplicate email protection."
+      },
+      "response": []
     }
   ]
 }

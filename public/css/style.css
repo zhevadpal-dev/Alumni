@@ -2026,3 +2026,263 @@ textarea.form-control {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==========================================================================
+   15. REGISTER PAGE — iOS GLASSMORPHISM & ROLE SEGMENTED CONTROL
+   ========================================================================== */
+.register-stage {
+  max-width: 660px;
+  padding-top: 24px;
+  padding-bottom: 72px;
+}
+
+.register-glass-card {
+  background: rgba(255, 255, 255, 0.48);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
+  padding: 40px 36px;
+  box-shadow: none !important;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.register-eyebrow {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #16191c;
+  margin-bottom: 12px;
+}
+
+.register-title {
+  font-family: var(--font-serif);
+  font-size: 2.15rem;
+  font-weight: 600;
+  color: #16191c;
+  letter-spacing: -0.025em;
+  margin: 0 0 8px 0;
+  line-height: 1.15;
+}
+
+.register-subtitle {
+  font-size: 0.95rem;
+  color: #4a4a4c;
+  margin: 0 auto;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+/* Soft Translucent Glass Error Alert Box */
+.glass-alert-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(254, 242, 242, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  color: #991b1b;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.glass-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.glass-alert-body strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 3px;
+  color: #7f1d1d;
+}
+
+.glass-alert-body p {
+  margin: 0;
+}
+
+.glass-alert-body ul {
+  margin: 4px 0 0 18px;
+  padding: 0;
+}
+
+.glass-alert-body li {
+  margin-bottom: 2px;
+}
+
+/* iOS-Style Pill Role Segmented Control */
+.role-toggle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.role-toggle-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #4d5358;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+}
+
+.role-segmented-control {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  max-width: 320px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 100px;
+}
+
+.role-segmented-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: #16191c;
+  border-radius: 100px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.role-segmented-slider.is-student {
+  transform: translateX(100%);
+}
+
+.role-segment-btn {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a4a4c;
+  cursor: pointer;
+  border-radius: 100px;
+  transition: color 0.2s ease;
+  text-align: center;
+}
+
+.role-segment-btn.active {
+  color: #ffffff;
+}
+
+/* Section Labels inside Register Form */
+.register-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4d5358;
+  margin: 22px 0 12px 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-section-label .optional-tag {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(22, 25, 28, 0.55);
+  text-transform: none;
+  letter-spacing: 0;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 9999px;
+  padding: 2px 8px;
+}
+
+/* Smooth Collapsible Career Fields Panel (Alumni Only) */
+.career-fields-panel {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+}
+
+.career-fields-panel.is-hidden {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.career-fields-inner {
+  overflow: hidden;
+}
+
+/* Submit Actions & Footer Link */
+.register-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.register-submit-btn {
+  width: 100%;
+  padding: 14px 32px;
+  font-size: 0.98rem;
+  border-radius: 100px;
+}
+
+.register-footer-link {
+  font-size: 0.875rem;
+  color: #4a4a4c;
+  margin: 0;
+}
+
+.register-footer-link a {
+  color: #16191c;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.register-footer-link a:hover {
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .register-glass-card {
+    padding: 28px 20px;
+  }
+
+  .register-title {
+    font-size: 1.75rem;
+  }
+}
