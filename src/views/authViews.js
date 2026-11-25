@@ -222,13 +222,14 @@ class AuthViews {
           <div class="form-group">
             <label for="graduationYear" id="graduationYearLabel">${isStudent ? 'Expected Graduation Year *' : 'Graduation Year *'}</label>
             <input
-              type="number"
+              type="text"
+              inputmode="numeric"
+              maxlength="4"
+              pattern="[0-9]{4}"
               id="graduationYear"
               name="graduationYear"
               class="form-control"
               placeholder="${isStudent ? 'e.g. 2027' : 'e.g. 2024'}"
-              min="1900"
-              max="2100"
               value="${escapeHtml(values.graduationYear || '')}"
               required
             />

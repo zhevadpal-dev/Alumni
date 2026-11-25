@@ -2406,3 +2406,18 @@ textarea.form-control {
   margin-top: 4px;
   padding-top: 10px;
 }
+
+/* Remove browser number input spinner arrows across all browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button,
+#graduationYear::-webkit-inner-spin-button,
+#graduationYear::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"],
+#graduationYear {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
