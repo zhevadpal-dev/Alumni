@@ -1,0 +1,7 @@
+$kind: http-request
+description: Redirects the authenticated user cleanly to their own profile page (/users/:id).
+url: "{{baseUrl}}/profile"
+method: GET
+headers:
+  Accept: text/html
+order: 3500

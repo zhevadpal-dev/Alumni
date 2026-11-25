@@ -410,6 +410,42 @@ class JobPostingModel {
     return res.rows;
   }
 
+  /**
+   * Fetch all job postings created by a specific user (strictly filtered by poster_id)
+   * along with the total number of submitted applications per job.
+   *
+   * @param {number|string} posterId - Logged-in creator's user ID
+   * @returns {Promise<Array<Object>>} User's own job postings with applicantCount
+   */
+  static async getByPosterWithApplicantCount(posterId) {
+    const numericId = parseInt(posterId, 10);
+    if (isNaN(numericId)) return [];
+
+    const sql = `
+      SELECT jp.id,
+             jp.title,
+             jp.company,
+             jp.location,
+             jp.job_type AS "jobType",
+             jp.description,
+             jp.salary_range AS "salaryRange",
+             jp.poster_id AS "posterId",
+             jp.status,
+             jp.deadline,
+             jp.created_at AS "createdAt",
+             jp.updated_at AS "updatedAt",
+             COUNT(a.id)::int AS "applicantCount"
+      FROM job_postings jp
+      LEFT JOIN applications a ON a.job_id = jp.id
+      WHERE jp.poster_id = $1
+      GROUP BY jp.id
+      ORDER BY jp.created_at DESC, jp.id DESC
+    `;
+
+    const res = await query(sql, [numericId]);
+    return res.rows;
+  }
+
   // ==========================================
   // CREATE (C)
   // ==========================================

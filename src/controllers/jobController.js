@@ -127,7 +127,11 @@ class JobController {
     try {
       const body = { ...req.body };
       if (body.posterId === '' || body.posterId === undefined) {
-        delete body.posterId;
+        if (req.session && req.session.user && req.session.user.id) {
+          body.posterId = req.session.user.id;
+        } else {
+          delete body.posterId;
+        }
       }
 
       const created = await JobPostingModel.create(body);

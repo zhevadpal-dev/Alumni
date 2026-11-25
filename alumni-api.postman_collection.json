@@ -2009,6 +2009,75 @@
         "description": "Renders the protected Alumly Admin Panel (requires authenticated Admin session; returns 403 for non-admins or 302 to /login if signed out)."
       },
       "response": []
+    },
+    {
+      "name": "Web My Applications (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/my-applications",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "my-applications"
+          ]
+        },
+        "description": "Renders the logged-in user's data-isolated My Applications workspace strictly filtered by req.session.user.id."
+      },
+      "response": []
+    },
+    {
+      "name": "Web My Job Postings (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/my-jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "my-jobs"
+          ]
+        },
+        "description": "Renders the logged-in Alumni/Faculty/Admin user's data-isolated My Job Postings workspace strictly filtered by poster_id = req.session.user.id."
+      },
+      "response": []
+    },
+    {
+      "name": "Web Profile Shortcut (GET)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/html"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/profile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "profile"
+          ]
+        },
+        "description": "Redirects the authenticated user directly to their own profile page (/users/:id)."
+      },
+      "response": []
     }
   ]
 }

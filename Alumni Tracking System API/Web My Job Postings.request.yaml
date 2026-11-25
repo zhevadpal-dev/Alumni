@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders the logged-in Alumni/Faculty/Admin user's data-isolated My Job Postings workspace strictly filtered by poster_id = req.session.user.id.
+url: "{{baseUrl}}/my-jobs"
+method: GET
+headers:
+  Accept: text/html
+order: 3490

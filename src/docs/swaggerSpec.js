@@ -447,6 +447,39 @@ const swaggerSpec = {
         }
       }
     },
+    '/my-applications': {
+      get: {
+        tags: ['Personal Workspace (WorkspaceController)'],
+        summary: 'Render logged-in user personal applications workspace',
+        description: 'Protected by requireAuth. Queries PostgreSQL strictly filtered by user_id = req.session.user.id so users only see their own job applications.',
+        responses: {
+          '200': { description: 'My Applications HTML workspace rendered successfully' },
+          '302': { description: 'Unauthenticated — redirects to /login' }
+        }
+      }
+    },
+    '/my-jobs': {
+      get: {
+        tags: ['Personal Workspace (WorkspaceController)'],
+        summary: 'Render logged-in user personal job postings workspace',
+        description: 'Protected by requireAuth + requireRole("alumni", "faculty", "teacher", "admin"). Queries PostgreSQL strictly filtered by poster_id = req.session.user.id with applicant counts.',
+        responses: {
+          '200': { description: 'My Job Postings HTML workspace rendered successfully' },
+          '302': { description: 'Unauthenticated — redirects to /login' },
+          '403': { description: 'Unauthorized role (e.g., Student) — renders 403 Access Denied glass page' }
+        }
+      }
+    },
+    '/profile': {
+      get: {
+        tags: ['Personal Workspace (WorkspaceController)'],
+        summary: 'Personal profile shortcut',
+        description: 'Protected by requireAuth. Redirects the authenticated user cleanly to /users/:id.',
+        responses: {
+          '302': { description: 'Redirects to /users/{currentUser.id} (or /login if signed out)' }
+        }
+      }
+    },
     '/admin': {
       get: {
         tags: ['Admin Panel (AdminController)'],

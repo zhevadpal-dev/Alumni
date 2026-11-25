@@ -620,6 +620,14 @@ npm run dev
 | `POST` | `/login` | Authenticate `email` & `password` against PostgreSQL `scrypt` hash and establish signed HTTP-only session cookie | Body: `email`, `password` -> redirects to `/` or returns 200 JSON |
 | `POST` / `GET` | `/logout` | Destroy signed user session cookie (`alumly_session`) and redirect to `/` | Clears `res.locals.currentUser` |
 
+### 🧭 Personal Workspace Endpoints (`WorkspaceController` ➡️ Data-Isolated by `req.session.user.id`)
+
+| Method | Endpoint | Description | Protection |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/my-applications` | Personalized `Your Applications` workspace strictly filtered by `user_id = req.session.user.id` with live summary KPIs and empty state | `requireAuth` |
+| `GET` | `/my-jobs` | Personalized `Your Job Postings` workspace strictly filtered by `poster_id = req.session.user.id` with applicant counts and Edit/Delete actions | `requireAuth`, `requireRole('alumni', 'faculty', 'teacher', 'admin')` |
+| `GET` | `/profile` | Personal profile shortcut redirecting cleanly to `/users/:id` for the logged-in user | `requireAuth` |
+
 ### 🛡️ Admin Panel Endpoints (`AdminController` ➡️ `/admin` — `Admin` Role Only)
 
 | Method | Endpoint | Description | Protection |

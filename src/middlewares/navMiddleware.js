@@ -4,8 +4,8 @@
  * Computes `res.locals.navItems` and `res.locals.currentPath` dynamically on
  * every incoming request based on the visitor's authenticated role:
  * - Guest (logged out): Home, Job Board, Announcements, About
- * - Student:            Home, Alumni Directory, Job Board, My Applications, Announcements
- * - Alumni / Faculty / Teacher: Home, Alumni Directory, Job Board, Post Job, Announcements
+ * - Student:            Home, Alumni Directory, Job Board, My Applications (/my-applications), Announcements
+ * - Alumni / Faculty / Teacher: Home, Alumni Directory, Job Board, My Jobs (/my-jobs), Announcements
  * - Admin:              Home, Alumni Directory, Job Board, Applications, Announcements, Admin Panel
  */
 
@@ -22,14 +22,14 @@ const ROLE_NAV_CONFIG = {
     { label: 'Home', href: '/' },
     { label: 'Alumni Directory', href: '/users' },
     { label: 'Job Board', href: '/jobs' },
-    { label: 'My Applications', href: '/applications' },
+    { label: 'My Applications', href: '/my-applications' },
     { label: 'Announcements', href: '/announcements' }
   ],
   alumni: [
     { label: 'Home', href: '/' },
     { label: 'Alumni Directory', href: '/users' },
     { label: 'Job Board', href: '/jobs' },
-    { label: 'Post Job', href: '/jobs/new' },
+    { label: 'My Jobs', href: '/my-jobs' },
     { label: 'Announcements', href: '/announcements' }
   ],
   admin: [

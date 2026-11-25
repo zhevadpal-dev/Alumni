@@ -1,0 +1,7 @@
+$kind: http-request
+description: Renders the logged-in user's data-isolated My Applications workspace strictly filtered by user_id = req.session.user.id.
+url: "{{baseUrl}}/my-applications"
+method: GET
+headers:
+  Accept: text/html
+order: 3480
