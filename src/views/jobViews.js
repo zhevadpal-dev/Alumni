@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Mint Green for Careers & Jobs)
  */
 
-const { getGlobalStyles, getHeadTags } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
 
 class JobViews {
   /**
@@ -376,9 +376,9 @@ class JobViews {
             </ul>
           </nav>
 
-          <!-- Right-Aligned Action CTA Button -->
+          <!-- Right-Aligned Action CTA Button / Logged-In User Pill -->
           <div class="nav-actions">
-            ${hideActionBtn ? '' : '<a href="/jobs/new" class="btn btn-primary btn-sm">+ Post Job</a>'}
+            ${renderUserSessionControls(hideActionBtn ? '' : '<a href="/jobs/new" class="btn btn-primary btn-sm">+ Post Job</a>')}
           </div>
         </div>
       </header>

@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { getCurrentUser } = require('../middlewares/session');
 
 let cachedCss = null;
 
@@ -107,9 +108,61 @@ function getHeadTags(pageTitle) {
   `;
 }
 
+function escapeAttr(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Render the right-column header controls.
+ * - When logged in: displays frosted-glass user pill (initials + first name • role) + Log Out button
+ *   (and preserves any contextual page CTA like + Post Job if passed).
+ * - When logged out: renders extraHtml (preserving clean empty spacer on pages without a CTA).
+ *
+ * @param {string} [extraHtml='']
+ * @returns {string}
+ */
+function renderUserSessionControls(extraHtml = '') {
+  const user = getCurrentUser();
+  if (!user) {
+    return extraHtml || '';
+  }
+
+  const fullName = (user.full_name || user.name || 'Member').trim();
+  const firstName = fullName.split(/\s+/)[0] || fullName;
+  const parts = fullName.split(/\s+/).filter(Boolean);
+  const initials =
+    parts.length >= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : fullName.slice(0, 2).toUpperCase();
+  const roleLabel = user.role
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+    : 'Member';
+
+  return `
+    ${extraHtml || ''}
+    <div class="user-session-group">
+      <a href="/users/${encodeURIComponent(user.id)}" class="user-session-pill" title="Signed in as ${escapeAttr(fullName)} (${escapeAttr(roleLabel)})">
+        <span class="user-avatar-circle" aria-hidden="true">${escapeAttr(initials)}</span>
+        <span class="user-session-name">${escapeAttr(firstName)}</span>
+        <span class="user-session-dot" aria-hidden="true">&bull;</span>
+        <span class="user-session-role">${escapeAttr(roleLabel)}</span>
+      </a>
+      <form action="/logout" method="POST" style="margin: 0;">
+        <button type="submit" class="btn-logout-pill">Log Out</button>
+      </form>
+    </div>
+  `;
+}
+
 module.exports = {
   getGlobalStyles,
   getHeadTags,
   BRAND_SVG_ICON,
-  getBrandLogoHtml
+  getBrandLogoHtml,
+  renderUserSessionControls
 };

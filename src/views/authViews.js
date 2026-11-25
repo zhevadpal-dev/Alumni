@@ -5,7 +5,7 @@
  * canonical Alumly iOS Glassmorphism Design System.
  */
 
-const { getHeadTags, BRAND_SVG_ICON } = require('./styles');
+const { getHeadTags, BRAND_SVG_ICON, renderUserSessionControls } = require('./styles');
 
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -76,8 +76,8 @@ class AuthViews {
         </ul>
       </nav>
 
-      <!-- Empty Right Spacer Column to Keep Center Pill Strictly Centered -->
-      <div class="nav-actions"></div>
+      <!-- Right Column: Logged-in User Pill or Balancing Spacer -->
+      <div class="nav-actions">${renderUserSessionControls()}</div>
     </div>
   </header>
 
@@ -160,12 +160,18 @@ class AuthViews {
               id="password"
               name="password"
               class="form-control"
-              placeholder="Create a password"
-              minlength="6"
+              placeholder="Create a strong password"
+              minlength="8"
               autocomplete="new-password"
               required
             />
-            <span class="form-hint">Must be at least 6 characters long.</span>
+            <div class="password-checklist" id="passwordChecklist" aria-live="polite">
+              <span class="pw-rule" data-rule="length"><span class="pw-icon" aria-hidden="true">○</span> 8+ chars</span>
+              <span class="pw-rule" data-rule="upper"><span class="pw-icon" aria-hidden="true">○</span> Uppercase</span>
+              <span class="pw-rule" data-rule="lower"><span class="pw-icon" aria-hidden="true">○</span> Lowercase</span>
+              <span class="pw-rule" data-rule="number"><span class="pw-icon" aria-hidden="true">○</span> Number</span>
+              <span class="pw-rule" data-rule="special"><span class="pw-icon" aria-hidden="true">○</span> Special</span>
+            </div>
           </div>
 
           <div class="form-group">
@@ -176,7 +182,7 @@ class AuthViews {
               name="confirmPassword"
               class="form-control"
               placeholder="Re-enter your password"
-              minlength="6"
+              minlength="8"
               autocomplete="new-password"
               required
             />
@@ -283,9 +289,28 @@ class AuthViews {
           </div>
         </div>
 
+        <!-- Mandatory KVKK Personal Data Protection Consent -->
+        <div class="kvkk-consent-box">
+          <label class="kvkk-checkbox-label" for="kvkkConsent">
+            <input
+              type="checkbox"
+              id="kvkkConsent"
+              name="kvkkConsent"
+              value="on"
+              class="kvkk-checkbox-input"
+              ${values.kvkkConsent ? 'checked' : ''}
+              required
+            />
+            <span class="kvkk-checkbox-text">
+              I have read and accept the
+              <button type="button" class="kvkk-policy-link" id="openKvkkModal">KVKK Personal Data Protection Policy</button> *
+            </span>
+          </label>
+        </div>
+
         <!-- Submit CTA & Sign-in Link -->
         <div class="register-actions">
-          <button type="submit" class="btn btn-primary register-submit-btn">Create Account</button>
+          <button type="submit" class="btn btn-primary register-submit-btn" id="registerSubmitBtn" ${values.kvkkConsent ? '' : 'disabled'}>Create Account</button>
           <p class="register-footer-link">
             Already have an account? <a href="/users">Sign in</a>
           </p>
@@ -293,6 +318,29 @@ class AuthViews {
       </form>
     </div>
   </main>
+
+  <!-- Sleek iOS Glassmorphism KVKK Policy Modal -->
+  <div class="glass-modal-backdrop" id="kvkkModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="kvkkModalTitle" aria-hidden="true">
+    <div class="glass-modal-card">
+      <div class="glass-modal-header">
+        <div>
+          <span class="badge register-eyebrow" style="margin-bottom: 6px;">● PRIVACY &amp; KVKK</span>
+          <h2 class="glass-modal-title" id="kvkkModalTitle">KVKK Personal Data Protection Policy</h2>
+        </div>
+        <button type="button" class="glass-modal-close" id="closeKvkkModal" aria-label="Close policy modal">&times;</button>
+      </div>
+      <div class="glass-modal-body">
+        <p><strong>1. Data Controller:</strong> Alumly operates as the academic alumni and career networking platform for your institution in compliance with Law No. 6698 on the Protection of Personal Data (KVKK).</p>
+        <p><strong>2. Data Collected:</strong> We process only the account and profile details you explicitly provide—Full Name, Email Address, Academic Role, Department / Major, Graduation Year, optional LinkedIn URL, and optional Career Information—alongside your cryptographically hashed password.</p>
+        <p><strong>3. Purpose of Processing:</strong> Your information is used solely to maintain the verified Alumni Directory, connect graduates and students with career opportunities, process job applications, and deliver institutional announcements.</p>
+        <p><strong>4. Security &amp; Your Rights:</strong> Passwords are never stored in plaintext. Under Article 11 of KVKK, you may access, update, or permanently delete your profile and associated applications at any time from your Alumly account.</p>
+      </div>
+      <div class="glass-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="dismissKvkkModal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" id="acceptKvkkModal">I Accept &amp; Close</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     (function () {
@@ -332,6 +380,35 @@ class AuthViews {
       tabAlumni.addEventListener('click', function () { setRole('alumni'); });
       tabStudent.addEventListener('click', function () { setRole('student'); });
 
+      var passwordChecklist = document.getElementById('passwordChecklist');
+      var kvkkCheckbox = document.getElementById('kvkkConsent');
+      var submitBtn = document.getElementById('registerSubmitBtn');
+      var registerForm = document.getElementById('registerForm');
+      var kvkkBackdrop = document.getElementById('kvkkModalBackdrop');
+      var openKvkkBtn = document.getElementById('openKvkkModal');
+      var closeKvkkBtn = document.getElementById('closeKvkkModal');
+      var dismissKvkkBtn = document.getElementById('dismissKvkkModal');
+      var acceptKvkkBtn = document.getElementById('acceptKvkkModal');
+
+      function updatePasswordChecklist() {
+        var val = passwordInput.value || '';
+        var checks = {
+          length: val.length >= 8,
+          upper: /[A-Z]/.test(val),
+          lower: /[a-z]/.test(val),
+          number: /[0-9]/.test(val),
+          special: /[^A-Za-z0-9]/.test(val)
+        };
+        Object.keys(checks).forEach(function (key) {
+          var el = passwordChecklist.querySelector('[data-rule="' + key + '"]');
+          if (!el) return;
+          var met = checks[key];
+          el.classList.toggle('is-met', met);
+          var icon = el.querySelector('.pw-icon');
+          if (icon) icon.textContent = met ? '✓' : '○';
+        });
+      }
+
       function checkPasswordMatch() {
         if (!confirmInput.value) {
           matchHint.textContent = 'Re-type your password to confirm.';
@@ -340,15 +417,75 @@ class AuthViews {
         }
         if (passwordInput.value === confirmInput.value) {
           matchHint.textContent = 'Passwords match.';
-          matchHint.style.color = '#15803d';
+          matchHint.style.color = '#16191c';
         } else {
           matchHint.textContent = 'Passwords do not match.';
           matchHint.style.color = '#b91c1c';
         }
       }
 
-      passwordInput.addEventListener('input', checkPasswordMatch);
+      function syncSubmitState() {
+        if (submitBtn && kvkkCheckbox) {
+          submitBtn.disabled = !kvkkCheckbox.checked;
+        }
+      }
+
+      passwordInput.addEventListener('input', function () {
+        updatePasswordChecklist();
+        checkPasswordMatch();
+      });
       confirmInput.addEventListener('input', checkPasswordMatch);
+
+      if (kvkkCheckbox) {
+        kvkkCheckbox.addEventListener('change', syncSubmitState);
+        syncSubmitState();
+      }
+
+      if (registerForm) {
+        registerForm.addEventListener('submit', function (e) {
+          if (kvkkCheckbox && !kvkkCheckbox.checked) {
+            e.preventDefault();
+            kvkkCheckbox.focus();
+          }
+        });
+      }
+
+      function openKvkkModal() {
+        kvkkBackdrop.classList.add('is-open');
+        kvkkBackdrop.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeKvkkModal() {
+        kvkkBackdrop.classList.remove('is-open');
+        kvkkBackdrop.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      if (openKvkkBtn) openKvkkBtn.addEventListener('click', openKvkkModal);
+      if (closeKvkkBtn) closeKvkkBtn.addEventListener('click', closeKvkkModal);
+      if (dismissKvkkBtn) dismissKvkkBtn.addEventListener('click', closeKvkkModal);
+      if (acceptKvkkBtn) {
+        acceptKvkkBtn.addEventListener('click', function () {
+          if (kvkkCheckbox) {
+            kvkkCheckbox.checked = true;
+            syncSubmitState();
+          }
+          closeKvkkModal();
+        });
+      }
+      if (kvkkBackdrop) {
+        kvkkBackdrop.addEventListener('click', function (e) {
+          if (e.target === kvkkBackdrop) closeKvkkModal();
+        });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && kvkkBackdrop && kvkkBackdrop.classList.contains('is-open')) {
+          closeKvkkModal();
+        }
+      });
+
+      updatePasswordChecklist();
 
       // Scrollable iOS Glassmorphism Combobox for Department / Major
       var MAJORS = [

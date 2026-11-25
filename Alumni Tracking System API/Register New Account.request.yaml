@@ -1,5 +1,5 @@
 $kind: http-request
-description: Registers a new Alumni or Student account with scrypt password hashing, strict role restriction, and duplicate email validation.
+description: Registers a new Alumni or Student account with 5-rule strong password validation, mandatory KVKK consent, scrypt hashing, and auto-login session cookie.
 url: "{{baseUrl}}/register"
 method: POST
 headers:
@@ -10,13 +10,14 @@ body:
     {
       "name": "Deniz Arslan",
       "email": "deniz.arslan@university.edu",
-      "password": "secret123",
-      "confirmPassword": "secret123",
+      "password": "Alumly@2026",
+      "confirmPassword": "Alumly@2026",
       "role": "alumni",
       "department": "Computer Engineering",
       "graduationYear": 2024,
       "company": "TechCorp Global",
       "jobTitle": "Software Engineer",
-      "linkedinUrl": "https://linkedin.com/in/denizarslan"
+      "linkedinUrl": "https://linkedin.com/in/denizarslan",
+      "kvkkConsent": true
     }
 order: 3450

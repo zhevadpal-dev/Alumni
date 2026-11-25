@@ -10,7 +10,7 @@
  * - Soft Pastel Badges: Color-coded pills (Academic, Career, Event, Urgent)
  */
 
-const { getGlobalStyles, getHeadTags } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
 
 class AnnouncementViews {
   /**
@@ -72,9 +72,9 @@ class AnnouncementViews {
             </ul>
           </nav>
 
-          <!-- Right-Aligned Action CTA Button or Balancing Spacer -->
+          <!-- Right-Aligned Action CTA Button / Logged-In User Pill -->
           <div class="nav-actions">
-            ${hideActionBtn ? '' : '<a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>'}
+            ${renderUserSessionControls(hideActionBtn ? '' : '<a href="#new-announcement" class="btn btn-primary btn-sm">+ New Announcement</a>')}
           </div>
         </div>
       </header>

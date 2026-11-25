@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const requestLogger = require('./middlewares/logger');
+const { sessionMiddleware } = require('./middlewares/session');
 const guardian404 = require('./middlewares/guardian404');
 const guardian5xx = require('./middlewares/guardian5xx');
 const routes = require('./routes');
@@ -14,14 +15,15 @@ const PORT = process.env.PORT || 5001;
 // Global request logger middleware (intercepts every incoming request)
 app.use(requestLogger);
 
-// Static assets (serves public directory for css, images, etc.)
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, 'public')));
+// Static assets (serves public directory for css, images, favicon; index: false lets '/' render dynamic Home)
+app.use(express.static(path.join(__dirname, '../public'), { index: false }));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // Essential middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(sessionMiddleware);
 
 // Lightweight parser for multipart/form-data text fields in Postman/dev environments
 app.use((req, res, next) => {

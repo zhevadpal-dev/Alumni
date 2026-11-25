@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Canary Yellow for Applications)
  */
 
-const { getGlobalStyles, getHeadTags } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderUserSessionControls } = require('./styles');
 
 class ApplicationViews {
   /**
@@ -302,8 +302,8 @@ class ApplicationViews {
             </ul>
           </nav>
 
-          <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-          <div class="nav-actions"></div>
+          <!-- Right-Aligned Action Spacer / Logged-In User Pill -->
+          <div class="nav-actions">${renderUserSessionControls()}</div>
         </div>
       </header>
     `;

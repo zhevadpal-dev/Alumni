@@ -2425,3 +2425,276 @@ input[type="number"],
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+
+/* ==========================================================================
+   17. STRONG PASSWORD CHECKLIST, KVKK CONSENT & GLASS MODAL, USER SESSION PILL
+   ========================================================================== */
+.password-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pw-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px */
+  font-weight: 400;
+  line-height: 1.3;
+  color: rgba(22, 25, 28, 0.48);
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 9999px;
+  padding: 3px 9px;
+  transition: color 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.pw-rule .pw-icon {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.pw-rule.is-met {
+  color: #16191c;
+  font-weight: 500;
+  background: rgba(22, 25, 28, 0.08);
+  border-color: rgba(22, 25, 28, 0.22);
+}
+
+/* KVKK Consent Checkbox */
+.kvkk-consent-box {
+  margin-top: 22px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+}
+
+.kvkk-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #272625;
+  font-weight: 400;
+}
+
+.kvkk-checkbox-input {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: #16191c;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.kvkk-policy-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: #16191c;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.kvkk-policy-link:hover {
+  opacity: 0.72;
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Sleek Centered iOS Glassmorphism KVKK Modal */
+.glass-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(22, 25, 28, 0.36);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.glass-modal-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.glass-modal-card {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 24px;
+  padding: 28px 28px 24px;
+  transform: translateY(8px) scale(0.98);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: none !important;
+}
+
+.glass-modal-backdrop.is-open .glass-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.glass-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.glass-modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #16191c;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.glass-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: 1px solid rgba(22, 25, 28, 0.12);
+  background: rgba(255, 255, 255, 0.65);
+  color: #16191c;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glass-modal-close:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.glass-modal-body {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #3a3d42;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.glass-modal-body p {
+  margin: 0 0 12px 0;
+}
+
+.glass-modal-body strong {
+  color: #16191c;
+}
+
+.glass-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(22, 25, 28, 0.08);
+}
+
+/* Global Logged-In User Session Pill + Log Out Button (Header Right Column) */
+.user-session-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-session-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px 5px 5px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 100px;
+  color: #16191c;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.user-session-pill:hover {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.user-avatar-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #16191c;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.user-session-dot {
+  color: rgba(22, 25, 28, 0.35);
+  font-size: 0.8rem;
+}
+
+.user-session-role {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #4d5358;
+}
+
+.btn-logout-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  color: #16191c;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-logout-pill:hover {
+  background: #16191c;
+  color: #ffffff;
+  border-color: #16191c;
+}

@@ -478,18 +478,19 @@ const swaggerSpec = {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['name', 'email', 'password', 'confirmPassword', 'role', 'department', 'graduationYear'],
+                required: ['name', 'email', 'password', 'confirmPassword', 'role', 'department', 'graduationYear', 'kvkkConsent'],
                 properties: {
                   name: { type: 'string', example: 'Deniz Arslan' },
                   email: { type: 'string', format: 'email', example: 'deniz.arslan@university.edu' },
-                  password: { type: 'string', minLength: 6, example: 'secret123' },
-                  confirmPassword: { type: 'string', minLength: 6, example: 'secret123' },
+                  password: { type: 'string', minLength: 8, example: 'Alumly@2026' },
+                  confirmPassword: { type: 'string', minLength: 8, example: 'Alumly@2026' },
                   role: { type: 'string', enum: ['alumni', 'student'], example: 'alumni' },
                   department: { type: 'string', example: 'Computer Engineering' },
                   graduationYear: { type: 'integer', example: 2024 },
                   company: { type: 'string', example: 'TechCorp Global' },
                   jobTitle: { type: 'string', example: 'Software Engineer' },
-                  linkedinUrl: { type: 'string', format: 'uri', example: 'https://linkedin.com/in/denizarslan' }
+                  linkedinUrl: { type: 'string', format: 'uri', example: 'https://linkedin.com/in/denizarslan' },
+                  kvkkConsent: { type: 'boolean', example: true, description: 'Mandatory acceptance of KVKK Personal Data Protection Policy' }
                 }
               }
             },
@@ -518,6 +519,25 @@ const swaggerSpec = {
           '302': { description: 'Account registered successfully (Browser redirect to /users with flash message)' },
           '400': { description: 'Validation error (missing fields, password mismatch, or disallowed role)' },
           '409': { description: 'Duplicate email address conflict' }
+        }
+      }
+    },
+    '/logout': {
+      post: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Log out current user session',
+        description: 'Clears the signed HTTP-only session cookie (alumly_session) and redirects browser clients to / or returns JSON 200.',
+        responses: {
+          '200': { description: 'Logged out successfully (JSON response)' },
+          '302': { description: 'Logged out successfully (Browser redirect to /)' }
+        }
+      },
+      get: {
+        tags: ['Authentication & Registration (AuthController)'],
+        summary: 'Log out current user session (GET convenience)',
+        description: 'Clears the signed HTTP-only session cookie and redirects to /.',
+        responses: {
+          '302': { description: 'Redirect to /' }
         }
       }
     },

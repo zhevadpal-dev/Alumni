@@ -1895,7 +1895,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Deniz Arslan\",\n  \"email\": \"deniz.arslan@university.edu\",\n  \"password\": \"secret123\",\n  \"confirmPassword\": \"secret123\",\n  \"role\": \"alumni\",\n  \"department\": \"Computer Engineering\",\n  \"graduationYear\": 2024,\n  \"company\": \"TechCorp Global\",\n  \"jobTitle\": \"Software Engineer\",\n  \"linkedinUrl\": \"https://linkedin.com/in/denizarslan\"\n}"
+          "raw": "{\n  \"name\": \"Deniz Arslan\",\n  \"email\": \"deniz.arslan@university.edu\",\n  \"password\": \"Alumly@2026\",\n  \"confirmPassword\": \"Alumly@2026\",\n  \"role\": \"alumni\",\n  \"department\": \"Computer Engineering\",\n  \"graduationYear\": 2024,\n  \"company\": \"TechCorp Global\",\n  \"jobTitle\": \"Software Engineer\",\n  \"linkedinUrl\": \"https://linkedin.com/in/denizarslan\",\n  \"kvkkConsent\": true\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/register",
@@ -1906,7 +1906,30 @@
             "register"
           ]
         },
-        "description": "Registers a new Alumni or Student account with scrypt password hashing, role restriction, and duplicate email protection."
+        "description": "Registers a new Alumni or Student account with strong password validation, mandatory KVKK consent, scrypt hashing, and auto-login session cookie."
+      },
+      "response": []
+    },
+    {
+      "name": "Logout Session (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        },
+        "description": "Clears the signed HTTP-only alumly_session cookie and logs out the current user."
       },
       "response": []
     }

@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for Applications, Petal Pink for Events)
  */
 
-const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON } = require('./styles');
+const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON, renderUserSessionControls } = require('./styles');
 
 class HtmlViews {
   /**
@@ -82,7 +82,7 @@ class HtmlViews {
       </nav>
 
       <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-      <div class="nav-actions"></div>
+      <div class="nav-actions">${renderUserSessionControls()}</div>
     </div>
   </header>
 
@@ -536,9 +536,8 @@ class HtmlViews {
         </ul>
       </nav>
 
-      <!-- Right-Aligned Action Spacer -->
-      <div class="nav-actions">
-      </div>
+      <!-- Right-Aligned Action Spacer / Logged-In Session -->
+      <div class="nav-actions">${renderUserSessionControls()}</div>
     </div>
   </header>
 
@@ -754,7 +753,7 @@ class HtmlViews {
             </nav>
 
             <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-            <div class="nav-actions"></div>
+            <div class="nav-actions">${renderUserSessionControls()}</div>
           </div>
         </header>
 
@@ -898,7 +897,7 @@ class HtmlViews {
               </ul>
             </nav>
             <div class="nav-actions">
-              <a href="/users" class="btn btn-secondary btn-sm">&larr; Directory</a>
+              ${renderUserSessionControls('<a href="/users" class="btn btn-secondary btn-sm">&larr; Directory</a>')}
             </div>
           </div>
         </header>
@@ -1031,7 +1030,7 @@ class HtmlViews {
               </ul>
             </nav>
             <div class="nav-actions">
-              <a href="/users/${user.id}" class="btn btn-secondary btn-sm">&larr; Profile</a>
+              ${renderUserSessionControls(`<a href="/users/${user.id}" class="btn btn-secondary btn-sm">&larr; Profile</a>`)}
             </div>
           </div>
         </header>
@@ -1133,7 +1132,7 @@ class HtmlViews {
                 <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
-            <div class="nav-actions"></div>
+            <div class="nav-actions">${renderUserSessionControls()}</div>
           </div>
         </header>
 
@@ -1198,7 +1197,7 @@ class HtmlViews {
                 <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
-            <div class="nav-actions"></div>
+            <div class="nav-actions">${renderUserSessionControls()}</div>
           </div>
         </header>
 
@@ -1263,7 +1262,7 @@ class HtmlViews {
                 <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
-            <div class="nav-actions"></div>
+            <div class="nav-actions">${renderUserSessionControls()}</div>
           </div>
         </header>
 
@@ -1323,7 +1322,7 @@ class HtmlViews {
                 <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
               </ul>
             </nav>
-            <div class="nav-actions"></div>
+            <div class="nav-actions">${renderUserSessionControls()}</div>
           </div>
         </header>
 

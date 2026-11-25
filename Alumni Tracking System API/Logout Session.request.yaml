@@ -1,0 +1,7 @@
+$kind: http-request
+description: Clears the signed HTTP-only alumly_session cookie and logs out the current user.
+url: "{{baseUrl}}/logout"
+method: POST
+headers:
+  Accept: application/json
+order: 3460

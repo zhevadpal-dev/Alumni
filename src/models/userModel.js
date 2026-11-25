@@ -142,14 +142,31 @@ class UserModel {
 
     if (!password) {
       errors.push('Password is required.');
-    } else if (password.length < 6) {
-      errors.push('Password must be at least 6 characters long.');
+    } else {
+      const unmetRules = [];
+      if (password.length < 8) unmetRules.push('at least 8 characters');
+      if (!/[A-Z]/.test(password)) unmetRules.push('1 uppercase letter (A-Z)');
+      if (!/[a-z]/.test(password)) unmetRules.push('1 lowercase letter (a-z)');
+      if (!/[0-9]/.test(password)) unmetRules.push('1 number (0-9)');
+      if (!/[^A-Za-z0-9]/.test(password)) unmetRules.push('1 special character (!@#$%^&*)');
+      if (unmetRules.length > 0) {
+        errors.push(`Password must contain ${unmetRules.join(', ')}.`);
+      }
     }
 
     if (!confirmPassword) {
       errors.push('Please confirm your password.');
     } else if (password && password !== confirmPassword) {
       errors.push('Passwords do not match.');
+    }
+
+    const kvkkAccepted =
+      data.kvkkConsent === true ||
+      data.kvkkConsent === 'on' ||
+      data.kvkkConsent === 'true' ||
+      data.kvkkConsent === '1';
+    if (!kvkkAccepted) {
+      errors.push('You must read and accept the KVKK Personal Data Protection Policy to create an account.');
     }
 
     if (!role || !this.PUBLIC_REGISTRATION_ROLES.includes(role)) {

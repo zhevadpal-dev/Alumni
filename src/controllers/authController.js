@@ -45,22 +45,28 @@ class AuthController {
       graduationYear: req.body?.graduationYear,
       company: req.body?.company,
       jobTitle: req.body?.jobTitle,
-      linkedinUrl: req.body?.linkedinUrl
+      linkedinUrl: req.body?.linkedinUrl,
+      kvkkConsent: req.body?.kvkkConsent
     };
 
     try {
       const newUser = await UserModel.register(payload);
 
+      // Auto-login newly registered user via signed HTTP-only session cookie
+      if (typeof req.loginUser === 'function') {
+        req.loginUser(newUser);
+      }
+
       if (acceptsJsonOnly) {
         return res.status(201).json({
           status: 'success',
-          message: 'Account registered successfully.',
+          message: 'Account registered and logged in successfully.',
           data: newUser
         });
       }
 
       const welcomeMsg = encodeURIComponent(
-        `Welcome to Alumly, ${newUser.name}! Your ${newUser.role} account has been created.`
+        `Welcome to Alumly, ${newUser.name}! Your ${newUser.role} account is ready and you are now signed in.`
       );
       return res.redirect(`/users?msg=${welcomeMsg}&type=success`);
     } catch (err) {
@@ -83,7 +89,8 @@ class AuthController {
         graduationYear: payload.graduationYear || '',
         company: payload.company || '',
         jobTitle: payload.jobTitle || '',
-        linkedinUrl: payload.linkedinUrl || ''
+        linkedinUrl: payload.linkedinUrl || '',
+        kvkkConsent: payload.kvkkConsent === 'on' || payload.kvkkConsent === 'true' || payload.kvkkConsent === true
       };
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -95,6 +102,31 @@ class AuthController {
         })
       );
     }
+  }
+
+  /**
+   * POST /logout & GET /logout
+   * Destroys the signed user session cookie and redirects to Home (/).
+   */
+  static async handleLogout(req, res) {
+    if (typeof req.logoutUser === 'function') {
+      req.logoutUser();
+    }
+
+    const acceptsJsonOnly =
+      req.xhr ||
+      (req.headers.accept &&
+        req.headers.accept.includes('application/json') &&
+        !req.headers.accept.includes('text/html'));
+
+    if (acceptsJsonOnly) {
+      return res.status(200).json({
+        status: 'success',
+        message: 'Logged out successfully.'
+      });
+    }
+
+    return res.redirect('/');
   }
 }
 
