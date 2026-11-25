@@ -11,6 +11,7 @@
  */
 
 const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON, renderUserSessionControls } = require('./styles');
+const { getCurrentUser } = require('../middlewares/session');
 
 class HtmlViews {
   /**
@@ -850,6 +851,8 @@ class HtmlViews {
    */
   static renderUserProfile(user, query = {}) {
     const flashBanner = this.renderFlashBanner(query);
+    const currentUser = getCurrentUser();
+    const isOwnProfile = Boolean(currentUser && Number(currentUser.id) === Number(user.id));
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -963,6 +966,12 @@ class HtmlViews {
                 <span style="flex: 1; color: #16191c; font-weight: 500; font-size: 0.9rem;">${new Date(user.updatedAt).toLocaleString()}</span>
               </div>` : ''}
             </div>
+            ${isOwnProfile ? `
+            <div class="profile-logout-footer">
+              <form action="/logout" method="POST" style="margin: 0;">
+                <button type="submit" class="btn-profile-logout">Log Out</button>
+              </form>
+            </div>` : ''}
           </div>
         </div>
       </body>

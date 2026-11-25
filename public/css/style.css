@@ -2780,3 +2780,36 @@ input[type="number"],
 .btn-signin-pill:hover {
   background: rgba(255, 255, 255, 0.78);
 }
+
+/* Profile Card Bottom Log Out Footer (Own Profile Only) */
+.profile-logout-footer {
+  border-top: 1px solid rgba(22, 25, 28, 0.08);
+  margin-top: 24px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-profile-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 22px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(22, 25, 28, 0.16);
+  color: #16191c;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-profile-logout:hover {
+  background: #16191c;
+  color: #ffffff;
+  border-color: #16191c;
+}

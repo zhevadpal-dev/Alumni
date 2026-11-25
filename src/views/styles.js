@@ -150,15 +150,12 @@ function renderUserSessionControls(extraHtml = '', options = {}) {
   return `
     ${extraHtml || ''}
     <div class="user-session-group">
-      <a href="/users/${encodeURIComponent(user.id)}" class="user-session-pill" title="Signed in as ${escapeAttr(fullName)} (${escapeAttr(roleLabel)})">
+      <a href="/users/${encodeURIComponent(user.id)}" class="user-session-pill" title="View your profile (${escapeAttr(fullName)} • ${escapeAttr(roleLabel)})">
         <span class="user-avatar-circle" aria-hidden="true">${escapeAttr(initials)}</span>
         <span class="user-session-name">${escapeAttr(firstName)}</span>
         <span class="user-session-dot" aria-hidden="true">&bull;</span>
         <span class="user-session-role">${escapeAttr(roleLabel)}</span>
       </a>
-      <form action="/logout" method="POST" style="margin: 0;">
-        <button type="submit" class="btn-logout-pill">Log Out</button>
-      </form>
     </div>
   `;
 }
