@@ -992,6 +992,7 @@ class HtmlViews {
    */
   static renderUserEditForm(user, query = {}) {
     const flashBanner = this.renderFlashBanner(query);
+    const isStudent = String(user.role || '').toLowerCase() === 'student';
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -1051,7 +1052,7 @@ class HtmlViews {
               <a href="/users/${user.id}" class="btn-glass-pill btn-view">&larr; Back to Profile</a>
             </div>
 
-            <h1 style="margin: 0 0 6px 0; font-family: var(--font-serif); font-size: 1.85rem; color: #16191c;">✏️ Edit User Record #${user.id}</h1>
+            <h1 style="margin: 0 0 6px 0; font-family: var(--font-serif); font-size: 1.85rem; color: #16191c;">Edit Profile — ${user.name}</h1>
             <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.95rem;">Update profile information and contact details.</p>
 
             <form action="/users/${user.id}/edit" method="POST">
@@ -1079,20 +1080,22 @@ class HtmlViews {
                   <input type="text" id="department" name="department" class="form-control" value="${user.department || ''}" />
                 </div>
                 <div class="form-group">
-                  <label for="graduationYear">Graduation Year</label>
-                  <input type="number" id="graduationYear" name="graduationYear" class="form-control" value="${user.graduationYear || ''}" min="1900" max="2100" />
+                  <label for="graduationYear" id="editGraduationYearLabel">${isStudent ? 'Expected Graduation Year' : 'Graduation Year'}</label>
+                  <input type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" id="graduationYear" name="graduationYear" class="form-control" value="${user.graduationYear || ''}" />
                 </div>
                 <div class="form-group">
                   <label for="phone">Phone Number</label>
                   <input type="tel" id="phone" name="phone" class="form-control" value="${user.phone || ''}" />
                 </div>
-                <div class="form-group">
-                  <label for="company">Company / Institution</label>
-                  <input type="text" id="company" name="company" class="form-control" value="${user.company || ''}" />
-                </div>
-                <div class="form-group">
-                  <label for="jobTitle">Job Title</label>
-                  <input type="text" id="jobTitle" name="jobTitle" class="form-control" value="${user.jobTitle || ''}" />
+                <div class="career-fields-group form-grid-2col" id="editCareerFields" style="grid-column: 1 / -1;${isStudent ? ' display: none;' : ''}">
+                  <div class="form-group">
+                    <label for="company">Company / Institution</label>
+                    <input type="text" id="company" name="company" class="form-control" value="${user.company || ''}" ${isStudent ? 'disabled' : ''} />
+                  </div>
+                  <div class="form-group">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" name="jobTitle" class="form-control" value="${user.jobTitle || ''}" ${isStudent ? 'disabled' : ''} />
+                  </div>
                 </div>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.5); padding-top: 20px;">
@@ -1102,6 +1105,31 @@ class HtmlViews {
             </form>
           </div>
         </div>
+
+        <script>
+          (function () {
+            var roleSelect = document.getElementById('role');
+            var careerGroup = document.getElementById('editCareerFields');
+            var companyInput = document.getElementById('company');
+            var jobTitleInput = document.getElementById('jobTitle');
+            var yearLabel = document.getElementById('editGraduationYearLabel');
+
+            function syncEditRoleFields() {
+              var isStudentRole = roleSelect && roleSelect.value.toLowerCase() === 'student';
+              if (careerGroup) careerGroup.style.display = isStudentRole ? 'none' : '';
+              if (companyInput) companyInput.disabled = isStudentRole;
+              if (jobTitleInput) jobTitleInput.disabled = isStudentRole;
+              if (yearLabel) {
+                yearLabel.textContent = isStudentRole ? 'Expected Graduation Year' : 'Graduation Year';
+              }
+            }
+
+            if (roleSelect) {
+              roleSelect.addEventListener('change', syncEditRoleFields);
+              syncEditRoleFields();
+            }
+          })();
+        </script>
       </body>
       </html>
     `;
