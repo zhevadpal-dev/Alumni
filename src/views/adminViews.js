@@ -6,7 +6,7 @@
  * for Users, Job Postings, Announcements, and Applications.
  */
 
-const { getHeadTags, BRAND_SVG_ICON, renderUserSessionControls, renderAdminNavItem } = require('./styles');
+const { getHeadTags, renderSharedHeader } = require('./styles');
 
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -188,30 +188,7 @@ class AdminViews {
   ${getHeadTags('Admin Panel | Alumly')}
 </head>
 <body>
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          ${BRAND_SVG_ICON}
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <nav class="nav-pill-menu" aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
-          <li><a href="/jobs" class="nav-link">Job Board</a></li>
-          <li><a href="/applications" class="nav-link">Applications</a></li>
-          <li><a href="/announcements" class="nav-link">Announcements</a></li>
-          ${renderAdminNavItem('admin')}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <div class="nav-actions">${renderUserSessionControls()}</div>
-    </div>
-  </header>
+  ${renderSharedHeader()}
 
   <main class="container" style="max-width: 1140px; padding-top: 24px; padding-bottom: 72px;">
     <div style="margin-bottom: 24px;">

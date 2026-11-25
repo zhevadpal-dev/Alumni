@@ -6,6 +6,7 @@ require('dotenv').config();
 const requestLogger = require('./middlewares/logger');
 const { sessionMiddleware } = require('./middlewares/session');
 const { attachCurrentUser } = require('./middlewares/authMiddleware');
+const { navMiddleware } = require('./middlewares/navMiddleware');
 const guardian404 = require('./middlewares/guardian404');
 const guardian5xx = require('./middlewares/guardian5xx');
 const routes = require('./routes');
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 app.use(attachCurrentUser);
+app.use(navMiddleware);
 
 // Lightweight parser for multipart/form-data text fields in Postman/dev environments
 app.use((req, res, next) => {

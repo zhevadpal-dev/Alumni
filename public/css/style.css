@@ -3160,3 +3160,16 @@ input[type="number"],
     padding: 20px 16px;
   }
 }
+
+/* Dynamic Navigation Active Link Pill Highlight */
+.nav-pill-menu .nav-link {
+  padding: 5px 11px;
+  border-radius: 100px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-pill-menu .nav-link.active {
+  color: #16191c !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.58);
+}

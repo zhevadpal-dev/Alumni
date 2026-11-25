@@ -116,6 +116,30 @@ function getCurrentUser() {
 }
 
 /**
+ * Store computed dynamic navigation state in the active request context.
+ * @param {{navItems: Array<{label: string, href: string}>, currentPath: string}} navState
+ */
+function setRequestNavState(navState) {
+  const store = sessionStorage.getStore();
+  if (store) {
+    store.navItems = navState.navItems;
+    store.currentPath = navState.currentPath;
+  }
+}
+
+/**
+ * Retrieve computed dynamic navigation items & currentPath for the active request.
+ * @returns {{navItems: Array<{label: string, href: string}>|null, currentPath: string}}
+ */
+function getRequestNavState() {
+  const store = sessionStorage.getStore();
+  return {
+    navItems: store && store.navItems ? store.navItems : null,
+    currentPath: store && store.currentPath ? store.currentPath : '/'
+  };
+}
+
+/**
  * Express middleware: parses signed session cookie, exposes res.locals.currentUser,
  * req.session, req.loginUser(user), and req.logoutUser().
  */
@@ -187,5 +211,7 @@ async function sessionMiddleware(req, res, next) {
 module.exports = {
   sessionMiddleware,
   getCurrentUser,
+  setRequestNavState,
+  getRequestNavState,
   COOKIE_NAME
 };

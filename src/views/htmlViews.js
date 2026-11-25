@@ -10,7 +10,7 @@
  * - Pastel Domain Taxonomy (Soft Violet for Alumni, Mint Green for Jobs, Canary Yellow for Applications, Petal Pink for Events)
  */
 
-const { getGlobalStyles, getHeadTags, BRAND_SVG_ICON, renderUserSessionControls, renderAdminNavItem } = require('./styles');
+const { getGlobalStyles, getHeadTags, renderSharedHeader } = require('./styles');
 const { getCurrentUser } = require('../middlewares/session');
 
 class HtmlViews {
@@ -39,54 +39,8 @@ class HtmlViews {
 </head>
 <body>
 
-  <!-- 1. FLOATING PILL TOP NAVIGATION BAR (STICKY HOMEBAR) -->
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="navAlumlyGradHome" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#FF9A76"/>
-                <stop offset="100%" stop-color="#FF528B"/>
-              </linearGradient>
-            </defs>
-            <!-- Bold Sans-Serif Capital Letter 'A' -->
-            <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
-            <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
-            <g transform="rotate(-13 16 8.5)">
-              <!-- Cap Under-Bevel / 3D Rim Layer -->
-              <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
-              <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-              <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradHome)"/>
-              <!-- Center Button Rivet -->
-              <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
-              <!-- Dangling Tassel Cord -->
-              <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-              <!-- Tassel Brush Accent -->
-              <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
-            </g>
-          </svg>
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <!-- Floating iOS-Style Pill Navigation -->
-      <nav class="nav-pill-menu">
-        <ul class="nav-links">
-          <li><a href="#directory" class="nav-link">Alumni Directory</a></li>
-          <li><a href="#jobs" class="nav-link">Job Board</a></li>
-          <li><a href="#applications" class="nav-link">Applications</a></li>
-          <li><a href="#pillars" class="nav-link">Platform</a></li>
-          ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
-    </div>
-  </header>
+  <!-- 1. FLOATING PILL TOP NAVIGATION BAR (DYNAMIC ROLE-BASED HEADER) -->
+  ${renderSharedHeader({ hideSignIn: true })}
 
   <!-- 2. HERO SECTION -->
   <section class="hero-section">
@@ -496,53 +450,7 @@ class HtmlViews {
 </head>
 <body>
   <!-- FLOATING PILL TOP NAVIGATION BAR -->
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="navAlumlyGradAbout" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#FF9A76"/>
-                <stop offset="100%" stop-color="#FF528B"/>
-              </linearGradient>
-            </defs>
-            <!-- Bold Sans-Serif Capital Letter 'A' -->
-            <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
-            <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
-            <g transform="rotate(-13 16 8.5)">
-              <!-- Cap Under-Bevel / 3D Rim Layer -->
-              <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
-              <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-              <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradAbout)"/>
-              <!-- Center Button Rivet -->
-              <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
-              <!-- Dangling Tassel Cord -->
-              <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-              <!-- Tassel Brush Accent -->
-              <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
-            </g>
-          </svg>
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <!-- Floating iOS-Style Pill Navigation -->
-      <nav class="nav-pill-menu">
-        <ul class="nav-links">
-          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
-          <li><a href="/jobs" class="nav-link">Job Board</a></li>
-          <li><a href="/applications" class="nav-link">Applications</a></li>
-          <li><a href="/announcements" class="nav-link">Announcements</a></li>
-          ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <!-- Right-Aligned Action Spacer / Logged-In Session -->
-      <div class="nav-actions">${renderUserSessionControls()}</div>
-    </div>
-  </header>
+  ${renderSharedHeader()}
 
   <div class="container" style="max-width: 1000px; padding-top: 24px; padding-bottom: 64px;">
     <!-- Page Header / Eyebrow -->
@@ -717,54 +625,7 @@ class HtmlViews {
       </head>
       <body>
         <!-- 1. FLOATING PILL TOP NAVIGATION BAR -->
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="navAlumlyGradUsers" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#FF9A76"/>
-                      <stop offset="100%" stop-color="#FF528B"/>
-                    </linearGradient>
-                  </defs>
-                  <!-- Bold Sans-Serif Capital Letter 'A' -->
-                  <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
-                  <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
-                  <g transform="rotate(-13 16 8.5)">
-                    <!-- Cap Under-Bevel / 3D Rim Layer -->
-                    <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
-                    <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-                    <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradUsers)"/>
-                    <!-- Center Button Rivet -->
-                    <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
-                    <!-- Dangling Tassel Cord -->
-                    <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-                    <!-- Tassel Brush Accent -->
-                    <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
-                  </g>
-                </svg>
-              </span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-
-            <!-- Floating iOS-Style Pill Navigation -->
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active" style="color: var(--color-ink-black); font-weight: 700;">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-              </ul>
-            </nav>
-
-            <!-- Right-Aligned Action Spacer (Empty column to preserve centered pill alignment) -->
-            <div class="nav-actions">${renderUserSessionControls()}</div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 1100px; padding-top: 24px; padding-bottom: 64px;">
           <div style="margin-bottom: 28px;">
@@ -870,50 +731,7 @@ class HtmlViews {
         ${getHeadTags(`${user.name} - Profile | Alumly`)}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="navAlumlyGradUserProf" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#FF9A76"/>
-                      <stop offset="100%" stop-color="#FF528B"/>
-                    </linearGradient>
-                  </defs>
-                  <!-- Bold Sans-Serif Capital Letter 'A' -->
-                  <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
-                  <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
-                  <g transform="rotate(-13 16 8.5)">
-                    <!-- Cap Under-Bevel / 3D Rim Layer -->
-                    <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
-                    <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-                    <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradUserProf)"/>
-                    <!-- Center Button Rivet -->
-                    <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
-                    <!-- Dangling Tassel Cord -->
-                    <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-                    <!-- Tassel Brush Accent -->
-                    <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
-                  </g>
-                </svg>
-              </span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">
-              ${renderUserSessionControls('<a href="/users" class="btn btn-secondary btn-sm">&larr; Directory</a>')}
-            </div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 720px; padding-top: 32px; padding-bottom: 64px;">
           ${flashBanner}
@@ -1011,50 +829,7 @@ class HtmlViews {
         ${getHeadTags(`Edit User: ${user.name} | Alumly`)}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="navAlumlyGradEditUser" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#FF9A76"/>
-                      <stop offset="100%" stop-color="#FF528B"/>
-                    </linearGradient>
-                  </defs>
-                  <!-- Bold Sans-Serif Capital Letter 'A' -->
-                  <path d="M8.5 26L14.2 11.5H17.8L23.5 26H20.2L18.6 21.5H13.4L11.8 26H8.5ZM14.3 18.5H17.7L16 13.8L14.3 18.5Z" fill="#FFFFFF"/>
-                  <!-- Graduation Cap (Mortarboard & Tassel) Tilted -13deg -->
-                  <g transform="rotate(-13 16 8.5)">
-                    <!-- Cap Under-Bevel / 3D Rim Layer -->
-                    <polygon points="16,13 25.5,8.5 24.5,9.6 16,14.1 7.5,9.6 6.5,8.5" fill="#D93B68"/>
-                    <!-- Mortarboard Diamond Top in Radiant Peach-to-Pink Gradient -->
-                    <polygon points="16,4 25.5,8.5 16,13 6.5,8.5" fill="url(#navAlumlyGradEditUser)"/>
-                    <!-- Center Button Rivet -->
-                    <circle cx="16" cy="8.5" r="1.1" fill="#FFFFFF"/>
-                    <!-- Dangling Tassel Cord -->
-                    <path d="M16 8.5 C 11.5 8.5 7.8 9.2 7.2 11.2 C 6.8 12.8 7 14.8 7 16.5" stroke="#FF8FB3" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-                    <!-- Tassel Brush Accent -->
-                    <rect x="5.8" y="16.5" width="2.4" height="3.2" rx="1.2" fill="#FF528B"/>
-                  </g>
-                </svg>
-              </span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active" style="font-weight: 700;">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">
-              ${renderUserSessionControls(`<a href="/users/${user.id}" class="btn btn-secondary btn-sm">&larr; Profile</a>`)}
-            </div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 800px; padding-top: 32px; padding-bottom: 64px;">
           ${flashBanner}
@@ -1164,26 +939,7 @@ class HtmlViews {
         ${getHeadTags('Registration Successful | Alumly')}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">${renderUserSessionControls()}</div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 650px; padding-top: 32px; padding-bottom: 64px;">
           <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
@@ -1230,26 +986,7 @@ class HtmlViews {
         ${getHeadTags('User Updated | Alumly')}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">${renderUserSessionControls()}</div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 650px; padding-top: 32px; padding-bottom: 64px;">
           <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
@@ -1296,26 +1033,7 @@ class HtmlViews {
         ${getHeadTags('User Deleted | Alumly')}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">${renderUserSessionControls()}</div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 600px; padding-top: 32px; padding-bottom: 64px;">
           <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">
@@ -1357,26 +1075,7 @@ class HtmlViews {
         ${getHeadTags('Error | Alumly')}
       </head>
       <body>
-        <header class="top-nav">
-          <div class="nav-wrapper">
-            <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-              <span class="nav-logo-icon" aria-hidden="true">${BRAND_SVG_ICON}</span>
-              <span class="nav-brand-text">Alumly</span>
-            </a>
-            <nav class="nav-pill-menu">
-              <ul class="nav-links">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/users" class="nav-link active">Alumni Directory</a></li>
-                <li><a href="/jobs" class="nav-link">Job Board</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="/announcements" class="nav-link">Announcements</a></li>
-                ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-              </ul>
-            </nav>
-            <div class="nav-actions">${renderUserSessionControls()}</div>
-          </div>
-        </header>
+        ${renderSharedHeader()}
 
         <div class="container" style="max-width: 600px; padding-top: 32px; padding-bottom: 64px;">
           <div class="glass-form-card" style="text-align: center; padding: 40px 28px;">

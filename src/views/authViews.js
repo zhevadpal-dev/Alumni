@@ -5,7 +5,7 @@
  * canonical Alumly iOS Glassmorphism Design System.
  */
 
-const { getHeadTags, BRAND_SVG_ICON, renderUserSessionControls, renderAdminNavItem } = require('./styles');
+const { getHeadTags, renderSharedHeader } = require('./styles');
 
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
@@ -54,33 +54,7 @@ class AuthViews {
   ${getHeadTags('Create Account | Alumly')}
 </head>
 <body>
-  <!-- Unified Full-Width 3-Column CSS Grid Header -->
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          ${BRAND_SVG_ICON}
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <!-- Centered Floating iOS-Style Frosted-Glass Pill Navigation -->
-      <nav class="nav-pill-menu" aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
-          <li><a href="/jobs" class="nav-link">Job Board</a></li>
-          <li><a href="/applications" class="nav-link">Applications</a></li>
-          <li><a href="/announcements" class="nav-link">Announcements</a></li>
-          ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <!-- Right Column: Logged-in User Pill or Balancing Spacer -->
-      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
-    </div>
-  </header>
+  ${renderSharedHeader({ hideSignIn: true })}
 
   <!-- Centered Frosted-Glass Registration Stage -->
   <main class="container register-stage">
@@ -749,33 +723,7 @@ class AuthViews {
   ${getHeadTags('Sign In | Alumly')}
 </head>
 <body>
-  <!-- Unified Full-Width 3-Column CSS Grid Header -->
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          ${BRAND_SVG_ICON}
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <!-- Centered Floating iOS-Style Frosted-Glass Pill Navigation -->
-      <nav class="nav-pill-menu" aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
-          <li><a href="/jobs" class="nav-link">Job Board</a></li>
-          <li><a href="/applications" class="nav-link">Applications</a></li>
-          <li><a href="/announcements" class="nav-link">Announcements</a></li>
-          ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <!-- Right Column: Logged-in User Pill or Balancing Spacer -->
-      <div class="nav-actions">${renderUserSessionControls('', { hideSignIn: true })}</div>
-    </div>
-  </header>
+  ${renderSharedHeader({ hideSignIn: true })}
 
   <!-- Compact Centered Frosted-Glass Login Stage -->
   <main class="container login-stage">
@@ -893,30 +841,7 @@ class AuthViews {
   ${getHeadTags('403 - Access Denied | Alumly')}
 </head>
 <body>
-  <header class="top-nav">
-    <div class="nav-wrapper">
-      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
-        <span class="nav-logo-icon" aria-hidden="true">
-          ${BRAND_SVG_ICON}
-        </span>
-        <span class="nav-brand-text">Alumly</span>
-      </a>
-
-      <nav class="nav-pill-menu" aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
-          <li><a href="/jobs" class="nav-link">Job Board</a></li>
-          <li><a href="/applications" class="nav-link">Applications</a></li>
-          <li><a href="/announcements" class="nav-link">Announcements</a></li>
-          ${renderAdminNavItem()}
-          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
-        </ul>
-      </nav>
-
-      <div class="nav-actions">${renderUserSessionControls()}</div>
-    </div>
-  </header>
+  ${renderSharedHeader()}
 
   <main class="container" style="max-width: 560px; padding-top: 56px; padding-bottom: 72px;">
     <div class="register-glass-card" style="text-align: center; padding: 48px 32px;">

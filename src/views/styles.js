@@ -5,7 +5,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { getCurrentUser } = require('../middlewares/session');
+const { getCurrentUser, getRequestNavState } = require('../middlewares/session');
+const { getNavItemsForRole } = require('../middlewares/navMiddleware');
 
 let cachedCss = null;
 
@@ -177,11 +178,81 @@ function renderAdminNavItem(activeTab = '') {
   return `<li><a href="/admin" class="nav-link${isActive ? ' active' : ''}"${activeStyle}>Admin Panel</a></li>`;
 }
 
+/**
+ * Determine whether a navigation item matches the current request path.
+ * @param {string} href
+ * @param {string} currentPath
+ * @returns {boolean}
+ */
+function isNavItemActive(href, currentPath) {
+  const normalizedPath = (currentPath || '/').replace(/\/+$/, '') || '/';
+  if (href === '/') {
+    return normalizedPath === '/' || normalizedPath === '/home' || normalizedPath === '/main';
+  }
+  if (href === '/jobs/new') {
+    return normalizedPath === '/jobs/new';
+  }
+  if (href === '/jobs') {
+    return (normalizedPath === '/jobs' || normalizedPath.startsWith('/jobs/')) && normalizedPath !== '/jobs/new';
+  }
+  return normalizedPath === href || normalizedPath.startsWith(`${href}/`);
+}
+
+/**
+ * Unified Full-Width 3-Column CSS Grid Shared Header Partial.
+ * Dynamically renders role-appropriate navItems from navMiddleware with active-link
+ * highlighting, Alumly logo flush left, floating frosted-glass pill centered,
+ * and dynamic right column (user profile pill when logged in, clean spacer or subtle Sign In when logged out).
+ *
+ * @param {Object} [options={}]
+ * @param {string} [options.extraRightHtml=''] - Optional contextual CTA (e.g., '+ Post Job')
+ * @param {boolean} [options.hideSignIn=false] - Keep right column empty when logged out (e.g., Home, Login, Register)
+ * @returns {string} HTML markup
+ */
+function renderSharedHeader(options = {}) {
+  const { extraRightHtml = '', hideSignIn = false } = options;
+  const user = getCurrentUser();
+  const { navItems: ctxNavItems, currentPath } = getRequestNavState();
+  const navItems = ctxNavItems || getNavItemsForRole(user ? user.role : null);
+
+  const navLinksHtml = navItems
+    .map((item) => {
+      const active = isNavItemActive(item.href, currentPath);
+      return `<li><a href="${escapeAttr(item.href)}" class="nav-link${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''}>${escapeAttr(item.label)}</a></li>`;
+    })
+    .join('\n          ');
+
+  return `
+  <!-- Unified Full-Width 3-Column CSS Grid Dynamic Header -->
+  <header class="top-nav">
+    <div class="nav-wrapper">
+      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+        <span class="nav-logo-icon" aria-hidden="true">
+          ${BRAND_SVG_ICON}
+        </span>
+        <span class="nav-brand-text">Alumly</span>
+      </a>
+
+      <!-- Centered Floating iOS-Style Frosted-Glass Pill Navigation -->
+      <nav class="nav-pill-menu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          ${navLinksHtml}
+        </ul>
+      </nav>
+
+      <!-- Right Column: Logged-In User Pill or Contextual Action / Spacer -->
+      <div class="nav-actions">${renderUserSessionControls(extraRightHtml, { hideSignIn })}</div>
+    </div>
+  </header>
+  `;
+}
+
 module.exports = {
   getGlobalStyles,
   getHeadTags,
   BRAND_SVG_ICON,
   getBrandLogoHtml,
   renderUserSessionControls,
-  renderAdminNavItem
+  renderAdminNavItem,
+  renderSharedHeader
 };
