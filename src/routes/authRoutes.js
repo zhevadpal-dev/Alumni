@@ -10,11 +10,12 @@ const express = require('express');
 const router = express.Router();
 const AuthController = require('../controllers/authController');
 const asyncHandler = require('../middlewares/asyncHandler');
+const { requireGuest } = require('../middlewares/authMiddleware');
 
-router.get('/register', asyncHandler(AuthController.renderRegister));
-router.post('/register', asyncHandler(AuthController.handleRegister));
-router.get('/login', asyncHandler(AuthController.renderLogin));
-router.post('/login', asyncHandler(AuthController.handleLogin));
+router.get('/register', requireGuest, asyncHandler(AuthController.renderRegister));
+router.post('/register', requireGuest, asyncHandler(AuthController.handleRegister));
+router.get('/login', requireGuest, asyncHandler(AuthController.renderLogin));
+router.post('/login', requireGuest, asyncHandler(AuthController.handleLogin));
 router.post('/logout', asyncHandler(AuthController.handleLogout));
 router.get('/logout', asyncHandler(AuthController.handleLogout));
 

@@ -113,14 +113,27 @@ class AuthController {
       return res.redirect('/');
     }
 
+    const notice = req.query?.msg ? String(req.query.msg) : null;
+    const nextUrl =
+      req.query?.next &&
+      String(req.query.next).startsWith('/') &&
+      !String(req.query.next).startsWith('//')
+        ? String(req.query.next)
+        : '';
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(AuthViews.renderLoginPage());
+    return res.status(200).send(
+      AuthViews.renderLoginPage({
+        notice,
+        nextUrl
+      })
+    );
   }
 
   /**
    * POST /login
    * Authenticates email + password against PostgreSQL scrypt hash, establishes
-   * signed HTTP-only session cookie, and redirects to / (or returns JSON).
+   * signed HTTP-only session cookie, and redirects to / (or safe nextUrl / JSON).
    */
   static async handleLogin(req, res) {
     const acceptsJsonOnly =
@@ -131,6 +144,11 @@ class AuthController {
 
     const email = req.body?.email || '';
     const password = req.body?.password || '';
+    const rawNext = req.body?.next || req.query?.next || '';
+    const safeNext =
+      rawNext && String(rawNext).startsWith('/') && !String(rawNext).startsWith('//')
+        ? String(rawNext)
+        : '/';
 
     try {
       const user = await UserModel.authenticate(email, password);
@@ -147,7 +165,7 @@ class AuthController {
         });
       }
 
-      return res.redirect('/');
+      return res.redirect(safeNext);
     } catch (err) {
       const statusCode = err.statusCode && err.statusCode < 500 ? err.statusCode : 401;
 
@@ -162,7 +180,8 @@ class AuthController {
       return res.status(statusCode).send(
         AuthViews.renderLoginPage({
           error: err.message,
-          values: { email }
+          values: { email },
+          nextUrl: safeNext !== '/' ? safeNext : ''
         })
       );
     }

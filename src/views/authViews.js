@@ -716,7 +716,19 @@ class AuthViews {
    * @returns {string} HTML markup
    */
   static renderLoginPage(options = {}) {
-    const { error = null, values = {} } = options;
+    const { error = null, notice = null, values = {}, nextUrl = '' } = options;
+
+    const noticeAlertHtml =
+      notice && !error
+        ? `
+        <div class="glass-alert-info" role="status" aria-live="polite">
+          <div class="glass-alert-info-icon" aria-hidden="true">i</div>
+          <div class="glass-alert-body">
+            <p>${escapeHtml(notice)}</p>
+          </div>
+        </div>
+      `
+        : '';
 
     const errorAlertHtml = error
       ? `
@@ -772,9 +784,11 @@ class AuthViews {
         <p class="register-subtitle">Access the alumni directory, career board, and your saved applications.</p>
       </div>
 
+      ${noticeAlertHtml}
       ${errorAlertHtml}
 
       <form action="/login" method="POST" id="loginForm">
+        ${nextUrl ? `<input type="hidden" name="next" value="${escapeHtml(nextUrl)}" />` : ''}
         <div class="form-group">
           <label for="loginEmail">Email Address *</label>
           <input
@@ -848,6 +862,73 @@ class AuthViews {
       });
     })();
   </script>
+</body>
+</html>`;
+  }
+
+  /**
+   * Render Alumly iOS Glassmorphism 403 Access Denied Page
+   *
+   * @param {Object} [options={}]
+   * @param {string} [options.message] - Explanation of why access was denied
+   * @param {Array<string>} [options.requiredRoles=[]] - Optional list of permitted roles
+   * @returns {string} HTML markup
+   */
+  static renderForbiddenPage(options = {}) {
+    const {
+      message = 'You do not have permission to access this resource.',
+      requiredRoles = []
+    } = options;
+
+    const rolesBadgeHtml =
+      requiredRoles.length > 0
+        ? `<div style="display: inline-block; font-family: var(--font-mono); font-size: 0.78rem; background: rgba(255, 255, 255, 0.58); color: #4d5358; padding: 6px 14px; border-radius: 100px; border: 1px solid rgba(255, 255, 255, 0.8); margin-bottom: 24px;">Permitted roles: ${escapeHtml(requiredRoles.map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(', '))}</div>`
+        : '';
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  ${getHeadTags('403 - Access Denied | Alumly')}
+</head>
+<body>
+  <header class="top-nav">
+    <div class="nav-wrapper">
+      <a href="/" class="nav-logo" title="Alumly — Alumni & Career Network">
+        <span class="nav-logo-icon" aria-hidden="true">
+          ${BRAND_SVG_ICON}
+        </span>
+        <span class="nav-brand-text">Alumly</span>
+      </a>
+
+      <nav class="nav-pill-menu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/users" class="nav-link">Alumni Directory</a></li>
+          <li><a href="/jobs" class="nav-link">Job Board</a></li>
+          <li><a href="/applications" class="nav-link">Applications</a></li>
+          <li><a href="/announcements" class="nav-link">Announcements</a></li>
+          <li><a href="/api/swagger" target="_blank" class="nav-link">API Docs</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">${renderUserSessionControls()}</div>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 560px; padding-top: 56px; padding-bottom: 72px;">
+    <div class="register-glass-card" style="text-align: center; padding: 48px 32px;">
+      <span class="badge" style="background: rgba(254, 242, 242, 0.78); border: 1px solid rgba(239, 68, 68, 0.3); color: #b91c1c; margin-bottom: 16px;">● HTTP 403</span>
+      <div style="font-family: var(--font-serif); font-size: 4.5rem; font-weight: 600; line-height: 1; color: #16191c; margin-bottom: 12px; letter-spacing: -0.04em;">403</div>
+      <h1 style="font-family: var(--font-serif); font-size: 1.9rem; font-weight: 600; color: #16191c; margin: 0 0 12px 0; letter-spacing: -0.02em;">Access Denied</h1>
+      <p style="color: #4a4a4c; font-size: 0.98rem; margin: 0 auto 22px auto; max-width: 420px; line-height: 1.55;">
+        ${escapeHtml(message)}
+      </p>
+      ${rolesBadgeHtml}
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <a href="/" class="btn btn-primary" style="padding: 12px 32px;">← Back to Home</a>
+      </div>
+    </div>
+  </main>
 </body>
 </html>`;
   }

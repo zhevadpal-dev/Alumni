@@ -14,29 +14,35 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController');
+const asyncHandler = require('../middlewares/asyncHandler');
+const {
+  requireAuth,
+  requireRole,
+  requireOwnerOrAdmin
+} = require('../middlewares/authMiddleware');
 
-// 1. READ (List View with embedded Create Form)
-router.get('/users', UserController.getAllUsers);
+// 1. READ (Public Alumni Directory browsing)
+router.get('/users', asyncHandler(UserController.getAllUsers));
 
-// 2. CREATE (Process form submission -> Success View)
-router.post('/users', UserController.createUser);
+// 2. CREATE (Admin-only direct user record creation from directory)
+router.post('/users', requireAuth, requireRole('admin'), asyncHandler(UserController.createUser));
 
-// 3. READ (Single User Profile View)
-router.get('/users/:id', UserController.getUserById);
+// 3. READ (Single User Profile View — requires authentication)
+router.get('/users/:id', requireAuth, asyncHandler(UserController.getUserById));
 
-// 4. UPDATE (Edit Form View)
-router.get('/users/:id/edit', UserController.renderEditForm);
+// 4. UPDATE (Edit Form View — profile owner or Admin only)
+router.get('/users/:id/edit', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.renderEditForm));
 
-// 5. UPDATE (Full Replacement Action -> Updated View)
-router.put('/users/:id', UserController.updateUserPut);
-router.post('/users/:id/edit', UserController.updateUserPut);
-router.post('/users/:id/update', UserController.updateUserPut);
+// 5. UPDATE (Full Replacement Action — profile owner or Admin only)
+router.put('/users/:id', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.updateUserPut));
+router.post('/users/:id/edit', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.updateUserPut));
+router.post('/users/:id/update', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.updateUserPut));
 
-// 6. UPDATE (Partial Modification Action -> Updated View)
-router.patch('/users/:id', UserController.updateUserPatch);
+// 6. UPDATE (Partial Modification Action — profile owner or Admin only)
+router.patch('/users/:id', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.updateUserPatch));
 
-// 7. DELETE (Delete Action -> Deleted View)
-router.delete('/users/:id', UserController.deleteUser);
-router.post('/users/:id/delete', UserController.deleteUser);
+// 7. DELETE (Delete Action — profile owner or Admin only)
+router.delete('/users/:id', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.deleteUser));
+router.post('/users/:id/delete', requireAuth, requireOwnerOrAdmin, asyncHandler(UserController.deleteUser));
 
 module.exports = router;

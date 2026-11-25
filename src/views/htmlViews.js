@@ -694,10 +694,15 @@ class HtmlViews {
         </div>
         <div class="action-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
           <a href="/users/${u.id}" class="btn-glass-pill btn-view">🔍 View</a>
+          ${(() => {
+            const cu = getCurrentUser();
+            const canEditRow = cu && (Number(cu.id) === Number(u.id) || String(cu.role || '').toLowerCase() === 'admin');
+            return canEditRow ? `
           <a href="/users/${u.id}/edit" class="btn-glass-pill btn-edit">✏️ Edit</a>
           <form action="/users/${u.id}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete user ${u.name}?');">
             <button type="submit" class="btn-glass-pill btn-delete">🗑️ Delete</button>
-          </form>
+          </form>` : '';
+          })()}
         </div>
       </div>
     `).join('');
@@ -853,6 +858,8 @@ class HtmlViews {
     const flashBanner = this.renderFlashBanner(query);
     const currentUser = getCurrentUser();
     const isOwnProfile = Boolean(currentUser && Number(currentUser.id) === Number(user.id));
+    const isAdmin = Boolean(currentUser && String(currentUser.role || '').toLowerCase() === 'admin');
+    const canManageProfile = isOwnProfile || isAdmin;
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -910,12 +917,13 @@ class HtmlViews {
           <div class="glass-form-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
               <a href="/users" class="btn-glass-pill btn-view">&larr; Back to Directory</a>
+              ${canManageProfile ? `
               <div class="action-group" style="display: flex; gap: 8px;">
                 <a href="/users/${user.id}/edit" class="btn-glass-pill btn-edit">✏️ Edit Profile</a>
                 <form action="/users/${user.id}/delete" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete ${user.name}?');">
                   <button type="submit" class="btn-glass-pill btn-delete">🗑️ Delete</button>
                 </form>
-              </div>
+              </div>` : ''}
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
