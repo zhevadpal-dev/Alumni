@@ -2698,3 +2698,51 @@ input[type="number"],
   color: #ffffff;
   border-color: #16191c;
 }
+
+/* ==========================================================================
+   18. SHOW/HIDE PASSWORD TOGGLE BUTTONS
+   ========================================================================== */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input {
+  padding-right: 44px !important;
+  box-sizing: border-box;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: #64686e;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #16191c;
+}
+
+.password-toggle-btn .icon-eye-off {
+  display: none;
+}
+
+.password-toggle-btn.is-visible .icon-eye {
+  display: none;
+}
+
+.password-toggle-btn.is-visible .icon-eye-off {
+  display: block;
+}

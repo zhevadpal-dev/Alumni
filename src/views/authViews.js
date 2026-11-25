@@ -155,16 +155,36 @@ class AuthViews {
 
           <div class="form-group">
             <label for="password">Password *</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control"
-              placeholder="Create a strong password"
-              minlength="8"
-              autocomplete="new-password"
-              required
-            />
+            <div class="password-input-wrapper">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control password-input"
+                placeholder="Create a strong password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle-btn"
+                data-target="password"
+                aria-label="Toggle password visibility"
+                aria-pressed="false"
+              >
+                <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c6.4 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                  <path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3.6 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                  <line x1="2" y1="2" x2="22" y2="22"/>
+                </svg>
+              </button>
+            </div>
             <div class="password-checklist" id="passwordChecklist" aria-live="polite">
               <span class="pw-rule" data-rule="length"><span class="pw-icon" aria-hidden="true">○</span> 8+ chars</span>
               <span class="pw-rule" data-rule="upper"><span class="pw-icon" aria-hidden="true">○</span> Uppercase</span>
@@ -176,16 +196,36 @@ class AuthViews {
 
           <div class="form-group">
             <label for="confirmPassword">Confirm Password *</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              class="form-control"
-              placeholder="Re-enter your password"
-              minlength="8"
-              autocomplete="new-password"
-              required
-            />
+            <div class="password-input-wrapper">
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                class="form-control password-input"
+                placeholder="Re-enter your password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle-btn"
+                data-target="confirmPassword"
+                aria-label="Toggle password visibility"
+                aria-pressed="false"
+              >
+                <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c6.4 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                  <path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3.6 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                  <line x1="2" y1="2" x2="22" y2="22"/>
+                </svg>
+              </button>
+            </div>
             <span class="form-hint" id="passwordMatchHint">Re-type your password to confirm.</span>
           </div>
         </div>
@@ -486,6 +526,20 @@ class AuthViews {
       });
 
       updatePasswordChecklist();
+
+      // Independent Show/Hide Password Toggle Buttons
+      var toggleButtons = document.querySelectorAll('.password-toggle-btn');
+      toggleButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('data-target');
+          var input = document.getElementById(targetId);
+          if (!input) return;
+          var isCurrentlyHidden = input.type === 'password';
+          input.type = isCurrentlyHidden ? 'text' : 'password';
+          btn.classList.toggle('is-visible', isCurrentlyHidden);
+          btn.setAttribute('aria-pressed', String(isCurrentlyHidden));
+        });
+      });
 
       // Scrollable iOS Glassmorphism Combobox for Department / Major
       var MAJORS = [
