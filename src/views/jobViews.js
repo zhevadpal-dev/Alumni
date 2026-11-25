@@ -996,7 +996,7 @@ class JobViews {
           <div class="glass-form-card">
             <div class="card-header" style="margin-bottom: 24px;">
               <div>
-                <h2 class="card-title">✏️ Edit Job Posting #${job.id}</h2>
+                <h2 class="card-title">${escapeHtml(job.title)}</h2>
                 <p style="color: #4a4a4c; font-size: 0.9rem; margin: 4px 0 0 0;">
                   Update job requirements, compensation, and publication lifecycle status.
                 </p>

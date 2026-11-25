@@ -384,7 +384,7 @@ class AnnouncementViews {
           ${flashBanner}
 
           <div class="glass-form-card">
-            <h1 style="font-family: var(--font-serif); margin: 0 0 6px 0; font-size: 1.65rem; color: #16191c;">✏️ Edit Announcement #${announcement.id}</h1>
+            <h1 style="font-family: var(--font-serif); margin: 0 0 6px 0; font-size: 1.65rem; color: #16191c;">${escapeHtml(announcement.title)}</h1>
             <p style="color: #4a4a4c; margin: 0 0 24px 0; font-size: 0.92rem;">Update the announcement title, body, author, or category.</p>
 
             <form action="/announcements/${announcement.id}/edit" method="POST">
