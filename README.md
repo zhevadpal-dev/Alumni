@@ -31,7 +31,7 @@ Comprehensive specifications for the **Alumly** brand identity and iOS glassmorp
 - **📅 Events & Reunions:** Scheduling and RSVP tracking for homecomings, professional webinars, networking sessions, and panels.
 - **🤝 Alumni Networking & Mentorship:** Directory search and mentorship matching connecting current students with established alumni.
 - **📊 Analytics & Institutional Insights:** Aggregated metrics on employment rates, industry distribution, and geographic alumni dispersal.
-- **🔐 Security & Access Control:** JWT-based stateless authentication and Role-Based Access Control (Admin, Alumni, Student).
+- **🔐 Authentication & Role-Based Access Control:** HMAC-SHA256 signed HTTP-only cookie sessions, `crypto.scrypt` salted password hashing, mandatory KVKK consent, dynamic role-based navigation, data-isolated personal workspaces (`/my-applications`, `/my-jobs`, `/profile`), and an `Admin`-only management dashboard (`/admin`).
 
 ---
 
@@ -782,6 +782,64 @@ Pre-configured in `alumni-api.postman_collection.json` and `Alumni Tracking Syst
 | `POST` | `/api/auth/login` | Authenticate user and issue JWT bearer token |
 | `GET` | `/api/alumni` | Search and filter verified graduate records |
 | `GET` | `/api/alumni/:id` | Retrieve comprehensive verified alumni dossier |
+
+---
+
+## 🔐 Authentication & Authorization
+
+**Alumly** implements a production-ready, defense-in-depth authentication and Role-Based Access Control (RBAC) architecture across both server-rendered HTML views and JSON API endpoints, aligned with `ddd.md`.
+
+### Authentication Flow
+
+- **Account Registration (`GET /register`, `POST /register`):**
+  - Renders the Alumly iOS glassmorphism registration page (protected by `requireGuest` so already signed-in users are redirected to `/`).
+  - **Password Hashing (`src/utils/password.js`):** Uses Node.js's built-in memory-hard **`crypto.scrypt`** algorithm with a per-user random 16-byte salt (`scrypt$<saltHex>$<hashHex>`) and constant-time comparison (`crypto.timingSafeEqual`).
+  - **Strong Password Policy:** Enforced both in real time via a live 5-rule UI checklist and strictly on the server in `UserModel.register`:
+    1. Minimum **8 characters**
+    2. At least **1 uppercase letter** (`A-Z`)
+    3. At least **1 lowercase letter** (`a-z`)
+    4. At least **1 numeric digit** (`0-9`)
+    5. At least **1 special character** (`!@#$%^&*`, etc.)
+  - **Mandatory KVKK / Personal Data Protection Consent:** Users must review and accept the KVKK privacy notice (presented in an interactive frosted-glass modal) before account creation. Both the frontend form and backend validator reject submissions without explicit consent (`kvkkConsent`), storing consent status and timestamp in PostgreSQL (`kvkk_accepted`, `kvkk_accepted_at`).
+  - **Automatic Login:** Upon successful registration, `req.loginUser(newUser)` immediately issues a signed session cookie so the new member is signed in and recognized across all pages.
+- **Sign In (`GET /login`, `POST /login`):**
+  - Validates email and password against the stored `scrypt` hash in PostgreSQL via `UserModel.authenticate`.
+  - Returns a generic `"Invalid email or password"` error on failure to prevent account enumeration, while preserving the entered email address.
+  - Supports safe internal `next` return URLs so visitors redirected from protected pages land back where they intended to go.
+- **Session Management (`src/middlewares/session.js`):**
+  - Persists user sessions in a tamper-proof, **HMAC-SHA256 signed HTTP-only cookie** (`alumly_session`, `SameSite=Lax`, 7-day expiry) backed by `SESSION_SECRET`.
+  - Uses Node.js `AsyncLocalStorage` to expose the active user and dynamic navigation state (`res.locals.currentUser`, `res.locals.navItems`) globally across all controllers and views.
+  - Synchronizes the user's current role directly from PostgreSQL on each request so role promotions/demotions take effect immediately without stale session cookies.
+- **Sign Out (`POST /logout`, `GET /logout`):**
+  - Clears the `alumly_session` cookie cleanly (`req.logoutUser()`) and redirects to `/`. In the UI, the `Log Out` action lives inside the user's own profile card (`/users/:id` or `/profile`), keeping the top-right header pill focused on direct profile navigation.
+
+### Auth Middleware (`src/middlewares/authMiddleware.js`)
+
+| Middleware | Responsibility | Unauthorized / Unauthenticated Behavior |
+| :--- | :--- | :--- |
+| **`attachCurrentUser`** | Global middleware that attaches `req.session.user` to `res.locals.currentUser` on every incoming request so all templates share consistent auth state. | Sets `res.locals.currentUser = null` for guests. |
+| **`requireAuth`** | Guards private routes and personal workspaces that require an active signed-in session. | Web: `302` redirect to `/login?msg=...&next=...`<br>API/JSON: `401 Unauthorized` JSON. |
+| **`requireGuest`** | Restricts `/login` and `/register` to unauthenticated visitors only. | Web: `302` redirect to `/`<br>API/JSON: `403 Forbidden` JSON. |
+| **`requireRole(...allowedRoles)`** | Case-insensitive RBAC guard factory restricting routes to specific roles (e.g., `requireRole('admin')` or `requireRole('alumni', 'faculty', 'teacher', 'admin')`). | Unauthenticated: delegates to `requireAuth`.<br>Wrong role: `403` Alumly glass Access Denied page (web) or `403` JSON (API). |
+| **`requireOwnerOrAdmin`** | Protects sensitive profile mutations (`/users/:id/edit`, `/users/:id/delete`, `PUT`/`PATCH`/`DELETE /users/:id`) so users can only modify their own profile unless they are an `Admin`. | `403` Alumly glass Access Denied page (web) or `403` JSON (API). |
+
+### Role-Based Access Control (RBAC) & Dynamic Navigation
+
+Navigation menus are computed centrally per request in `src/middlewares/navMiddleware.js` and rendered automatically by the unified 3-column CSS Grid header (`renderSharedHeader()` in `src/views/styles.js`):
+
+| Role | Accessible Routes & Capabilities | Personal / Role Workspaces | Dynamic Navigation Menu |
+| :--- | :--- | :--- | :--- |
+| **Guest** *(Logged Out)* | Public landing page (`/`), About (`/about`), read-only Job Board (`/jobs`, `/jobs/:id`), Announcements (`/announcements`), Sign In (`/login`), Register (`/register`), and Swagger API Docs (`/api/swagger`). | None (private routes redirect to `/login`) | `Home`, `Job Board`, `Announcements`, `About` *(+ `Sign In` / `Join Alumly`)* |
+| **Student** | All public pages + Alumni Directory (`/users`, `/users/:id`), apply to jobs (`POST /jobs/:id/apply`), edit own profile (`/users/:id/edit`). Blocked (`403`) from posting jobs, `/my-jobs`, and `/admin`. | `/my-applications` *(strictly filtered by `user_id = req.session.user.id`)*<br>`/profile` *(redirects to `/users/:id`)* | `Home`, `Alumni Directory`, `Job Board`, `My Applications`, `Announcements` |
+| **Alumni** *(+ Faculty / Teacher)* | All Student capabilities + create, edit, and delete job postings (`/jobs/new`, `/jobs/:id/edit`, `POST /jobs/:id/delete`) with automatic `poster_id` ownership assignment. Blocked (`403`) from `/admin`. | `/my-jobs` *(strictly filtered by `poster_id = req.session.user.id` with applicant counts)*<br>`/my-applications`, `/profile` | `Home`, `Alumni Directory`, `Job Board`, `My Jobs`, `Announcements` |
+| **Admin** | Unrestricted platform access: full user & role management, job moderation, institutional announcement publishing, application status management, and all personal workspaces. | `/admin` *(unified KPI & 4-tab CRUD dashboard)*<br>`/applications`, `/my-jobs`, `/my-applications`, `/profile` | `Home`, `Alumni Directory`, `Job Board`, `Applications`, `Announcements`, `Admin Panel` |
+
+### Security Notes
+
+- **Public Registration Role Restriction:** `POST /register` strictly whitelists `student` and `alumni` roles only. Any attempt to self-register as `admin`, `faculty`, or `teacher` is rejected at the backend model layer (`UserModel.register`).
+- **Database-Controlled Admin Assignment:** `Admin` privileges cannot be acquired through public registration; they are assigned directly via PostgreSQL migration/seed scripts (e.g., `src/migrations/005_promote_primary_admin.sql`) or promoted by an existing `Admin` inside `/admin`.
+- **Self-Lockout Protection:** Inside `/admin`, an authenticated administrator cannot demote or delete their own active Admin account.
+- **Data Isolation:** Personal workspaces (`/my-applications` and `/my-jobs`) derive ownership strictly from the verified server-side session (`req.session.user.id`) rather than trusting client-supplied user IDs.
 
 ---
 
